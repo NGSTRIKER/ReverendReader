@@ -19,11 +19,13 @@ import {
 interface ReaderInterfaceProps {
   manifest: ManifestData;
   initialChapterId?: number;
+  initialSettings?: ReaderSettings;
 }
 
 export function ReaderInterface({
   manifest,
   initialChapterId = 1,
+  initialSettings = DEFAULT_SETTINGS,
 }: ReaderInterfaceProps) {
   // Current Chapter State
   const [currentChapterId, setCurrentChapterId] = useState<number>(initialChapterId);
@@ -36,7 +38,17 @@ export function ReaderInterface({
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   // Preferences & Bookmarks State (Cookie + LocalStorage backed)
-  const [settings, setSettings] = useState<ReaderSettings>(DEFAULT_SETTINGS);
+  // Initialize lazily to prevent flashing to defaults if saved in client storage or SSR cookies
+  const [settings, setSettings] = useState<ReaderSettings>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        return loadThemeSettings();
+      } catch {
+        return initialSettings;
+      }
+    }
+    return initialSettings;
+  });
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
   const [customBgUrl, setCustomBgUrl] = useState<string | null>(null);
   const prevCustomBgRef = useRef<string | null>(null);
@@ -44,8 +56,8 @@ export function ReaderInterface({
   // Load saved preferences and bookmarks on mount from cookies/localStorage
   useEffect(() => {
     try {
-      const initialSettings = loadThemeSettings();
-      setSettings(initialSettings);
+      const stored = loadThemeSettings();
+      setSettings(stored);
 
       const initialBookmarks = loadBookmarks();
       setBookmarks(initialBookmarks);
@@ -61,7 +73,8 @@ export function ReaderInterface({
     } catch {
       // Ignore local storage / cookie read errors
     }
-  }, [initialChapterId, manifest.chapters.length]);
+    // Only run on initial mount
+  }, []);
 
   // Clean up object URLs when custom background changes or unmounts
   const handleSetCustomBg = useCallback((newUrl: string | null) => {
@@ -174,8 +187,27 @@ export function ReaderInterface({
     if (hasNext) setCurrentChapterId((prev) => prev + 1);
   };
 
+  const themePageStyles: Record<string, { bg: string; text: string }> = {
+    catppuccin: { bg: "bg-[#1e1e2e]", text: "text-[#cdd6f4]" },
+    "catppuccin-mocha": { bg: "bg-[#11111b]", text: "text-[#cdd6f4]" },
+    "catppuccin-pink": { bg: "bg-[#1d101a]", text: "text-[#f5e0dc]" },
+    "catppuccin-coffee": { bg: "bg-[#1a120e]", text: "text-[#f4ebd0]" },
+    "catppuccin-jade": { bg: "bg-[#0f1b14]", text: "text-[#e0ede4]" },
+    "catppuccin-latte": { bg: "bg-[#dce0e8]", text: "text-[#4c4f69]" },
+    acrylic: { bg: "bg-[#11111b]", text: "text-[#cdd6f4]" },
+    blur: { bg: "bg-[#11111b]", text: "text-[#cdd6f4]" },
+    transparent: { bg: "bg-[#11111b]", text: "text-[#cdd6f4]" },
+    black: { bg: "bg-[#09090b]", text: "text-zinc-100" },
+    slate: { bg: "bg-[#0f172a]", text: "text-slate-100" },
+    sepia: { bg: "bg-[#171412]", text: "text-[#f4ebd0]" },
+    dark: { bg: "bg-[#121212]", text: "text-[#e0e0e0]" },
+  };
+
+  const activeThemeStyle =
+    themePageStyles[settings.surfaceTheme] || themePageStyles.catppuccin;
+
   return (
-    <div className="relative min-h-screen bg-[#1e1e2e] text-[#cdd6f4]">
+    <div className={`relative min-h-screen ${activeThemeStyle.bg} ${activeThemeStyle.text} transition-colors duration-200`}>
       {/* Custom Background Image Layer */}
       {customBgUrl && (
         <div
@@ -199,6 +231,7 @@ export function ReaderInterface({
           onOpenSettings={() => setIsSettingsOpen(true)}
           isBookmarked={isCurrentBookmarked}
           onToggleBookmark={handleToggleBookmark}
+          settings={settings}
         />
 
         {/* Reading Canvas */}

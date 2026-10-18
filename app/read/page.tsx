@@ -1,8 +1,10 @@
 import fs from "fs";
 import path from "path";
 import { Metadata } from "next";
+import { cookies } from "next/headers";
 import { ManifestData } from "@/types/novel";
 import { ReaderInterface } from "@/components/reader/ReaderInterface";
+import { parseSettingsFromRaw } from "@/lib/storage";
 
 export const metadata: Metadata = {
   title: "Read Reverend Insanity | Distraction-Free Novel Reader",
@@ -37,10 +39,16 @@ export default async function ReadPage({ searchParams }: ReadPageProps) {
     }
   }
 
+  // Read saved theme settings from server-side cookies
+  const cookieStore = await cookies();
+  const themeCookie = cookieStore.get("reverend_theme_settings")?.value;
+  const initialSettings = parseSettingsFromRaw(themeCookie);
+
   return (
     <ReaderInterface
       manifest={manifest}
       initialChapterId={initialChapterId}
+      initialSettings={initialSettings}
     />
   );
 }

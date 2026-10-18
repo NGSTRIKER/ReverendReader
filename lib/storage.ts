@@ -11,28 +11,58 @@ export const DEFAULT_SETTINGS: ReaderSettings = {
 };
 
 /**
- * Set a cookie with 365-day persistence, SameSite=Lax
+ * Helper to parse a raw JSON or URI-encoded string into ReaderSettings
+ */
+export function parseSettingsFromRaw(raw: string | null | undefined): ReaderSettings {
+  if (!raw) return DEFAULT_SETTINGS;
+  try {
+    let jsonStr = raw;
+    try {
+      jsonStr = decodeURIComponent(raw);
+    } catch {
+      jsonStr = raw;
+    }
+    const parsed = JSON.parse(jsonStr);
+    if (parsed && typeof parsed === "object") {
+      return { ...DEFAULT_SETTINGS, ...parsed };
+    }
+  } catch {
+    // If double encoded or plain string
+    try {
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === "object") {
+        return { ...DEFAULT_SETTINGS, ...parsed };
+      }
+    } catch {
+      // Fallback
+    }
+  }
+  return DEFAULT_SETTINGS;
+}
+
+/**
+ * Set a cookie with 365-day persistence, SameSite=Lax, path=/
  */
 export function setCookie(name: string, value: string, days = 365): void {
   if (typeof document === "undefined") return;
   const expires = new Date(Date.now() + days * 864e5).toUTCString();
-  document.cookie = `${encodeURIComponent(name)}=${encodeURIComponent(value)}; expires=${expires}; path=/; SameSite=Lax`;
+  const maxAge = days * 86400;
+  document.cookie = `${encodeURIComponent(name)}=${encodeURIComponent(value)}; expires=${expires}; max-age=${maxAge}; path=/; SameSite=Lax`;
 }
 
 /**
- * Get a cookie value by name
+ * Get a cookie value by name (handles any spacing, multiple cookies, and URI encoding)
  */
 export function getCookie(name: string): string | null {
   if (typeof document === "undefined") return null;
-  const cookies = document.cookie ? document.cookie.split("; ") : [];
-  for (const c of cookies) {
-    const parts = c.split("=");
-    const key = decodeURIComponent(parts[0]);
-    if (key === name) {
-      return decodeURIComponent(parts.slice(1).join("="));
-    }
+  const escapedName = encodeURIComponent(name).replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+  const match = document.cookie.match(new RegExp(`(?:^|;\\s*)${escapedName}=([^;]*)`));
+  if (!match) return null;
+  try {
+    return decodeURIComponent(match[1]);
+  } catch {
+    return match[1];
   }
-  return null;
 }
 
 /**
@@ -52,20 +82,33 @@ export function saveThemeSettings(settings: ReaderSettings): void {
 }
 
 /**
- * Load theme settings from cookie with localStorage fallback
+ * Load theme settings from cookie with localStorage fallback, syncing if needed
  */
 export function loadThemeSettings(): ReaderSettings {
   try {
+    // 1. Try reading from cookie
     const fromCookie = getCookie("reverend_theme_settings");
     if (fromCookie) {
-      return { ...DEFAULT_SETTINGS, ...JSON.parse(fromCookie) };
+      const parsed = parseSettingsFromRaw(fromCookie);
+      // Keep localStorage in sync
+      try {
+        if (typeof localStorage !== "undefined") {
+          localStorage.setItem("reverend_theme_settings", JSON.stringify(parsed));
+        }
+      } catch {}
+      return parsed;
     }
+
+    // 2. Try reading from localStorage fallback
     if (typeof localStorage !== "undefined") {
       const fromLocal =
         localStorage.getItem("reverend_theme_settings") ||
         localStorage.getItem("reverend_reader_settings");
       if (fromLocal) {
-        return { ...DEFAULT_SETTINGS, ...JSON.parse(fromLocal) };
+        const parsed = parseSettingsFromRaw(fromLocal);
+        // Sync into cookie so server can read it on next page load / refresh
+        setCookie("reverend_theme_settings", JSON.stringify(parsed));
+        return parsed;
       }
     }
   } catch {
