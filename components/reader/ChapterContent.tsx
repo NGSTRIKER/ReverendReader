@@ -102,14 +102,19 @@ export function ChapterContent({
       .filter((p) => p.length > 0);
   }, [content]);
 
+  const isFullWidth = settings.maxWidth >= 9999;
+  const maxWidthStyle = isFullWidth ? "100%" : `${settings.maxWidth}px`;
+
   return (
     <article
       style={{
-        maxWidth: `${settings.maxWidth}px`,
+        maxWidth: maxWidthStyle,
         backgroundColor: surfaceBackground,
         ...textShadowStyle,
       }}
-      className={`relative mx-auto my-6 sm:my-10 rounded-xl border ${borderClass} px-6 sm:px-12 md:px-16 py-10 sm:py-16 ${containerShadow} transition-all duration-200 ${backdropClass} ${fontClass}`}
+      className={`relative mx-auto my-6 sm:my-10 rounded-xl border ${borderClass} px-6 sm:px-12 md:px-16 py-10 sm:py-16 ${containerShadow} transition-all duration-200 ${backdropClass} ${fontClass} ${
+        isFullWidth ? "w-[calc(100%-1rem)] sm:w-[calc(100%-2rem)] max-w-full" : ""
+      }`}
     >
       {/* Chapter Heading */}
       <header className="mb-10 sm:mb-14 border-b border-[#313244] pb-8 text-center">

@@ -116,20 +116,24 @@ export function FontSelector({ settings, onChangeSettings }: FontSelectorProps) 
         </label>
         <div className="grid grid-cols-3 gap-2">
           {[
-            { label: "Narrow", value: 680 },
-            { label: "Default", value: 760 },
-            { label: "Wide", value: 880 },
+            { label: "Narrow", value: 680, desc: "680px" },
+            { label: "Default", value: 760, desc: "760px" },
+            { label: "Wide", value: 880, desc: "880px" },
+            { label: "Extra Wide", value: 1100, desc: "1100px" },
+            { label: "Ultra Wide", value: 1440, desc: "1440px" },
+            { label: "Full Wide", value: 9999, desc: "100%" },
           ].map((item) => (
             <button
               key={item.label}
               onClick={() => onChangeSettings({ maxWidth: item.value })}
-              className={`rounded-lg border px-2.5 py-1.5 text-xs transition-colors ${
+              className={`flex flex-col items-center justify-center rounded-lg border py-2 px-1 text-xs transition-colors ${
                 settings.maxWidth === item.value
-                  ? "border-[#89b4fa] bg-[#89b4fa]/20 text-white font-medium"
+                  ? "border-[#89b4fa] bg-[#89b4fa]/20 text-white font-medium shadow-sm"
                   : "border-[#313244] bg-[#11111b]/60 text-[#a6adc8] hover:text-white hover:border-[#45475a]"
               }`}
             >
-              {item.label}
+              <span className="font-medium truncate">{item.label}</span>
+              <span className="text-[10px] text-[#6c7086] mt-0.5">{item.desc}</span>
             </button>
           ))}
         </div>
