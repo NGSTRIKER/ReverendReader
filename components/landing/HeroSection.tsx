@@ -102,7 +102,7 @@ export function HeroSection() {
         {/* Iconic Opening Quote */}
         <blockquote className="mx-auto max-w-2xl border-l-2 border-[#89b4fa] pl-4 text-left sm:text-center sm:border-l-0 sm:pl-0 mb-8">
           <p className="font-serif italic text-lg sm:text-xl text-[#cdd6f4] leading-relaxed drop-shadow-sm">
-            &ldquo;Humans are clever in tens of thousands of ways, Gu are the true refined essences of Heaven and Earth.&rdquo;
+            &ldquo;Humans are the spirit of all living beings, Gu are the essence of heaven and earth.&rdquo;
           </p>
         </blockquote>
 
