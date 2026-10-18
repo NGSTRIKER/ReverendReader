@@ -45,18 +45,37 @@ export function HeroSection() {
           }}
           className="relative w-full h-full will-change-transform"
         >
-          <Image
-            src="/images/fang-yuan-creation.png"
-            alt="The Creation of Gu — Fang Yuan Demonic Rebirth"
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover object-center filter brightness-[0.90] contrast-[1.05]"
-          />
+          {/* Landscape / Desktop Background: Creation of Gu (Full Quality Uncompressed) */}
+          <div className="hidden sm:landscape:block sm:block landscape:block absolute inset-0">
+            <Image
+              src="/images/fang-yuan-creation.png"
+              alt="The Creation of Gu — Fang Yuan Demonic Rebirth"
+              fill
+              priority
+              unoptimized
+              sizes="100vw"
+              className="object-cover object-center filter brightness-[0.92] contrast-[1.05]"
+              style={{ imageRendering: "-webkit-optimize-contrast" }}
+            />
+          </div>
+
+          {/* Portrait / Phone User Background: Solitary Snow Path (Full Quality Uncompressed) */}
+          <div className="block sm:landscape:hidden sm:hidden landscape:hidden absolute inset-0">
+            <Image
+              src="/images/fang-yuan-snow.jpg"
+              alt="Fang Yuan walking through snowy plum blossoms"
+              fill
+              priority
+              unoptimized
+              sizes="100vw"
+              className="object-cover object-top filter brightness-[0.92] contrast-[1.05]"
+              style={{ imageRendering: "-webkit-optimize-contrast" }}
+            />
+          </div>
         </div>
 
         {/* Lightweight subtle vignette tint so the artwork is vivid and clear */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#1e1e2e] via-[#1e1e2e]/40 to-black/25" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#1e1e2e] via-[#1e1e2e]/35 to-black/20" />
 
         {/* Soft bottom transition blend into next section */}
         <div className="absolute bottom-0 inset-x-0 h-28 bg-gradient-to-t from-[#1e1e2e] to-transparent" />
