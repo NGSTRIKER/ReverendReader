@@ -42,12 +42,22 @@ export function parseSettingsFromRaw(raw: string | null | undefined): ReaderSett
 
 /**
  * Set a cookie with 365-day persistence, SameSite=Lax, path=/
+ * Also deduplicates by clearing any legacy path-specific cookie
  */
 export function setCookie(name: string, value: string, days = 365): void {
   if (typeof document === "undefined") return;
   const expires = new Date(Date.now() + days * 864e5).toUTCString();
   const maxAge = days * 86400;
-  document.cookie = `${encodeURIComponent(name)}=${encodeURIComponent(value)}; expires=${expires}; max-age=${maxAge}; path=/; SameSite=Lax`;
+  const encName = encodeURIComponent(name);
+  const encVal = encodeURIComponent(value);
+
+  // Clear any potential legacy path-specific duplicate cookie (e.g. created on /read)
+  if (typeof window !== "undefined" && window.location.pathname && window.location.pathname !== "/") {
+    document.cookie = `${encName}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=${window.location.pathname}; SameSite=Lax`;
+  }
+
+  // Set the site-wide root cookie
+  document.cookie = `${encName}=${encVal}; expires=${expires}; max-age=${maxAge}; path=/; SameSite=Lax`;
 }
 
 /**
@@ -66,15 +76,47 @@ export function getCookie(name: string): string | null {
 }
 
 /**
- * Save theme and typography settings to both cookie and localStorage
+ * Save theme and typography settings to both cookie and localStorage.
+ * Updates both the consolidated JSON cookie and individual cookies for every setting.
  */
 export function saveThemeSettings(settings: ReaderSettings): void {
   const serialized = JSON.stringify(settings);
+
+  // 1. Consolidated cookie for SSR & atomic restores
   setCookie("reverend_theme_settings", serialized);
+
+  // 2. Individual dedicated cookies updated immediately on every setting change
+  if (settings.surfaceTheme) {
+    setCookie("reverend_surface_theme", settings.surfaceTheme);
+  }
+  if (settings.font) {
+    setCookie("reverend_font", settings.font);
+  }
+  if (typeof settings.fontSize === "number") {
+    setCookie("reverend_font_size", String(settings.fontSize));
+  }
+  if (typeof settings.lineHeight === "number") {
+    setCookie("reverend_line_height", String(settings.lineHeight));
+  }
+  if (typeof settings.surfaceOpacity === "number") {
+    setCookie("reverend_surface_opacity", String(settings.surfaceOpacity));
+  }
+  if (typeof settings.maxWidth === "number") {
+    setCookie("reverend_max_width", String(settings.maxWidth));
+  }
+  if (settings.fontColor) {
+    setCookie("reverend_font_color", settings.fontColor);
+  }
+
+  // 3. Keep localStorage fully in sync
   try {
     if (typeof localStorage !== "undefined") {
       localStorage.setItem("reverend_theme_settings", serialized);
       localStorage.setItem("reverend_reader_settings", serialized);
+      localStorage.setItem("reverend_surface_theme", settings.surfaceTheme);
+      localStorage.setItem("reverend_font", settings.font);
+      localStorage.setItem("reverend_font_size", String(settings.fontSize));
+      localStorage.setItem("reverend_font_color", settings.fontColor || "#cdd6f4");
     }
   } catch {
     // Ignore quota errors
@@ -82,32 +124,77 @@ export function saveThemeSettings(settings: ReaderSettings): void {
 }
 
 /**
- * Load theme settings from cookie with localStorage fallback, syncing if needed
+ * Load theme settings from cookies with localStorage fallback, merging individual cookies if present
  */
 export function loadThemeSettings(): ReaderSettings {
   try {
-    // 1. Try reading from cookie
+    let currentSettings: ReaderSettings = { ...DEFAULT_SETTINGS };
+    let hasLoaded = false;
+
+    // 1. Try reading from consolidated cookie
     const fromCookie = getCookie("reverend_theme_settings");
     if (fromCookie) {
-      const parsed = parseSettingsFromRaw(fromCookie);
+      currentSettings = parseSettingsFromRaw(fromCookie);
+      hasLoaded = true;
+    }
+
+    // 2. Overlay individual cookies if set
+    const surfaceThemeCookie = getCookie("reverend_surface_theme");
+    const fontCookie = getCookie("reverend_font");
+    const fontSizeCookie = getCookie("reverend_font_size");
+    const lineHeightCookie = getCookie("reverend_line_height");
+    const opacityCookie = getCookie("reverend_surface_opacity");
+    const maxWidthCookie = getCookie("reverend_max_width");
+    const fontColorCookie = getCookie("reverend_font_color");
+
+    if (surfaceThemeCookie) {
+      currentSettings.surfaceTheme = surfaceThemeCookie as ReaderSettings["surfaceTheme"];
+      hasLoaded = true;
+    }
+    if (fontCookie) {
+      currentSettings.font = fontCookie as ReaderSettings["font"];
+      hasLoaded = true;
+    }
+    if (fontSizeCookie && !isNaN(parseInt(fontSizeCookie, 10))) {
+      currentSettings.fontSize = parseInt(fontSizeCookie, 10);
+      hasLoaded = true;
+    }
+    if (lineHeightCookie && !isNaN(parseFloat(lineHeightCookie))) {
+      currentSettings.lineHeight = parseFloat(lineHeightCookie);
+      hasLoaded = true;
+    }
+    if (opacityCookie && !isNaN(parseFloat(opacityCookie))) {
+      currentSettings.surfaceOpacity = parseFloat(opacityCookie);
+      hasLoaded = true;
+    }
+    if (maxWidthCookie && !isNaN(parseInt(maxWidthCookie, 10))) {
+      currentSettings.maxWidth = parseInt(maxWidthCookie, 10);
+      hasLoaded = true;
+    }
+    if (fontColorCookie) {
+      currentSettings.fontColor = fontColorCookie;
+      hasLoaded = true;
+    }
+
+    if (hasLoaded) {
       // Keep localStorage in sync
       try {
         if (typeof localStorage !== "undefined") {
-          localStorage.setItem("reverend_theme_settings", JSON.stringify(parsed));
+          localStorage.setItem("reverend_theme_settings", JSON.stringify(currentSettings));
         }
       } catch {}
-      return parsed;
+      return currentSettings;
     }
 
-    // 2. Try reading from localStorage fallback
+    // 3. Try reading from localStorage fallback
     if (typeof localStorage !== "undefined") {
       const fromLocal =
         localStorage.getItem("reverend_theme_settings") ||
         localStorage.getItem("reverend_reader_settings");
       if (fromLocal) {
         const parsed = parseSettingsFromRaw(fromLocal);
-        // Sync into cookie so server can read it on next page load / refresh
-        setCookie("reverend_theme_settings", JSON.stringify(parsed));
+        // Sync into cookies so server can read it
+        saveThemeSettings(parsed);
         return parsed;
       }
     }

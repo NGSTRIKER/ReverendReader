@@ -32,17 +32,62 @@ export default async function ReadPage({ searchParams }: ReadPageProps) {
   const rawChapterParam = resolvedParams.c;
   let initialChapterId = 1;
 
+  const cookieStore = await cookies();
+
   if (typeof rawChapterParam === "string") {
     const parsed = parseInt(rawChapterParam, 10);
     if (!isNaN(parsed) && parsed >= 1 && parsed <= manifest.totalChapters) {
       initialChapterId = parsed;
     }
+  } else {
+    // If no query param, check reverend_last_read cookie
+    const lastReadCookie = cookieStore.get("reverend_last_read")?.value;
+    if (lastReadCookie) {
+      const parsedLast = parseInt(lastReadCookie, 10);
+      if (!isNaN(parsedLast) && parsedLast >= 1 && parsedLast <= manifest.totalChapters) {
+        initialChapterId = parsedLast;
+      }
+    }
   }
 
   // Read saved theme settings from server-side cookies
-  const cookieStore = await cookies();
   const themeCookie = cookieStore.get("reverend_theme_settings")?.value;
   const initialSettings = parseSettingsFromRaw(themeCookie);
+
+  // Overlay individual cookies if set
+  const surfaceThemeCookie = cookieStore.get("reverend_surface_theme")?.value;
+  const fontCookie = cookieStore.get("reverend_font")?.value;
+  const fontSizeCookie = cookieStore.get("reverend_font_size")?.value;
+  const lineHeightCookie = cookieStore.get("reverend_line_height")?.value;
+  const opacityCookie = cookieStore.get("reverend_surface_opacity")?.value;
+  const maxWidthCookie = cookieStore.get("reverend_max_width")?.value;
+  const fontColorCookie = cookieStore.get("reverend_font_color")?.value;
+
+  if (surfaceThemeCookie) {
+    initialSettings.surfaceTheme = surfaceThemeCookie as ManifestData extends never ? never : typeof initialSettings.surfaceTheme;
+  }
+  if (fontCookie) {
+    initialSettings.font = fontCookie as typeof initialSettings.font;
+  }
+  if (fontSizeCookie && !isNaN(parseInt(fontSizeCookie, 10))) {
+    initialSettings.fontSize = parseInt(fontSizeCookie, 10);
+  }
+  if (lineHeightCookie && !isNaN(parseFloat(lineHeightCookie))) {
+    initialSettings.lineHeight = parseFloat(lineHeightCookie);
+  }
+  if (opacityCookie && !isNaN(parseFloat(opacityCookie))) {
+    initialSettings.surfaceOpacity = parseFloat(opacityCookie);
+  }
+  if (maxWidthCookie && !isNaN(parseInt(maxWidthCookie, 10))) {
+    initialSettings.maxWidth = parseInt(maxWidthCookie, 10);
+  }
+  if (fontColorCookie) {
+    try {
+      initialSettings.fontColor = decodeURIComponent(fontColorCookie);
+    } catch {
+      initialSettings.fontColor = fontColorCookie;
+    }
+  }
 
   return (
     <ReaderInterface

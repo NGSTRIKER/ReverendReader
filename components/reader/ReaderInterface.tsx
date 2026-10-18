@@ -13,6 +13,7 @@ import {
   loadBookmarks,
   saveBookmarks,
   toggleBookmarkStorage,
+  setCookie,
   DEFAULT_SETTINGS,
 } from "@/lib/storage";
 
@@ -93,14 +94,19 @@ export function ReaderInterface({
     };
   }, []);
 
-  // Update Settings and persist to cookies and localStorage
-  const handleUpdateSettings = (newPartial: Partial<ReaderSettings>) => {
+  // Update Settings immediately and persist to cookies and localStorage
+  const handleUpdateSettings = useCallback((newPartial: Partial<ReaderSettings>) => {
     setSettings((prev) => {
       const updated = { ...prev, ...newPartial };
       saveThemeSettings(updated);
       return updated;
     });
-  };
+  }, []);
+
+  // Update cookies every time settings state changes
+  useEffect(() => {
+    saveThemeSettings(settings);
+  }, [settings]);
 
   const currentChapter =
     manifest.chapters.find((c) => c.id === currentChapterId) || manifest.chapters[0];
@@ -148,9 +154,10 @@ export function ReaderInterface({
         setContent(text);
         setLoading(false);
 
-        // Save last read position
+        // Save last read position to cookie and localStorage
         try {
           localStorage.setItem("reverend_last_read", String(id));
+          setCookie("reverend_last_read", String(id));
         } catch {}
 
         // Update URL query parameter without triggering full reload
