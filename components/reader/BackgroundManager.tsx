@@ -68,14 +68,19 @@ export function BackgroundManager({
   };
 
   const surfaceThemes: { id: ReaderSurfaceTheme; label: string; desc: string; bgClass: string }[] = [
-    { id: "catppuccin", label: "Catppuccin", desc: "Soothing Blue Mocha", bgClass: "bg-[#1e1e2e] border border-[#89b4fa]/50" },
-    { id: "acrylic", label: "Acrylic", desc: "Frosted Glass", bgClass: "bg-white/10 backdrop-blur-md border border-white/20" },
-    { id: "blur", label: "Blur", desc: "Soft Dark Blur", bgClass: "bg-[#11111b]/50 backdrop-blur-md border border-white/10" },
-    { id: "transparent", label: "Transparent", desc: "100% See-Through", bgClass: "bg-transparent border border-dashed border-[#89b4fa]/60" },
-    { id: "dark", label: "Charcoal", desc: "Classic Dark", bgClass: "bg-[#181825]" },
-    { id: "black", label: "Onyx", desc: "Pure Black", bgClass: "bg-[#09090b]" },
-    { id: "slate", label: "Slate", desc: "Deep Cool", bgClass: "bg-[#0f172a]" },
-    { id: "sepia", label: "Dark Sepia", desc: "Aged Warmth", bgClass: "bg-[#171412]" },
+    { id: "catppuccin", label: "Catppuccin Blue", desc: "Soothing Blue Mocha", bgClass: "bg-[#1e1e2e] border border-[#89b4fa]" },
+    { id: "catppuccin-mocha", label: "Catppuccin Mocha", desc: "Deep Midnight & Mauve", bgClass: "bg-[#11111b] border border-[#cba6f7]" },
+    { id: "catppuccin-pink", label: "Catppuccin Pink", desc: "Flamingo & Velvet Rose", bgClass: "bg-[#281827] border border-[#f5c2e7]" },
+    { id: "catppuccin-coffee", label: "Catppuccin Coffee", desc: "Warm Caramel & Espresso", bgClass: "bg-[#241a16] border border-[#fab387]" },
+    { id: "catppuccin-jade", label: "Catppuccin Jade", desc: "Bamboo & Herbal Forest", bgClass: "bg-[#14231b] border border-[#a6e3a1]" },
+    { id: "catppuccin-latte", label: "Catppuccin Latte", desc: "Gentle Day Reading (Light)", bgClass: "bg-[#eff1f5] border border-[#1e66f5]" },
+    { id: "acrylic", label: "Acrylic Glass", desc: "Frosted Glass Blur", bgClass: "bg-white/10 backdrop-blur-md border border-white/20" },
+    { id: "blur", label: "Soft Dark Blur", desc: "Gentle Transparent Tint", bgClass: "bg-[#11111b]/50 backdrop-blur-md border border-white/10" },
+    { id: "transparent", label: "Full Transparent", desc: "100% See-Through", bgClass: "bg-transparent border border-dashed border-[#89b4fa]/60" },
+    { id: "dark", label: "Charcoal Dark", desc: "Classic Dark", bgClass: "bg-[#181825] border border-[#313244]" },
+    { id: "black", label: "Pure Onyx", desc: "Absolute OLED Black", bgClass: "bg-[#09090b] border border-zinc-800" },
+    { id: "slate", label: "Deep Slate", desc: "Cool Oceanic Navy", bgClass: "bg-[#0f172a] border border-slate-700" },
+    { id: "sepia", label: "Aged Sepia", desc: "Warm Parchment Noir", bgClass: "bg-[#171412] border border-amber-950/60" },
   ];
 
   return (
@@ -147,6 +152,14 @@ export function BackgroundManager({
                 } else if (settings.surfaceOpacity === 0) {
                   updates.surfaceOpacity = 0.95;
                 }
+
+                // Auto-switch font color appropriately if transitioning between light / dark
+                if (theme.id === "catppuccin-latte" && (!settings.fontColor || settings.fontColor === "#cdd6f4")) {
+                  updates.fontColor = "#4c4f69";
+                } else if (theme.id !== "catppuccin-latte" && settings.fontColor === "#4c4f69") {
+                  updates.fontColor = "#cdd6f4";
+                }
+
                 onChangeSettings(updates);
               }}
               className={`flex items-center space-x-2.5 rounded-lg border p-2.5 text-left text-xs transition-colors ${

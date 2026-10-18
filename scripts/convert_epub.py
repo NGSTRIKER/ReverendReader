@@ -258,7 +258,7 @@ def convert_epub(
         with open(tmp_manifest_path, 'w', encoding='utf-8') as manifest_out:
             json.dump({
                 "novelTitle": "Reverend Insanity",
-                "author": "Gu Zhen Ren",
+                "author": "Gu Zhenren",
                 "totalChapters": len(chapters_manifest),
                 "totalWords": total_words,
                 "totalBytes": current_byte_offset,

@@ -1,8 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { ReaderSettings, ReaderFont } from "@/types/novel";
-import { Type, Minus, Plus } from "lucide-react";
+import { Type, Minus, Plus, Palette, RotateCcw, Check } from "lucide-react";
 
 interface FontSelectorProps {
   settings: ReaderSettings;
@@ -10,6 +10,22 @@ interface FontSelectorProps {
 }
 
 export function FontSelector({ settings, onChangeSettings }: FontSelectorProps) {
+  const currentFontColor = settings.fontColor || "#cdd6f4";
+  const [hexInput, setHexInput] = useState<string>(currentFontColor);
+
+  useEffect(() => {
+    setHexInput(settings.fontColor || "#cdd6f4");
+  }, [settings.fontColor]);
+
+  const handleHexInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setHexInput(val);
+    // If valid 6-hex or 3-hex color code
+    if (/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(val)) {
+      onChangeSettings({ fontColor: val });
+    }
+  };
+
   const fontOptions: { id: ReaderFont; label: string; preview: string; className: string }[] = [
     { id: "serif", label: "Serif", preview: "Georgia Classic", className: "font-serif" },
     { id: "literary", label: "Literary", preview: "Palatino Book", className: "font-literary" },
@@ -17,8 +33,23 @@ export function FontSelector({ settings, onChangeSettings }: FontSelectorProps) 
     { id: "mono", label: "Mono", preview: "Clean Monospace", className: "font-mono" },
   ];
 
+  const colorPresets: { hex: string; name: string; tag?: string }[] = [
+    { hex: "#cdd6f4", name: "Catppuccin Text", tag: "Default" },
+    { hex: "#89b4fa", name: "Catppuccin Blue", tag: "Blue" },
+    { hex: "#b4befe", name: "Catppuccin Lavender" },
+    { hex: "#74c7ec", name: "Catppuccin Sapphire" },
+    { hex: "#a6e3a1", name: "Catppuccin Mint" },
+    { hex: "#f9e2af", name: "Catppuccin Gold" },
+    { hex: "#fab387", name: "Catppuccin Peach" },
+    { hex: "#f5c2e7", name: "Catppuccin Pink" },
+    { hex: "#f2cdcd", name: "Catppuccin Flamingo" },
+    { hex: "#e6d5b8", name: "Vintage Parchment" },
+    { hex: "#ffffff", name: "Crisp White" },
+    { hex: "#bac2de", name: "Catppuccin Subtext" },
+  ];
+
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       {/* Font Family */}
       <div>
         <label className="text-xs font-semibold uppercase tracking-wider text-[#a6adc8] mb-2.5 flex items-center space-x-1.5">
@@ -106,6 +137,130 @@ export function FontSelector({ settings, onChangeSettings }: FontSelectorProps) 
               {item.label}
             </button>
           ))}
+        </div>
+      </div>
+
+      {/* Font Color & Color Wheel */}
+      <div>
+        <div className="flex justify-between items-center mb-2.5">
+          <label className="text-xs font-semibold uppercase tracking-wider text-[#a6adc8] flex items-center space-x-1.5">
+            <Palette className="h-3.5 w-3.5 text-[#89b4fa]" />
+            <span>Font Color</span>
+          </label>
+          <button
+            onClick={() => onChangeSettings({ fontColor: "#cdd6f4" })}
+            title="Reset to Catppuccin default"
+            className="inline-flex items-center space-x-1 text-[11px] text-[#a6adc8] hover:text-[#89b4fa] transition-colors"
+          >
+            <RotateCcw className="h-3 w-3" />
+            <span>Default</span>
+          </button>
+        </div>
+
+        {/* Color Wheel Trigger & Direct Hex Input */}
+        <div className="flex items-center gap-2.5 mb-3.5 p-2.5 rounded-lg border border-[#313244] bg-[#11111b]/70">
+          {/* Active color swatch with color wheel launcher */}
+          <label
+            htmlFor="color-wheel-picker"
+            className="group relative flex items-center space-x-2 cursor-pointer rounded-md border border-[#45475a] bg-[#181825] px-2.5 py-1.5 hover:border-[#89b4fa] transition-all"
+            title="Open Color Wheel Selector"
+          >
+            {/* Color wheel visual gradient circle */}
+            <span
+              className="h-5 w-5 rounded-full shadow-inner flex-shrink-0 border border-white/20"
+              style={{
+                background: "conic-gradient(from 0deg, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000)",
+              }}
+            />
+            <span className="text-xs font-medium text-[#cdd6f4] group-hover:text-white">
+              Color Wheel
+            </span>
+            <input
+              id="color-wheel-picker"
+              type="color"
+              value={currentFontColor.startsWith("#") ? currentFontColor : "#cdd6f4"}
+              onChange={(e) => onChangeSettings({ fontColor: e.target.value })}
+              className="sr-only"
+            />
+          </label>
+
+          {/* Current Color Indicator Swatch */}
+          <div
+            className="h-7 w-7 rounded-md border border-[#45475a] shadow-sm flex-shrink-0"
+            style={{ backgroundColor: currentFontColor }}
+            title={`Active: ${currentFontColor}`}
+          />
+
+          {/* Hex Input */}
+          <div className="flex-1 flex items-center rounded-md border border-[#313244] bg-[#181825] px-2.5 py-1 focus-within:border-[#89b4fa]">
+            <span className="text-xs text-[#6c7086] mr-1 font-mono">#</span>
+            <input
+              type="text"
+              value={hexInput.startsWith("#") ? hexInput.slice(1) : hexInput}
+              onChange={(e) => {
+                const raw = e.target.value.replace(/[^0-9A-Fa-f]/g, "").slice(0, 6);
+                handleHexInputChange({
+                  target: { value: `#${raw}` },
+                } as React.ChangeEvent<HTMLInputElement>);
+              }}
+              placeholder="cdd6f4"
+              className="w-full bg-transparent font-mono text-xs uppercase text-white focus:outline-none"
+              maxLength={6}
+            />
+          </div>
+        </div>
+
+        {/* Curated Catppuccin & Reader Presets */}
+        <div>
+          <div className="text-[11px] font-medium text-[#6c7086] mb-2 uppercase tracking-wider">
+            Catppuccin Blue & Reading Presets
+          </div>
+          <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
+            {colorPresets.map((preset) => {
+              const isSelected = currentFontColor.toLowerCase() === preset.hex.toLowerCase();
+              return (
+                <button
+                  key={preset.hex}
+                  onClick={() => onChangeSettings({ fontColor: preset.hex })}
+                  title={`${preset.name} (${preset.hex})`}
+                  className={`group relative flex flex-col items-center justify-center rounded-lg border py-2 px-1 text-center transition-all ${
+                    isSelected
+                      ? "border-[#89b4fa] bg-[#89b4fa]/20 shadow-sm"
+                      : "border-[#313244] bg-[#11111b]/60 hover:border-[#45475a] hover:bg-[#181825]"
+                  }`}
+                >
+                  <span
+                    className="h-4 w-4 rounded-full border border-black/30 shadow-sm mb-1.5 flex items-center justify-center flex-shrink-0"
+                    style={{ backgroundColor: preset.hex }}
+                  >
+                    {isSelected && <Check className="h-2.5 w-2.5 text-black font-bold" />}
+                  </span>
+                  <span
+                    className="text-[10px] font-medium truncate max-w-full px-0.5"
+                    style={{ color: preset.hex }}
+                  >
+                    {preset.name.replace("Catppuccin ", "")}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Real-time typography & color preview */}
+        <div className="mt-3.5 rounded-lg border border-[#313244] bg-[#11111b]/80 p-3 text-center">
+          <div className="text-[10px] uppercase tracking-wider text-[#6c7086] mb-1">
+            Preview
+          </div>
+          <p
+            className={`transition-colors duration-150 leading-relaxed font-${settings.font}`}
+            style={{
+              color: currentFontColor,
+              fontSize: `${Math.min(18, Math.max(14, settings.fontSize - 2))}px`,
+            }}
+          >
+            “The world is boundless, who can grasp eternity?”
+          </p>
         </div>
       </div>
 

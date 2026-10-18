@@ -7,6 +7,7 @@ export const DEFAULT_SETTINGS: ReaderSettings = {
   surfaceOpacity: 0.95,
   surfaceTheme: "catppuccin", // Catppuccin Blue
   maxWidth: 760,
+  fontColor: "#cdd6f4", // Catppuccin Text Lavender
 };
 
 /**

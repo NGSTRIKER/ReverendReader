@@ -1,8 +1,6 @@
 import { Navigation } from "@/components/landing/Navigation";
 import { HeroSection } from "@/components/landing/HeroSection";
 import { SynopsisSection } from "@/components/landing/SynopsisSection";
-import { ThemesSection } from "@/components/landing/ThemesSection";
-import { ArtworkSection } from "@/components/landing/ArtworkSection";
 import { Footer } from "@/components/landing/Footer";
 
 export default function HomePage() {
@@ -16,24 +14,24 @@ export default function HomePage() {
         "@id": `${siteUrl}/#website`,
         url: siteUrl,
         name: "Reverend Insanity Reader",
-        description: "Distraction-free, high performance novel reader for Reverend Insanity by Gu Zhen Ren.",
+        description: "Distraction-free, high performance novel reader for Reverend Insanity by Gu Zhenren.",
         inLanguage: "en-US",
       },
       {
         "@type": "Book",
         "@id": `${siteUrl}/#book`,
-        name: "Reverend Insanity (Daoist Gu / 蛊真人)",
-        alternateName: ["Daoist Gu", "Gu Zhen Ren", "Master of Gu"],
+        name: "Reverend Insanity (蛊真人)",
+        alternateName: ["Gu Zhenren", "蛊真人", "Master of Gu"],
         author: {
           "@type": "Person",
-          name: "Gu Zhen Ren",
+          name: "Gu Zhenren",
           alternateName: "蛊真人",
         },
         genre: ["Dark Fantasy", "Xianxia", "Cultivation", "Philosophical Fiction"],
         numberOfPages: 2334,
         inLanguage: "en",
         description:
-          "The story of Fang Yuan who was reborn 500 years into the past with the Spring Autumn Cicada, embarking on an unrelenting pursuit of eternal life through Gu refinement.",
+          "Humans are clever in tens of thousands of ways, Gu are the true refined essences of Heaven and Earth. Follow Fang Yuan's 500-year rebirth through a ruthless world of Gu cultivation.",
       },
     ],
   };
@@ -51,8 +49,6 @@ export default function HomePage() {
       <main className="flex-1">
         <HeroSection />
         <SynopsisSection />
-        <ThemesSection />
-        <ArtworkSection />
       </main>
 
       <Footer />

@@ -48,6 +48,27 @@ export function ChapterContent({
     surfaceBackground = `rgba(30, 30, 46, ${settings.surfaceOpacity})`;
     backdropClass = "backdrop-blur-sm";
     borderClass = "border-[#313244]";
+  } else if (settings.surfaceTheme === "catppuccin-mocha") {
+    surfaceBackground = `rgba(24, 24, 37, ${settings.surfaceOpacity})`;
+    backdropClass = "backdrop-blur-sm";
+    borderClass = "border-[#45475a]";
+  } else if (settings.surfaceTheme === "catppuccin-pink") {
+    surfaceBackground = `rgba(40, 24, 39, ${settings.surfaceOpacity})`;
+    backdropClass = "backdrop-blur-sm";
+    borderClass = "border-[#683f5e]";
+  } else if (settings.surfaceTheme === "catppuccin-coffee") {
+    surfaceBackground = `rgba(36, 26, 22, ${settings.surfaceOpacity})`;
+    backdropClass = "backdrop-blur-sm";
+    borderClass = "border-[#5c3e32]";
+  } else if (settings.surfaceTheme === "catppuccin-jade") {
+    surfaceBackground = `rgba(20, 35, 27, ${settings.surfaceOpacity})`;
+    backdropClass = "backdrop-blur-sm";
+    borderClass = "border-[#2f5544]";
+  } else if (settings.surfaceTheme === "catppuccin-latte") {
+    surfaceBackground = `rgba(239, 241, 245, ${settings.surfaceOpacity})`;
+    backdropClass = "backdrop-blur-sm";
+    borderClass = "border-[#ccd0da]";
+    containerShadow = "shadow-lg";
   } else if (settings.surfaceTheme === "acrylic") {
     // Frosted acrylic glass: intense blur, frosted sheen, luminous subtle border
     surfaceBackground = `rgba(24, 24, 37, ${settings.surfaceOpacity})`;
@@ -92,6 +113,69 @@ export function ChapterContent({
     };
   }
 
+  const isLatte = settings.surfaceTheme === "catppuccin-latte";
+  const defaultFontColor = isLatte ? "#4c4f69" : "#cdd6f4";
+  const activeFontColor = settings.fontColor || defaultFontColor;
+
+  const dividerBorderClass = isLatte ? "border-[#ccd0da]" : "border-[#313244]";
+  const subtextClass = isLatte ? "text-[#6c6f85]" : "text-[#a6adc8]";
+  const navBtnClass = isLatte
+    ? "border-[#ccd0da] bg-[#e6e9ef] text-[#4c4f69] hover:bg-[#dce0e8]"
+    : "border-[#313244] bg-[#181825] text-[#cdd6f4] hover:bg-[#313244] hover:text-white";
+
+  // Coordinated theme accents
+  const themeAccents: Record<string, { badgeBorder: string; badgeBg: string; badgeText: string; nextBtnBg: string; nextBtnHover: string; nextBtnText: string }> = {
+    catppuccin: {
+      badgeBorder: "border-[#89b4fa]/40",
+      badgeBg: "bg-[#89b4fa]/10",
+      badgeText: "text-[#89b4fa]",
+      nextBtnBg: "bg-[#89b4fa]",
+      nextBtnHover: "hover:bg-[#b4befe]",
+      nextBtnText: "text-[#11111b]",
+    },
+    "catppuccin-mocha": {
+      badgeBorder: "border-[#cba6f7]/40",
+      badgeBg: "bg-[#cba6f7]/10",
+      badgeText: "text-[#cba6f7]",
+      nextBtnBg: "bg-[#cba6f7]",
+      nextBtnHover: "hover:bg-[#f5c2e7]",
+      nextBtnText: "text-[#11111b]",
+    },
+    "catppuccin-pink": {
+      badgeBorder: "border-[#f5c2e7]/40",
+      badgeBg: "bg-[#f5c2e7]/10",
+      badgeText: "text-[#f5c2e7]",
+      nextBtnBg: "bg-[#f5c2e7]",
+      nextBtnHover: "hover:bg-[#f2cdcd]",
+      nextBtnText: "text-[#181119]",
+    },
+    "catppuccin-coffee": {
+      badgeBorder: "border-[#fab387]/40",
+      badgeBg: "bg-[#fab387]/10",
+      badgeText: "text-[#fab387]",
+      nextBtnBg: "bg-[#fab387]",
+      nextBtnHover: "hover:bg-[#f9e2af]",
+      nextBtnText: "text-[#1c1512]",
+    },
+    "catppuccin-jade": {
+      badgeBorder: "border-[#a6e3a1]/40",
+      badgeBg: "bg-[#a6e3a1]/10",
+      badgeText: "text-[#a6e3a1]",
+      nextBtnBg: "bg-[#a6e3a1]",
+      nextBtnHover: "hover:bg-[#94e2d5]",
+      nextBtnText: "text-[#111c16]",
+    },
+    "catppuccin-latte": {
+      badgeBorder: "border-[#1e66f5]/40",
+      badgeBg: "bg-[#1e66f5]/10",
+      badgeText: "text-[#1e66f5]",
+      nextBtnBg: "bg-[#1e66f5]",
+      nextBtnHover: "hover:bg-[#04a5e5]",
+      nextBtnText: "text-white",
+    },
+  };
+  const accent = themeAccents[settings.surfaceTheme] || themeAccents.catppuccin;
+
   // Split plain text by double newlines into clean paragraphs
   // NEVER use innerHTML - render as react string children
   const paragraphs = React.useMemo(() => {
@@ -117,14 +201,17 @@ export function ChapterContent({
       }`}
     >
       {/* Chapter Heading */}
-      <header className="mb-10 sm:mb-14 border-b border-[#313244] pb-8 text-center">
-        <div className="mb-3 inline-block rounded-full border border-[#89b4fa]/40 bg-[#89b4fa]/10 px-3.5 py-1 font-mono text-xs tracking-wider text-[#89b4fa] uppercase">
+      <header className={`mb-10 sm:mb-14 border-b ${dividerBorderClass} pb-8 text-center`}>
+        <div className={`mb-3 inline-block rounded-full border ${accent.badgeBorder} ${accent.badgeBg} px-3.5 py-1 font-mono text-xs tracking-wider ${accent.badgeText} uppercase`}>
           Chapter {chapter.number}
         </div>
-        <h1 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-[#cdd6f4]">
+        <h1
+          className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight"
+          style={{ color: activeFontColor }}
+        >
           {chapter.title}
         </h1>
-        <div className="mt-3 text-xs text-[#a6adc8] font-mono">
+        <div className={`mt-3 text-xs ${subtextClass} font-mono`}>
           {chapter.wordCount.toLocaleString()} words
         </div>
       </header>
@@ -161,10 +248,11 @@ export function ChapterContent({
       {/* Chapter Text - Rendered purely as plaintext paragraphs */}
       {!loading && !error && (
         <div
-          className="reader-content text-[#cdd6f4] selection:bg-[#89b4fa]/30 selection:text-white"
+          className="reader-content selection:bg-[#89b4fa]/30 selection:text-white"
           style={{
             fontSize: `${settings.fontSize}px`,
             lineHeight: settings.lineHeight,
+            color: activeFontColor,
           }}
         >
           {paragraphs.map((para, index) => (
@@ -174,24 +262,24 @@ export function ChapterContent({
       )}
 
       {/* Bottom Chapter Navigation Footer */}
-      <footer className="mt-14 pt-8 border-t border-[#313244] flex flex-col sm:flex-row items-center justify-between gap-4">
+      <footer className={`mt-14 pt-8 border-t ${dividerBorderClass} flex flex-col sm:flex-row items-center justify-between gap-4`}>
         <button
           onClick={onPrev}
           disabled={!hasPrev}
-          className="flex w-full sm:w-auto items-center justify-center space-x-2 rounded border border-[#313244] bg-[#181825] px-5 py-2.5 text-xs font-medium text-[#cdd6f4] hover:bg-[#313244] hover:text-white disabled:opacity-30 disabled:pointer-events-none transition-colors"
+          className={`flex w-full sm:w-auto items-center justify-center space-x-2 rounded border px-5 py-2.5 text-xs font-medium disabled:opacity-30 disabled:pointer-events-none transition-colors ${navBtnClass}`}
         >
           <ChevronLeft className="h-4 w-4" />
           <span>Previous Chapter</span>
         </button>
 
-        <span className="text-xs text-[#a6adc8] font-mono">
+        <span className={`text-xs ${subtextClass} font-mono`}>
           Chapter {chapter.number}
         </span>
 
         <button
           onClick={onNext}
           disabled={!hasNext}
-          className="flex w-full sm:w-auto items-center justify-center space-x-2 rounded bg-[#89b4fa] px-5 py-2.5 text-xs font-semibold text-[#11111b] hover:bg-[#b4befe] disabled:opacity-30 disabled:pointer-events-none transition-colors"
+          className={`flex w-full sm:w-auto items-center justify-center space-x-2 rounded px-5 py-2.5 text-xs font-semibold disabled:opacity-30 disabled:pointer-events-none transition-colors ${accent.nextBtnBg} ${accent.nextBtnHover} ${accent.nextBtnText}`}
         >
           <span>Next Chapter</span>
           <ChevronRight className="h-4 w-4" />

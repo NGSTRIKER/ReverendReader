@@ -16,18 +16,18 @@ export const metadata: Metadata = {
     template: "%s | Reverend Insanity Reader",
   },
   description:
-    "An uncompromised reading experience for Reverend Insanity (Daoist Gu) by Gu Zhen Ren. Follow Fang Yuan's 500-year rebirth through a ruthless world of Gu cultivation.",
+    "An uncompromised reading experience for Reverend Insanity by Gu Zhenren (蛊真人). Follow Fang Yuan's 500-year rebirth through a ruthless world of Gu cultivation.",
   keywords: [
     "Reverend Insanity",
-    "Daoist Gu",
-    "Gu Zhen Ren",
+    "Gu Zhenren",
+    "蛊真人",
     "Fang Yuan",
     "Cultivation Novel",
     "Dark Fantasy",
     "Xianxia",
     "Web Novel Reader",
   ],
-  authors: [{ name: "Gu Zhen Ren" }],
+  authors: [{ name: "Gu Zhenren" }],
   creator: "Reverend Reader",
   openGraph: {
     title: "Reverend Insanity Reader — The Eternal Journey",

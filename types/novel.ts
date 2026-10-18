@@ -22,6 +22,11 @@ export type ReaderFont = 'serif' | 'sans' | 'mono' | 'literary';
 
 export type ReaderSurfaceTheme =
   | 'catppuccin'
+  | 'catppuccin-mocha'
+  | 'catppuccin-pink'
+  | 'catppuccin-coffee'
+  | 'catppuccin-jade'
+  | 'catppuccin-latte'
   | 'dark'
   | 'black'
   | 'slate'
@@ -37,6 +42,7 @@ export interface ReaderSettings {
   surfaceOpacity: number; // 0.0 to 1.0
   surfaceTheme: ReaderSurfaceTheme;
   maxWidth: number; // e.g. 680, 760, 840
+  fontColor?: string; // hex color string, e.g. "#cdd6f4"
 }
 
 export interface Bookmark {
