@@ -1,0 +1,99 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Catppuccin Mocha Palette with Blue Accent */
+  --background: #1e1e2e;
+  --foreground: #cdd6f4;
+  --surface: #181825;
+  --surface-border: #313244;
+  --accent-blue: #89b4fa;
+  --accent-sapphire: #74c7ec;
+  --accent-lavender: #b4befe;
+  --accent-mauve: #cba6f7;
+  --accent-peach: #fab387;
+
+  /* Font families fallback */
+  --font-serif: "Georgia", "Cambria", "Times New Roman", Times, serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-literary: "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: dark;
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom scrollbar in Catppuccin Mocha */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #181825;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #45475a;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #585b70;
+}
+
+/* Reader Typography Classes */
+.font-choice-serif {
+  font-family: var(--font-serif);
+}
+
+.font-choice-sans {
+  font-family: var(--font-sans);
+}
+
+.font-choice-mono {
+  font-family: var(--font-mono);
+}
+
+.font-choice-literary {
+  font-family: var(--font-literary);
+}
+
+.reader-content p {
+  margin-bottom: 1.5em;
+  line-height: 1.85;
+  text-indent: 1.5em;
+  letter-spacing: 0.01em;
+}
+
+.reader-content p:first-of-type {
+  text-indent: 0;
+}
+
+.reader-content p:first-of-type::first-letter {
+  float: left;
+  font-size: 3.2em;
+  line-height: 0.85;
+  padding-top: 4px;
+  padding-right: 8px;
+  padding-bottom: 2px;
+  color: #89b4fa;
+  font-family: var(--font-serif);
+  font-weight: 700;
+}
