@@ -51,28 +51,15 @@ export function HeroSection() {
             fill
             priority
             sizes="100vw"
-            className="object-cover object-center filter brightness-[0.70] contrast-[1.10]"
+            className="object-cover object-center filter brightness-[0.90] contrast-[1.05]"
           />
         </div>
 
-        {/* Catppuccin Blue & Mocha Tint Overlays for Crystal Readability */}
-        {/* Layer 1: Base color tint */}
-        <div className="absolute inset-0 bg-[#1e1e2e]/80 mix-blend-multiply" />
+        {/* Lightweight subtle vignette tint so the artwork is vivid and clear */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#1e1e2e] via-[#1e1e2e]/40 to-black/25" />
 
-        {/* Layer 2: Directional vignette and gradient */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#1e1e2e] via-[#1e1e2e]/75 to-[#181825]/65" />
-
-        {/* Layer 3: Subtle Catppuccin Blue ambient radial glow */}
-        <div
-          className="absolute inset-0 opacity-40"
-          style={{
-            backgroundImage:
-              "radial-gradient(circle at 50% 30%, rgba(137, 180, 250, 0.25) 0%, rgba(30, 30, 46, 0) 75%)",
-          }}
-        />
-
-        {/* Layer 4: Delicate frosted blur */}
-        <div className="absolute inset-0 backdrop-blur-[1.5px]" />
+        {/* Soft bottom transition blend into next section */}
+        <div className="absolute bottom-0 inset-x-0 h-28 bg-gradient-to-t from-[#1e1e2e] to-transparent" />
       </div>
 
       {/* Hero Foreground Content */}
