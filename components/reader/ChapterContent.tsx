@@ -17,6 +17,74 @@ interface ChapterContentProps {
   settings: ReaderSettings;
 }
 
+const FONT_CLASSES: Record<string, string> = {
+  serif: "font-choice-serif",
+  sans: "font-choice-sans",
+  mono: "font-choice-mono",
+  literary: "font-choice-literary",
+};
+
+const THEME_ACCENTS: Record<
+  string,
+  {
+    badgeBorder: string;
+    badgeBg: string;
+    badgeText: string;
+    nextBtnBg: string;
+    nextBtnHover: string;
+    nextBtnText: string;
+  }
+> = {
+  catppuccin: {
+    badgeBorder: "border-[#89b4fa]/40",
+    badgeBg: "bg-[#89b4fa]/10",
+    badgeText: "text-[#89b4fa]",
+    nextBtnBg: "bg-[#89b4fa]",
+    nextBtnHover: "hover:bg-[#b4befe]",
+    nextBtnText: "text-[#11111b]",
+  },
+  "catppuccin-mocha": {
+    badgeBorder: "border-[#cba6f7]/40",
+    badgeBg: "bg-[#cba6f7]/10",
+    badgeText: "text-[#cba6f7]",
+    nextBtnBg: "bg-[#cba6f7]",
+    nextBtnHover: "hover:bg-[#f5c2e7]",
+    nextBtnText: "text-[#11111b]",
+  },
+  "catppuccin-pink": {
+    badgeBorder: "border-[#f5c2e7]/40",
+    badgeBg: "bg-[#f5c2e7]/10",
+    badgeText: "text-[#f5c2e7]",
+    nextBtnBg: "bg-[#f5c2e7]",
+    nextBtnHover: "hover:bg-[#f2cdcd]",
+    nextBtnText: "text-[#181119]",
+  },
+  "catppuccin-coffee": {
+    badgeBorder: "border-[#fab387]/40",
+    badgeBg: "bg-[#fab387]/10",
+    badgeText: "text-[#fab387]",
+    nextBtnBg: "bg-[#fab387]",
+    nextBtnHover: "hover:bg-[#f9e2af]",
+    nextBtnText: "text-[#1c1512]",
+  },
+  "catppuccin-jade": {
+    badgeBorder: "border-[#a6e3a1]/40",
+    badgeBg: "bg-[#a6e3a1]/10",
+    badgeText: "text-[#a6e3a1]",
+    nextBtnBg: "bg-[#a6e3a1]",
+    nextBtnHover: "hover:bg-[#94e2d5]",
+    nextBtnText: "text-[#111c16]",
+  },
+  "catppuccin-latte": {
+    badgeBorder: "border-[#1e66f5]/40",
+    badgeBg: "bg-[#1e66f5]/10",
+    badgeText: "text-[#1e66f5]",
+    nextBtnBg: "bg-[#1e66f5]",
+    nextBtnHover: "hover:bg-[#04a5e5]",
+    nextBtnText: "text-white",
+  },
+};
+
 export function ChapterContent({
   chapter,
   content,
@@ -30,12 +98,7 @@ export function ChapterContent({
   settings,
 }: ChapterContentProps) {
   // Map font settings to class
-  const fontClass = {
-    serif: "font-choice-serif",
-    sans: "font-choice-sans",
-    mono: "font-choice-mono",
-    literary: "font-choice-literary",
-  }[settings.font];
+  const fontClass = FONT_CLASSES[settings.font] || FONT_CLASSES.serif;
 
   // Map surface theme to styles
   let surfaceBackground = `rgba(30, 30, 46, ${settings.surfaceOpacity})`; // default Catppuccin Base
@@ -124,57 +187,7 @@ export function ChapterContent({
     : "border-[#313244] bg-[#181825] text-[#cdd6f4] hover:bg-[#313244] hover:text-white";
 
   // Coordinated theme accents
-  const themeAccents: Record<string, { badgeBorder: string; badgeBg: string; badgeText: string; nextBtnBg: string; nextBtnHover: string; nextBtnText: string }> = {
-    catppuccin: {
-      badgeBorder: "border-[#89b4fa]/40",
-      badgeBg: "bg-[#89b4fa]/10",
-      badgeText: "text-[#89b4fa]",
-      nextBtnBg: "bg-[#89b4fa]",
-      nextBtnHover: "hover:bg-[#b4befe]",
-      nextBtnText: "text-[#11111b]",
-    },
-    "catppuccin-mocha": {
-      badgeBorder: "border-[#cba6f7]/40",
-      badgeBg: "bg-[#cba6f7]/10",
-      badgeText: "text-[#cba6f7]",
-      nextBtnBg: "bg-[#cba6f7]",
-      nextBtnHover: "hover:bg-[#f5c2e7]",
-      nextBtnText: "text-[#11111b]",
-    },
-    "catppuccin-pink": {
-      badgeBorder: "border-[#f5c2e7]/40",
-      badgeBg: "bg-[#f5c2e7]/10",
-      badgeText: "text-[#f5c2e7]",
-      nextBtnBg: "bg-[#f5c2e7]",
-      nextBtnHover: "hover:bg-[#f2cdcd]",
-      nextBtnText: "text-[#181119]",
-    },
-    "catppuccin-coffee": {
-      badgeBorder: "border-[#fab387]/40",
-      badgeBg: "bg-[#fab387]/10",
-      badgeText: "text-[#fab387]",
-      nextBtnBg: "bg-[#fab387]",
-      nextBtnHover: "hover:bg-[#f9e2af]",
-      nextBtnText: "text-[#1c1512]",
-    },
-    "catppuccin-jade": {
-      badgeBorder: "border-[#a6e3a1]/40",
-      badgeBg: "bg-[#a6e3a1]/10",
-      badgeText: "text-[#a6e3a1]",
-      nextBtnBg: "bg-[#a6e3a1]",
-      nextBtnHover: "hover:bg-[#94e2d5]",
-      nextBtnText: "text-[#111c16]",
-    },
-    "catppuccin-latte": {
-      badgeBorder: "border-[#1e66f5]/40",
-      badgeBg: "bg-[#1e66f5]/10",
-      badgeText: "text-[#1e66f5]",
-      nextBtnBg: "bg-[#1e66f5]",
-      nextBtnHover: "hover:bg-[#04a5e5]",
-      nextBtnText: "text-white",
-    },
-  };
-  const accent = themeAccents[settings.surfaceTheme] || themeAccents.catppuccin;
+  const accent = THEME_ACCENTS[settings.surfaceTheme] || THEME_ACCENTS.catppuccin;
 
   // Split plain text by double newlines into clean paragraphs
   // NEVER use innerHTML - render as react string children

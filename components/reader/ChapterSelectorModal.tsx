@@ -131,13 +131,13 @@ export function ChapterSelectorModal({
             {/* Filter and Jump Bar */}
             <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 border-b border-[#313244] p-4 bg-[#1e1e2e]/50">
               <div className="relative sm:col-span-7">
-                <Search className="absolute left-3 top-2.5 h-4 w-4 text-[#6c7086]" />
+                <Search className="absolute left-3 top-2.5 h-4 w-4 text-[#9399b2]" />
                 <input
                   type="text"
                   placeholder="Search chapters by title or number..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full rounded border border-[#313244] bg-[#11111b] pl-9 pr-3 py-2 text-xs text-[#cdd6f4] placeholder-[#6c7086] focus:border-[#89b4fa] focus:outline-none"
+                  className="w-full rounded border border-[#313244] bg-[#11111b] pl-9 pr-3 py-2 text-xs text-[#cdd6f4] placeholder-[#9399b2] focus:border-[#89b4fa] focus:outline-none"
                 />
               </div>
 
@@ -149,7 +149,7 @@ export function ChapterSelectorModal({
                   placeholder="Jump to #"
                   value={jumpInput}
                   onChange={(e) => setJumpInput(e.target.value)}
-                  className="w-full rounded border border-[#313244] bg-[#11111b] px-3 py-2 text-xs text-[#cdd6f4] placeholder-[#6c7086] focus:border-[#89b4fa] focus:outline-none"
+                  className="w-full rounded border border-[#313244] bg-[#11111b] px-3 py-2 text-xs text-[#cdd6f4] placeholder-[#9399b2] focus:border-[#89b4fa] focus:outline-none"
                 />
                 <button
                   type="submit"
@@ -192,7 +192,7 @@ export function ChapterSelectorModal({
                       }`}
                     >
                       <div className="flex items-baseline space-x-3 truncate pr-4">
-                        <span className="font-mono text-xs text-[#6c7086] w-12 flex-shrink-0">
+                        <span className="font-mono text-xs text-[#a6adc8] w-12 flex-shrink-0">
                           #{chapter.number}
                         </span>
                         <span className="truncate text-sm font-serif">
@@ -200,7 +200,7 @@ export function ChapterSelectorModal({
                         </span>
                       </div>
 
-                      <span className="font-mono text-[11px] text-[#6c7086] flex-shrink-0">
+                      <span className="font-mono text-[11px] text-[#a6adc8] flex-shrink-0">
                         {chapter.wordCount.toLocaleString()} w
                       </span>
                     </button>
@@ -224,7 +224,7 @@ export function ChapterSelectorModal({
               <div className="my-auto py-16 text-center text-[#a6adc8]">
                 <BookmarkIcon className="mx-auto h-10 w-10 text-[#45475a] mb-3" />
                 <p className="text-sm font-medium text-[#cdd6f4] mb-1">No bookmarks saved yet</p>
-                <p className="text-xs text-[#6c7086] max-w-xs mx-auto">
+                <p className="text-xs text-[#a6adc8] max-w-xs mx-auto">
                   Click the bookmark icon on the top navigation bar while reading any chapter to save your place.
                 </p>
               </div>
@@ -250,7 +250,7 @@ export function ChapterSelectorModal({
                           {b.chapterTitle}
                         </span>
                       </div>
-                      <div className="text-[11px] text-[#6c7086] mt-0.5">
+                      <div className="text-[11px] text-[#a6adc8] mt-0.5">
                         Bookmarked on {new Date(b.createdAt).toLocaleDateString()}
                       </div>
                     </button>

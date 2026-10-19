@@ -1,32 +1,50 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useCallback, useRef, useEffect } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { ArrowRight, BookOpen, Sparkles } from "lucide-react";
 
 export function HeroSection() {
-  const [offset, setOffset] = useState({ x: 0, y: 0 });
   const sectionRef = useRef<HTMLElement | null>(null);
+  const bgRef = useRef<HTMLDivElement | null>(null);
+  const rafId = useRef<number | null>(null);
 
-  // Parallax mouse movement handler
+  // Parallax mouse movement handler using requestAnimationFrame (zero React re-renders)
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLElement>) => {
-    if (!sectionRef.current) return;
+    if (!sectionRef.current || !bgRef.current) return;
     const rect = sectionRef.current.getBoundingClientRect();
-    // Normalized coordinates from -1 to 1 based on center of hero section
     const x = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
     const y = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
 
-    // Dampen movement range to 30px maximum
-    setOffset({
-      x: Math.round(x * 28),
-      y: Math.round(y * 24),
+    const targetX = Math.round(x * 28);
+    const targetY = Math.round(y * 24);
+
+    if (rafId.current !== null) {
+      cancelAnimationFrame(rafId.current);
+    }
+
+    rafId.current = requestAnimationFrame(() => {
+      if (bgRef.current) {
+        bgRef.current.style.transform = `translate3d(${-targetX}px, ${-targetY}px, 0) scale(1.10)`;
+      }
     });
   }, []);
 
   const handleMouseLeave = useCallback(() => {
-    // Smoothly return to center when mouse leaves
-    setOffset({ x: 0, y: 0 });
+    if (rafId.current !== null) {
+      cancelAnimationFrame(rafId.current);
+    }
+    if (bgRef.current) {
+      bgRef.current.style.transform = "translate3d(0px, 0px, 0) scale(1.10)";
+    }
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (rafId.current !== null) {
+        cancelAnimationFrame(rafId.current);
+      }
+    };
   }, []);
 
   return (
@@ -39,39 +57,39 @@ export function HeroSection() {
       {/* Parallax Background Container */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div
+          ref={bgRef}
           style={{
-            transform: `translate3d(${-offset.x}px, ${-offset.y}px, 0) scale(1.10)`,
+            transform: "translate3d(0px, 0px, 0) scale(1.10)",
             transition: "transform 0.25s cubic-bezier(0.25, 1, 0.5, 1)",
           }}
           className="relative w-full h-full will-change-transform"
         >
-          {/* Landscape / Desktop Background: Creation of Gu (Full Quality Uncompressed) */}
-          <div className="hidden sm:landscape:block sm:block landscape:block absolute inset-0">
-            <Image
+          {/* Responsive Picture: Downloads ONLY the appropriate image for device form factor in modern WebP */}
+          <picture className="absolute inset-0 w-full h-full">
+            {/* Portrait / Phone User Background: Solitary Snow Path (WebP or JPG fallback) */}
+            <source
+              media="(max-width: 639px) and (orientation: portrait)"
+              type="image/webp"
+              srcSet="/images/fang-yuan-snow.webp"
+            />
+            <source
+              media="(max-width: 639px) and (orientation: portrait)"
+              srcSet="/images/fang-yuan-snow.jpg"
+            />
+            {/* Landscape / Desktop Background: Creation of Gu (WebP or PNG fallback) */}
+            <source
+              type="image/webp"
+              srcSet="/images/fang-yuan-creation.webp"
+            />
+            <img
               src="/images/fang-yuan-creation.png"
               alt="The Creation of Gu — Fang Yuan Demonic Rebirth"
-              fill
-              priority
-              unoptimized
-              sizes="100vw"
-              className="object-cover object-center filter brightness-[0.92] contrast-[1.05]"
+              loading="eager"
+              decoding="async"
+              className="h-full w-full object-cover object-center filter brightness-[0.92] contrast-[1.05]"
               style={{ imageRendering: "-webkit-optimize-contrast" }}
             />
-          </div>
-
-          {/* Portrait / Phone User Background: Solitary Snow Path (Full Quality Uncompressed) */}
-          <div className="block sm:landscape:hidden sm:hidden landscape:hidden absolute inset-0">
-            <Image
-              src="/images/fang-yuan-snow.jpg"
-              alt="Fang Yuan walking through snowy plum blossoms"
-              fill
-              priority
-              unoptimized
-              sizes="100vw"
-              className="object-cover object-top filter brightness-[0.92] contrast-[1.05]"
-              style={{ imageRendering: "-webkit-optimize-contrast" }}
-            />
-          </div>
+          </picture>
         </div>
 
         {/* Lightweight subtle vignette tint so the artwork is vivid and clear */}

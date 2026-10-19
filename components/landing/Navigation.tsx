@@ -11,7 +11,7 @@ export function Navigation() {
         >
           <div className="relative h-9 w-9 flex-shrink-0 overflow-hidden rounded-xl border border-[#45475a] shadow-sm group-hover:border-[#89b4fa] transition-colors">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/icon.svg" alt="Reverend Insanity" className="h-full w-full object-cover" />
+            <img src="/icon.svg" alt="Reverend Insanity" width="36" height="36" className="h-full w-full object-cover" />
           </div>
           <div className="flex flex-col">
             <span className="font-serif text-base font-semibold tracking-wider uppercase text-[#cdd6f4] group-hover:text-white">
