@@ -43,6 +43,7 @@ export interface ReaderSettings {
   surfaceTheme: ReaderSurfaceTheme;
   maxWidth: number; // e.g. 680, 760, 840
   fontColor?: string; // hex color string, e.g. "#cdd6f4"
+  letterSpacing?: number; // letter spacing in pixels (e.g. 0, 0.5, 1.0)
 }
 
 export interface Bookmark {

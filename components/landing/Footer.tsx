@@ -8,8 +8,9 @@ export function Footer() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-12">
           <div>
             <div className="flex items-center space-x-3 mb-2">
-              <div className="flex h-7 w-7 items-center justify-center rounded border border-[#89b4fa]/40 bg-[#89b4fa]/10 text-[#89b4fa] font-serif text-xs font-bold">
-                蛊
+              <div className="relative h-7 w-7 flex-shrink-0 overflow-hidden rounded-lg border border-[#45475a] shadow-sm">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/icon.svg" alt="Reverend Insanity" className="h-full w-full object-cover" />
               </div>
               <span className="font-serif text-lg font-semibold tracking-wider uppercase text-[#cdd6f4]">
                 Reverend Insanity Reader

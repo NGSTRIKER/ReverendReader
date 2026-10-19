@@ -76,10 +76,10 @@ body {
 }
 
 .reader-content p {
-  margin-bottom: 1.5em;
-  line-height: 1.85;
+  margin-bottom: var(--reader-paragraph-spacing, 1.5em);
+  line-height: inherit;
   text-indent: 1.5em;
-  letter-spacing: 0.01em;
+  letter-spacing: inherit;
 }
 
 .reader-content p:first-of-type {

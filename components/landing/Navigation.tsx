@@ -9,8 +9,9 @@ export function Navigation() {
           href="/"
           className="group flex items-center space-x-3 text-[#cdd6f4] hover:text-white transition-colors"
         >
-          <div className="flex h-8 w-8 items-center justify-center rounded border border-[#89b4fa]/40 bg-[#89b4fa]/10 text-[#89b4fa] group-hover:border-[#89b4fa] transition-colors">
-            <span className="font-serif text-sm font-bold">蛊</span>
+          <div className="relative h-9 w-9 flex-shrink-0 overflow-hidden rounded-xl border border-[#45475a] shadow-sm group-hover:border-[#89b4fa] transition-colors">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/icon.svg" alt="Reverend Insanity" className="h-full w-full object-cover" />
           </div>
           <div className="flex flex-col">
             <span className="font-serif text-base font-semibold tracking-wider uppercase text-[#cdd6f4] group-hover:text-white">

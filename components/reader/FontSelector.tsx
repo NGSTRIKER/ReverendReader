@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { ReaderSettings, ReaderFont } from "@/types/novel";
-import { Type, Minus, Plus, Palette, RotateCcw, Check } from "lucide-react";
+import { Type, Minus, Plus, Palette, RotateCcw, Check, AlignJustify } from "lucide-react";
 
 interface FontSelectorProps {
   settings: ReaderSettings;
@@ -111,30 +111,158 @@ export function FontSelector({ settings, onChangeSettings }: FontSelectorProps) 
         </div>
       </div>
 
-      {/* Line Height / Spacing */}
+      {/* Line Spacing / Height with Slider and Presets */}
       <div>
         <div className="flex justify-between items-center mb-2">
-          <label className="text-xs font-semibold uppercase tracking-wider text-[#a6adc8]">
-            Line Spacing
+          <label className="text-xs font-semibold uppercase tracking-wider text-[#a6adc8] flex items-center space-x-1.5">
+            <AlignJustify className="h-3.5 w-3.5 text-[#89b4fa]" />
+            <span>Line Spacing</span>
           </label>
-          <span className="font-mono text-xs text-[#89b4fa]">{settings.lineHeight.toFixed(2)}x</span>
+          <span className="font-mono text-xs text-[#89b4fa]">
+            {settings.lineHeight.toFixed(2)}x
+          </span>
         </div>
-        <div className="grid grid-cols-3 gap-2">
+
+        {/* Line Spacing Slider with - and + buttons */}
+        <div className="flex items-center space-x-3 mb-2.5">
+          <button
+            onClick={() =>
+              onChangeSettings({
+                lineHeight: Math.max(1.3, Number((settings.lineHeight - 0.05).toFixed(2))),
+              })
+            }
+            disabled={settings.lineHeight <= 1.3}
+            className="rounded border border-[#313244] bg-[#11111b] p-2 text-[#cdd6f4] hover:bg-[#313244] disabled:opacity-40 transition-colors"
+            aria-label="Decrease line spacing"
+          >
+            <Minus className="h-3.5 w-3.5" />
+          </button>
+          <input
+            type="range"
+            min="1.30"
+            max="2.60"
+            step="0.05"
+            value={settings.lineHeight}
+            onChange={(e) =>
+              onChangeSettings({ lineHeight: parseFloat(e.target.value) })
+            }
+            className="flex-1 accent-[#89b4fa] cursor-pointer h-1.5 bg-[#313244] rounded-lg appearance-none"
+          />
+          <button
+            onClick={() =>
+              onChangeSettings({
+                lineHeight: Math.min(2.6, Number((settings.lineHeight + 0.05).toFixed(2))),
+              })
+            }
+            disabled={settings.lineHeight >= 2.6}
+            className="rounded border border-[#313244] bg-[#11111b] p-2 text-[#cdd6f4] hover:bg-[#313244] disabled:opacity-40 transition-colors"
+            aria-label="Increase line spacing"
+          >
+            <Plus className="h-3.5 w-3.5" />
+          </button>
+        </div>
+
+        {/* Line Spacing Quick Presets */}
+        <div className="grid grid-cols-4 gap-1.5">
           {[
+            { label: "Tight", value: 1.5 },
             { label: "Compact", value: 1.65 },
             { label: "Standard", value: 1.85 },
-            { label: "Spacious", value: 2.1 },
+            { label: "Spacious", value: 2.15 },
           ].map((item) => (
             <button
               key={item.label}
               onClick={() => onChangeSettings({ lineHeight: item.value })}
-              className={`rounded-lg border px-2.5 py-1.5 text-xs transition-colors ${
-                Math.abs(settings.lineHeight - item.value) < 0.05
-                  ? "border-[#89b4fa] bg-[#89b4fa]/20 text-white font-medium"
+              className={`rounded-lg border py-1.5 px-2 text-xs transition-colors ${
+                Math.abs(settings.lineHeight - item.value) < 0.04
+                  ? "border-[#89b4fa] bg-[#89b4fa]/20 text-white font-medium shadow-sm"
                   : "border-[#313244] bg-[#11111b]/60 text-[#a6adc8] hover:text-white hover:border-[#45475a]"
               }`}
             >
-              {item.label}
+              <span className="block text-[11px] font-medium">{item.label}</span>
+              <span className="block text-[9px] text-[#6c7086]">{item.value.toFixed(2)}x</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Letter Spacing with Slider and Presets */}
+      <div>
+        <div className="flex justify-between items-center mb-2">
+          <label className="text-xs font-semibold uppercase tracking-wider text-[#a6adc8]">
+            Letter Spacing
+          </label>
+          <span className="font-mono text-xs text-[#89b4fa]">
+            {(settings.letterSpacing ?? 0.2) > 0
+              ? `+${(settings.letterSpacing ?? 0.2).toFixed(2)}px`
+              : `${(settings.letterSpacing ?? 0.2).toFixed(2)}px`}
+          </span>
+        </div>
+
+        {/* Letter Spacing Slider with - and + buttons */}
+        <div className="flex items-center space-x-3 mb-2.5">
+          <button
+            onClick={() =>
+              onChangeSettings({
+                letterSpacing: Math.max(
+                  -0.5,
+                  Number(((settings.letterSpacing ?? 0.2) - 0.1).toFixed(2))
+                ),
+              })
+            }
+            disabled={(settings.letterSpacing ?? 0.2) <= -0.5}
+            className="rounded border border-[#313244] bg-[#11111b] p-2 text-[#cdd6f4] hover:bg-[#313244] disabled:opacity-40 transition-colors"
+            aria-label="Decrease letter spacing"
+          >
+            <Minus className="h-3.5 w-3.5" />
+          </button>
+          <input
+            type="range"
+            min="-0.5"
+            max="2.5"
+            step="0.05"
+            value={settings.letterSpacing ?? 0.2}
+            onChange={(e) =>
+              onChangeSettings({ letterSpacing: parseFloat(e.target.value) })
+            }
+            className="flex-1 accent-[#89b4fa] cursor-pointer h-1.5 bg-[#313244] rounded-lg appearance-none"
+          />
+          <button
+            onClick={() =>
+              onChangeSettings({
+                letterSpacing: Math.min(
+                  2.5,
+                  Number(((settings.letterSpacing ?? 0.2) + 0.1).toFixed(2))
+                ),
+              })
+            }
+            disabled={(settings.letterSpacing ?? 0.2) >= 2.5}
+            className="rounded border border-[#313244] bg-[#11111b] p-2 text-[#cdd6f4] hover:bg-[#313244] disabled:opacity-40 transition-colors"
+            aria-label="Increase letter spacing"
+          >
+            <Plus className="h-3.5 w-3.5" />
+          </button>
+        </div>
+
+        {/* Letter Spacing Quick Presets */}
+        <div className="grid grid-cols-4 gap-1.5">
+          {[
+            { label: "Normal", value: 0 },
+            { label: "Clean", value: 0.2 },
+            { label: "Wide", value: 0.6 },
+            { label: "Airy", value: 1.2 },
+          ].map((item) => (
+            <button
+              key={item.label}
+              onClick={() => onChangeSettings({ letterSpacing: item.value })}
+              className={`rounded-lg border py-1.5 px-2 text-xs transition-colors ${
+                Math.abs((settings.letterSpacing ?? 0.2) - item.value) < 0.06
+                  ? "border-[#89b4fa] bg-[#89b4fa]/20 text-white font-medium shadow-sm"
+                  : "border-[#313244] bg-[#11111b]/60 text-[#a6adc8] hover:text-white hover:border-[#45475a]"
+              }`}
+            >
+              <span className="block text-[11px] font-medium">{item.label}</span>
+              <span className="block text-[9px] text-[#6c7086]">{item.value}px</span>
             </button>
           ))}
         </div>
@@ -253,10 +381,12 @@ export function FontSelector({ settings, onChangeSettings }: FontSelectorProps) 
             Preview
           </div>
           <p
-            className={`transition-colors duration-150 leading-relaxed font-${settings.font}`}
+            className={`transition-colors duration-150 font-${settings.font}`}
             style={{
               color: currentFontColor,
               fontSize: `${Math.min(18, Math.max(14, settings.fontSize - 2))}px`,
+              lineHeight: settings.lineHeight,
+              letterSpacing: typeof settings.letterSpacing === "number" ? `${settings.letterSpacing}px` : "0.01em",
             }}
           >
             “The world is boundless, who can grasp eternity?”

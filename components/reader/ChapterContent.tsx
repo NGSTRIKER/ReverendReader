@@ -252,11 +252,14 @@ export function ChapterContent({
           style={{
             fontSize: `${settings.fontSize}px`,
             lineHeight: settings.lineHeight,
+            letterSpacing: typeof settings.letterSpacing === "number" ? `${settings.letterSpacing}px` : "0.01em",
             color: activeFontColor,
           }}
         >
           {paragraphs.map((para, index) => (
-            <p key={index}>{para}</p>
+            <p key={index} style={{ lineHeight: settings.lineHeight }}>
+              {para}
+            </p>
           ))}
         </div>
       )}

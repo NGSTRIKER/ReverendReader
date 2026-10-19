@@ -62,6 +62,7 @@ export default async function ReadPage({ searchParams }: ReadPageProps) {
   const opacityCookie = cookieStore.get("reverend_surface_opacity")?.value;
   const maxWidthCookie = cookieStore.get("reverend_max_width")?.value;
   const fontColorCookie = cookieStore.get("reverend_font_color")?.value;
+  const letterSpacingCookie = cookieStore.get("reverend_letter_spacing")?.value;
 
   if (surfaceThemeCookie) {
     initialSettings.surfaceTheme = surfaceThemeCookie as ManifestData extends never ? never : typeof initialSettings.surfaceTheme;
@@ -87,6 +88,9 @@ export default async function ReadPage({ searchParams }: ReadPageProps) {
     } catch {
       initialSettings.fontColor = fontColorCookie;
     }
+  }
+  if (letterSpacingCookie && !isNaN(parseFloat(letterSpacingCookie))) {
+    initialSettings.letterSpacing = parseFloat(letterSpacingCookie);
   }
 
   return (

@@ -8,6 +8,7 @@ export const DEFAULT_SETTINGS: ReaderSettings = {
   surfaceTheme: "catppuccin", // Catppuccin Blue
   maxWidth: 760,
   fontColor: "#cdd6f4", // Catppuccin Text Lavender
+  letterSpacing: 0.2,
 };
 
 /**
@@ -107,6 +108,9 @@ export function saveThemeSettings(settings: ReaderSettings): void {
   if (settings.fontColor) {
     setCookie("reverend_font_color", settings.fontColor);
   }
+  if (typeof settings.letterSpacing === "number") {
+    setCookie("reverend_letter_spacing", String(settings.letterSpacing));
+  }
 
   // 3. Keep localStorage fully in sync
   try {
@@ -116,7 +120,11 @@ export function saveThemeSettings(settings: ReaderSettings): void {
       localStorage.setItem("reverend_surface_theme", settings.surfaceTheme);
       localStorage.setItem("reverend_font", settings.font);
       localStorage.setItem("reverend_font_size", String(settings.fontSize));
+      localStorage.setItem("reverend_line_height", String(settings.lineHeight));
       localStorage.setItem("reverend_font_color", settings.fontColor || "#cdd6f4");
+      if (typeof settings.letterSpacing === "number") {
+        localStorage.setItem("reverend_letter_spacing", String(settings.letterSpacing));
+      }
     }
   } catch {
     // Ignore quota errors
@@ -146,6 +154,7 @@ export function loadThemeSettings(): ReaderSettings {
     const opacityCookie = getCookie("reverend_surface_opacity");
     const maxWidthCookie = getCookie("reverend_max_width");
     const fontColorCookie = getCookie("reverend_font_color");
+    const letterSpacingCookie = getCookie("reverend_letter_spacing");
 
     if (surfaceThemeCookie) {
       currentSettings.surfaceTheme = surfaceThemeCookie as ReaderSettings["surfaceTheme"];
@@ -173,6 +182,10 @@ export function loadThemeSettings(): ReaderSettings {
     }
     if (fontColorCookie) {
       currentSettings.fontColor = fontColorCookie;
+      hasLoaded = true;
+    }
+    if (letterSpacingCookie && !isNaN(parseFloat(letterSpacingCookie))) {
+      currentSettings.letterSpacing = parseFloat(letterSpacingCookie);
       hasLoaded = true;
     }
 
