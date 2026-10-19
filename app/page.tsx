@@ -4,7 +4,7 @@ import { SynopsisSection } from "@/components/landing/SynopsisSection";
 import { Footer } from "@/components/landing/Footer";
 
 export default function HomePage() {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://reverend-reader.local";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://reverend-reader.vercel.app";
 
   const jsonLd = {
     "@context": "https://schema.org",

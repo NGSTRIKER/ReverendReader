@@ -1,7 +1,8 @@
 import type { Metadata, Viewport } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://reverend-reader.local";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://reverend-reader.vercel.app";
 
 export const viewport: Viewport = {
   themeColor: "#1e1e2e",
@@ -76,6 +77,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen bg-[#1e1e2e] text-[#cdd6f4] selection:bg-[#89b4fa]/30 selection:text-white">
         {children}
+        <Analytics />
       </body>
     </html>
   );
