@@ -52,7 +52,7 @@ export function HeroSection() {
       ref={sectionRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="relative overflow-hidden border-b border-[#2b303c]/70 bg-[#0d0e15] py-20 sm:py-28"
+      className="relative overflow-hidden border-b border-[#313244] bg-[#181825] py-20 sm:py-28"
     >
       {/* Parallax Background Container */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -66,7 +66,7 @@ export function HeroSection() {
         >
           {/* Responsive Picture: Downloads ONLY the appropriate image for device form factor in modern WebP */}
           <picture className="absolute inset-0 w-full h-full">
-            {/* Portrait / Phone User Background: Solitary Snow Path (WebP or JPG fallback) */}
+            {/* Portrait / Phone User Background */}
             <source
               media="(max-width: 639px) and (orientation: portrait)"
               type="image/webp"
@@ -76,7 +76,7 @@ export function HeroSection() {
               media="(max-width: 639px) and (orientation: portrait)"
               srcSet="/images/fang-yuan-snow.jpg"
             />
-            {/* Landscape / Desktop Background: Creation of Gu (WebP or PNG fallback) */}
+            {/* Landscape / Desktop Background */}
             <source
               type="image/webp"
               srcSet="/images/fang-yuan-creation.webp"
@@ -86,55 +86,58 @@ export function HeroSection() {
               alt="The Creation of Gu — Fang Yuan Demonic Rebirth"
               loading="eager"
               decoding="async"
-              className="h-full w-full object-cover object-center filter brightness-[0.88] contrast-[1.08]"
+              className="h-full w-full object-cover object-center filter brightness-[0.75] contrast-[1.05]"
               style={{ imageRendering: "-webkit-optimize-contrast" }}
             />
           </picture>
         </div>
 
-        {/* Precision dark matte vignette to emphasize typography and artwork atmosphere */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#11121c] via-[#0d0e15]/40 to-black/30" />
+        {/* Archcraft Minimal Matte Overlay (Flat, deep, non-glowing) */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#181825] via-[#181825]/85 to-[#11111b]/70" />
 
-        {/* Soft bottom edge blend */}
-        <div className="absolute bottom-0 inset-x-0 h-24 bg-gradient-to-t from-[#11121c] to-transparent" />
+        {/* Bottom edge blend to section base */}
+        <div className="absolute bottom-0 inset-x-0 h-16 bg-gradient-to-t from-[#181825] to-transparent" />
       </div>
 
       {/* Hero Foreground Content */}
       <div className="relative z-10 mx-auto max-w-4xl px-4 sm:px-6 text-center">
-        {/* Riced Tag Pill */}
-        <div className="inline-flex items-center space-x-2 rounded-full border border-[#3b4252] bg-[#141622]/90 px-3.5 py-1 text-[11px] font-mono tracking-[0.2em] uppercase text-[#74c7ec] mb-7 shadow-sm backdrop-blur-md">
+        {/* Archcraft Tag Pill */}
+        <div className="inline-flex items-center space-x-2 rounded-full border border-[#313244] bg-[#181825]/90 px-3.5 py-1 text-[11px] font-mono tracking-[0.2em] uppercase text-[#a6adc8] mb-6 backdrop-blur-sm">
           <span className="h-1.5 w-1.5 rounded-full bg-[#89b4fa]" />
           <span>Gu Zhenren · 蛊真人 · 宿命之争</span>
         </div>
 
-        {/* Primary Heading */}
-        <h1 className="font-serif text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight text-white mb-2 drop-shadow-[0_4px_20px_rgba(0,0,0,0.85)]">
+        {/* Primary Heading - Clean, thin/medium typography without neon drop-shadows */}
+        <h1 className="font-serif text-4xl sm:text-6xl md:text-7xl font-normal tracking-tight text-white mb-1">
           Reverend Insanity
         </h1>
 
+        {/* Archcraft Signature Accent Bar */}
+        <div className="w-12 h-[2px] bg-[#89b4fa] mx-auto my-4" />
+
         {/* Subtitle Monogram */}
-        <p className="font-mono text-xs sm:text-sm text-[#89b4fa] tracking-[0.35em] uppercase font-medium mb-8">
+        <p className="font-mono text-xs sm:text-sm text-[#89b4fa] tracking-[0.3em] uppercase mb-7">
           蛊真人 · MASTER OF GU
         </p>
 
-        {/* Iconic Opening Verse */}
-        <div className="mx-auto max-w-2xl mb-8 px-4">
-          <p className="font-serif italic text-lg sm:text-xl text-[#f5e0dc] leading-relaxed drop-shadow-sm">
+        {/* Opening Verse */}
+        <div className="mx-auto max-w-2xl mb-7 px-4">
+          <p className="font-serif italic text-lg sm:text-xl text-[#cdd6f4] leading-relaxed font-normal">
             &ldquo;Humans are clever in tens of thousands of ways, Gu are the true refined essences of Heaven and Earth.&rdquo;
           </p>
         </div>
 
-        {/* Concise Atmospheric Premise */}
-        <p className="mx-auto max-w-2xl text-sm sm:text-base text-[#bac2de] leading-relaxed mb-10 drop-shadow">
+        {/* Atmospheric Premise */}
+        <p className="mx-auto max-w-2xl text-xs sm:text-sm text-[#a6adc8] leading-relaxed mb-9">
           Five centuries of demonic cultivation end in encirclement. Activating the supreme Spring Autumn Cicada,
           Fang Yuan reverses temporal flow 500 years into the past—indifferent to worldly morality, relentlessly pursuing eternal life.
         </p>
 
-        {/* Unified Riced Action Deck */}
-        <div className="flex flex-wrap items-center justify-center gap-3.5 mb-14">
+        {/* Matte Action Buttons (Flat, crisp, 1px border, zero glow) */}
+        <div className="flex flex-wrap items-center justify-center gap-3 mb-12">
           <Link
             href="/read"
-            className="group inline-flex items-center space-x-2 rounded-md bg-[#89b4fa] px-6 py-3 text-xs font-mono font-semibold tracking-wider uppercase text-[#11111b] shadow-md hover:bg-[#b4befe] transition-all focus:outline-none focus:ring-2 focus:ring-[#89b4fa]"
+            className="group inline-flex items-center space-x-2 rounded-md bg-[#89b4fa] px-6 py-2.5 text-xs font-mono font-medium tracking-wider uppercase text-[#11111b] hover:bg-[#b4befe] transition-colors focus:outline-none focus:ring-1 focus:ring-[#89b4fa]"
           >
             <BookOpen className="h-3.5 w-3.5" />
             <span>Start Reading</span>
@@ -143,7 +146,7 @@ export function HeroSection() {
 
           <Link
             href="#synopsis"
-            className="inline-flex items-center space-x-1.5 rounded-md border border-[#3b4252] bg-[#141622]/80 px-5 py-3 text-xs font-mono tracking-wider uppercase text-[#cdd6f4] hover:border-[#89b4fa]/50 hover:bg-[#1e1e2e] backdrop-blur-md transition-all"
+            className="inline-flex items-center space-x-1.5 rounded-md border border-[#313244] bg-[#181825] px-5 py-2.5 text-xs font-mono tracking-wider uppercase text-[#cdd6f4] hover:bg-[#313244] hover:border-[#45475a] hover:text-white transition-colors"
           >
             <span>Synopsis</span>
           </Link>
@@ -152,7 +155,7 @@ export function HeroSection() {
             href="https://discord.gg/YbwBb6DjXH"
             target="_blank"
             rel="noopener noreferrer"
-            className="group inline-flex items-center space-x-2 rounded-md border border-[#5865F2]/40 bg-[#5865F2]/10 px-5 py-3 text-xs font-mono tracking-wide text-[#cdd6f4] hover:border-[#5865F2] hover:bg-[#5865F2]/20 hover:text-white backdrop-blur-md transition-all"
+            className="group inline-flex items-center space-x-2 rounded-md border border-[#313244] bg-[#181825] px-5 py-2.5 text-xs font-mono tracking-wide text-[#cdd6f4] hover:bg-[#313244] hover:border-[#45475a] hover:text-white transition-colors"
           >
             <span className="h-1.5 w-1.5 rounded-full bg-[#a6e3a1]" />
             <svg className="h-3.5 w-3.5 text-[#89b4fa] group-hover:text-white transition-colors" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -162,23 +165,23 @@ export function HeroSection() {
           </a>
         </div>
 
-        {/* Riced Telemetry HUD Bar */}
-        <div className="mx-auto max-w-3xl rounded-lg border border-[#2b303c] bg-[#12141f]/90 p-4 backdrop-blur-md shadow-lg">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 divide-y sm:divide-y-0 sm:divide-x divide-[#2b303c] text-left">
+        {/* Archcraft Telemetry HUD Bar (Flat matte, clean border) */}
+        <div className="mx-auto max-w-3xl rounded-md border border-[#313244] bg-[#181825] p-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 divide-y sm:divide-y-0 sm:divide-x divide-[#313244] text-left">
             <div className="sm:px-3 pt-2 sm:pt-0">
-              <span className="block font-mono text-[10px] uppercase tracking-widest text-[#74c7ec]">Author</span>
+              <span className="block font-mono text-[10px] uppercase tracking-widest text-[#a6adc8]">Author</span>
               <span className="mt-0.5 block text-xs font-medium text-[#cdd6f4]">Gu Zhenren (蛊真人)</span>
             </div>
             <div className="sm:px-3 pt-2 sm:pt-0">
-              <span className="block font-mono text-[10px] uppercase tracking-widest text-[#74c7ec]">Genre</span>
+              <span className="block font-mono text-[10px] uppercase tracking-widest text-[#a6adc8]">Genre</span>
               <span className="mt-0.5 block text-xs font-medium text-[#cdd6f4]">Dark Xianxia</span>
             </div>
             <div className="sm:px-3 pt-2 sm:pt-0">
-              <span className="block font-mono text-[10px] uppercase tracking-widest text-[#74c7ec]">Protagonist</span>
+              <span className="block font-mono text-[10px] uppercase tracking-widest text-[#a6adc8]">Protagonist</span>
               <span className="mt-0.5 block text-xs font-medium text-[#cdd6f4]">Fang Yuan (方源)</span>
             </div>
             <div className="sm:px-3 pt-2 sm:pt-0">
-              <span className="block font-mono text-[10px] uppercase tracking-widest text-[#74c7ec]">Canon</span>
+              <span className="block font-mono text-[10px] uppercase tracking-widest text-[#a6adc8]">Canon</span>
               <span className="mt-0.5 block font-mono text-xs font-medium text-[#89b4fa]">2,334 Chapters</span>
             </div>
           </div>
