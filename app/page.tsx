@@ -37,7 +37,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#1e1e2e] text-[#cdd6f4]">
+    <div className="flex min-h-screen flex-col bg-[#0d0e15] text-[#cdd6f4]">
       {/* Structured Data */}
       <script
         type="application/ld+json"
