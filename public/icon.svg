@@ -1,33 +1,33 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#1e1e2e"/>
-      <stop offset="1" stop-color="#181825"/>
+      <stop offset="0" stop-color="#303446"/>
+      <stop offset="1" stop-color="#292c3c"/>
     </linearGradient>
     <linearGradient id="blue" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#89b4fa"/>
-      <stop offset="1" stop-color="#b4befe"/>
+      <stop offset="0" stop-color="#8caaee"/>
+      <stop offset="1" stop-color="#babbf1"/>
     </linearGradient>
     <linearGradient id="lav" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#cba6f7"/>
-      <stop offset="1" stop-color="#89b4fa"/>
+      <stop offset="0" stop-color="#ca9ee6"/>
+      <stop offset="1" stop-color="#8caaee"/>
     </linearGradient>
   </defs>
 
   <rect x="8" y="8" width="240" height="240" rx="55"
-        fill="url(#bg)" stroke="#45475a" stroke-width="1.5"/>
+        fill="url(#bg)" stroke="#51576d" stroke-width="1.5"/>
 
-  <circle cx="169" cy="78" r="38" fill="#89b4fa" opacity=".14"/>
+  <circle cx="169" cy="78" r="38" fill="#8caaee" opacity=".14"/>
   <path d="M143 47 A35 35 0 1 0 183 91 A29 29 0 0 1 143 47Z"
         fill="url(#blue)"/>
 
   <path d="M26 175 L77 112 L104 144 L147 91
-           L229 188 L229 215 L26 215Z" fill="#313244"/>
+           L229 188 L229 215 L26 215Z" fill="#414559"/>
   <path d="M26 195 L94 137 L127 171 L166 130
-           L229 191 L229 215 L26 215Z" fill="#45475a"/>
+           L229 191 L229 215 L26 215Z" fill="#51576d"/>
   <path d="M28 207 L91 171 L119 190 L158 160
            L228 203 L228 215 L28 215Z"
-        fill="#585b70" opacity=".65"/>
+        fill="#626880" opacity=".65"/>
 
   <!-- R monogram -->
   <path d="M42 213 V76 Q42 68 50 68 H89
@@ -36,7 +36,7 @@
         fill="url(#blue)"/>
   <path d="M65 89 H87 Q102 89 102 103
            Q102 116 87 116 H65Z"
-        fill="#1e1e2e"/>
+        fill="#303446"/>
 
   <!-- I monogram -->
   <path d="M148 68 H190 V88 H179 V192
@@ -44,10 +44,10 @@
            H148Z" fill="url(#lav)"/>
 
   <path d="M36 225 Q128 235 220 225"
-        fill="none" stroke="#89b4fa" stroke-width="2"
+        fill="none" stroke="#8caaee" stroke-width="2"
         opacity=".75"/>
 
   <path d="M205 44 L208 52 L216 55 L208 58
            L205 66 L202 58 L194 55 L202 52Z"
-        fill="#cba6f7"/>
+        fill="#ca9ee6"/>
 </svg>

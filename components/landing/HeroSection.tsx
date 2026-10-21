@@ -52,7 +52,7 @@ export function HeroSection() {
       ref={sectionRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="relative overflow-hidden border-b border-[#313244] bg-[#181825] py-20 sm:py-28"
+      className="relative overflow-hidden border-b border-[#414559] bg-[#292c3c] py-20 sm:py-28"
     >
       {/* Parallax Background Container */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -92,18 +92,18 @@ export function HeroSection() {
           </picture>
         </div>
 
-        {/* Archcraft Minimal Matte Overlay (Flat, deep, non-glowing) */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#181825] via-[#181825]/85 to-[#11111b]/70" />
+        {/* Archcraft Minimal Matte Overlay in Catppuccin Frappe */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#292c3c] via-[#292c3c]/85 to-[#232634]/70" />
 
         {/* Bottom edge blend to section base */}
-        <div className="absolute bottom-0 inset-x-0 h-16 bg-gradient-to-t from-[#181825] to-transparent" />
+        <div className="absolute bottom-0 inset-x-0 h-16 bg-gradient-to-t from-[#292c3c] to-transparent" />
       </div>
 
       {/* Hero Foreground Content */}
       <div className="relative z-10 mx-auto max-w-4xl px-4 sm:px-6 text-center">
         {/* Archcraft Tag Pill */}
-        <div className="inline-flex items-center space-x-2 rounded-full border border-[#313244] bg-[#181825]/90 px-3.5 py-1 text-[11px] font-mono tracking-[0.2em] uppercase text-[#a6adc8] mb-6 backdrop-blur-sm">
-          <span className="h-1.5 w-1.5 rounded-full bg-[#89b4fa]" />
+        <div className="inline-flex items-center space-x-2 rounded-full border border-[#414559] bg-[#292c3c]/90 px-3.5 py-1 text-[11px] font-mono tracking-[0.2em] uppercase text-[#a5adce] mb-6 backdrop-blur-sm">
+          <span className="h-1.5 w-1.5 rounded-full bg-[#8caaee]" />
           <span>Gu Zhenren · 蛊真人 · 宿命之争</span>
         </div>
 
@@ -113,22 +113,22 @@ export function HeroSection() {
         </h1>
 
         {/* Archcraft Signature Accent Bar */}
-        <div className="w-12 h-[2px] bg-[#89b4fa] mx-auto my-4" />
+        <div className="w-12 h-[2px] bg-[#8caaee] mx-auto my-4" />
 
         {/* Subtitle Monogram */}
-        <p className="font-mono text-xs sm:text-sm text-[#89b4fa] tracking-[0.3em] uppercase mb-7">
+        <p className="font-mono text-xs sm:text-sm text-[#8caaee] tracking-[0.3em] uppercase mb-7">
           蛊真人 · MASTER OF GU
         </p>
 
         {/* Opening Verse */}
         <div className="mx-auto max-w-2xl mb-7 px-4">
-          <p className="font-serif italic text-lg sm:text-xl text-[#cdd6f4] leading-relaxed font-normal">
+          <p className="font-serif italic text-lg sm:text-xl text-[#c6d0f5] leading-relaxed font-normal">
             &ldquo;Humans are clever in tens of thousands of ways, Gu are the true refined essences of Heaven and Earth.&rdquo;
           </p>
         </div>
 
         {/* Atmospheric Premise */}
-        <p className="mx-auto max-w-2xl text-xs sm:text-sm text-[#a6adc8] leading-relaxed mb-9">
+        <p className="mx-auto max-w-2xl text-xs sm:text-sm text-[#a5adce] leading-relaxed mb-9">
           Five centuries of demonic cultivation end in encirclement. Activating the supreme Spring Autumn Cicada,
           Fang Yuan reverses temporal flow 500 years into the past—indifferent to worldly morality, relentlessly pursuing eternal life.
         </p>
@@ -137,7 +137,7 @@ export function HeroSection() {
         <div className="flex flex-wrap items-center justify-center gap-3 mb-12">
           <Link
             href="/read"
-            className="group inline-flex items-center space-x-2 rounded-md bg-[#89b4fa] px-6 py-2.5 text-xs font-mono font-medium tracking-wider uppercase text-[#11111b] hover:bg-[#b4befe] transition-colors focus:outline-none focus:ring-1 focus:ring-[#89b4fa]"
+            className="group inline-flex items-center space-x-2 rounded-md bg-[#8caaee] px-6 py-2.5 text-xs font-mono font-medium tracking-wider uppercase text-[#232634] hover:bg-[#babbf1] transition-colors focus:outline-none focus:ring-1 focus:ring-[#8caaee]"
           >
             <BookOpen className="h-3.5 w-3.5" />
             <span>Start Reading</span>
@@ -146,7 +146,7 @@ export function HeroSection() {
 
           <Link
             href="#synopsis"
-            className="inline-flex items-center space-x-1.5 rounded-md border border-[#313244] bg-[#181825] px-5 py-2.5 text-xs font-mono tracking-wider uppercase text-[#cdd6f4] hover:bg-[#313244] hover:border-[#45475a] hover:text-white transition-colors"
+            className="inline-flex items-center space-x-1.5 rounded-md border border-[#414559] bg-[#292c3c] px-5 py-2.5 text-xs font-mono tracking-wider uppercase text-[#c6d0f5] hover:bg-[#414559] hover:border-[#51576d] hover:text-white transition-colors"
           >
             <span>Synopsis</span>
           </Link>
@@ -155,10 +155,10 @@ export function HeroSection() {
             href="https://discord.gg/YbwBb6DjXH"
             target="_blank"
             rel="noopener noreferrer"
-            className="group inline-flex items-center space-x-2 rounded-md border border-[#313244] bg-[#181825] px-5 py-2.5 text-xs font-mono tracking-wide text-[#cdd6f4] hover:bg-[#313244] hover:border-[#45475a] hover:text-white transition-colors"
+            className="group inline-flex items-center space-x-2 rounded-md border border-[#414559] bg-[#292c3c] px-5 py-2.5 text-xs font-mono tracking-wide text-[#c6d0f5] hover:bg-[#414559] hover:border-[#51576d] hover:text-white transition-colors"
           >
-            <span className="h-1.5 w-1.5 rounded-full bg-[#a6e3a1]" />
-            <svg className="h-3.5 w-3.5 text-[#89b4fa] group-hover:text-white transition-colors" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#a6d189]" />
+            <svg className="h-3.5 w-3.5 text-[#8caaee] group-hover:text-white transition-colors" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.929 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.894.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
             </svg>
             <span>Alliance Discord</span>
@@ -166,23 +166,23 @@ export function HeroSection() {
         </div>
 
         {/* Archcraft Telemetry HUD Bar (Flat matte, clean border) */}
-        <div className="mx-auto max-w-3xl rounded-md border border-[#313244] bg-[#181825] p-4">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 divide-y sm:divide-y-0 sm:divide-x divide-[#313244] text-left">
+        <div className="mx-auto max-w-3xl rounded-md border border-[#414559] bg-[#292c3c] p-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 divide-y sm:divide-y-0 sm:divide-x divide-[#414559] text-left">
             <div className="sm:px-3 pt-2 sm:pt-0">
-              <span className="block font-mono text-[10px] uppercase tracking-widest text-[#a6adc8]">Author</span>
-              <span className="mt-0.5 block text-xs font-medium text-[#cdd6f4]">Gu Zhenren (蛊真人)</span>
+              <span className="block font-mono text-[10px] uppercase tracking-widest text-[#a5adce]">Author</span>
+              <span className="mt-0.5 block text-xs font-medium text-[#c6d0f5]">Gu Zhenren (蛊真人)</span>
             </div>
             <div className="sm:px-3 pt-2 sm:pt-0">
-              <span className="block font-mono text-[10px] uppercase tracking-widest text-[#a6adc8]">Genre</span>
-              <span className="mt-0.5 block text-xs font-medium text-[#cdd6f4]">Dark Xianxia</span>
+              <span className="block font-mono text-[10px] uppercase tracking-widest text-[#a5adce]">Genre</span>
+              <span className="mt-0.5 block text-xs font-medium text-[#c6d0f5]">Dark Xianxia</span>
             </div>
             <div className="sm:px-3 pt-2 sm:pt-0">
-              <span className="block font-mono text-[10px] uppercase tracking-widest text-[#a6adc8]">Protagonist</span>
-              <span className="mt-0.5 block text-xs font-medium text-[#cdd6f4]">Fang Yuan (方源)</span>
+              <span className="block font-mono text-[10px] uppercase tracking-widest text-[#a5adce]">Protagonist</span>
+              <span className="mt-0.5 block text-xs font-medium text-[#c6d0f5]">Fang Yuan (方源)</span>
             </div>
             <div className="sm:px-3 pt-2 sm:pt-0">
-              <span className="block font-mono text-[10px] uppercase tracking-widest text-[#a6adc8]">Canon</span>
-              <span className="mt-0.5 block font-mono text-xs font-medium text-[#89b4fa]">2,334 Chapters</span>
+              <span className="block font-mono text-[10px] uppercase tracking-widest text-[#a5adce]">Canon</span>
+              <span className="mt-0.5 block font-mono text-xs font-medium text-[#8caaee]">2,334 Chapters</span>
             </div>
           </div>
         </div>

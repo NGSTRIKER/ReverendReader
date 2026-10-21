@@ -3,14 +3,14 @@ import { ArrowRight, BookOpen } from "lucide-react";
 
 export function Navigation() {
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-[#313244] bg-[#181825]/95 backdrop-blur-md">
+    <header className="sticky top-0 z-40 w-full border-b border-[#414559] bg-[#292c3c]/95 backdrop-blur-md">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
         {/* Brand */}
         <Link
           href="/"
-          className="group flex items-center space-x-3 text-[#cdd6f4] hover:text-white transition-colors"
+          className="group flex items-center space-x-3 text-[#c6d0f5] hover:text-white transition-colors"
         >
-          <div className="relative h-8 w-8 flex-shrink-0 overflow-hidden rounded-md border border-[#313244] bg-[#1e1e2e]">
+          <div className="relative h-8 w-8 flex-shrink-0 overflow-hidden rounded-md border border-[#414559] bg-[#303446]">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/icon.svg"
@@ -21,17 +21,17 @@ export function Navigation() {
             />
           </div>
           <div className="flex items-baseline space-x-2">
-            <span className="font-sans text-sm font-medium tracking-wide text-[#cdd6f4] group-hover:text-white">
+            <span className="font-sans text-sm font-medium tracking-wide text-[#c6d0f5] group-hover:text-white">
               Reverend Insanity
             </span>
-            <span className="hidden sm:inline-block font-mono text-[10px] tracking-widest text-[#89b4fa] uppercase">
+            <span className="hidden sm:inline-block font-mono text-[10px] tracking-widest text-[#8caaee] uppercase">
               [ 蛊真人 ]
             </span>
           </div>
         </Link>
 
         {/* Navigation links */}
-        <nav className="hidden md:flex items-center space-x-7 text-xs font-mono tracking-wider text-[#a6adc8]">
+        <nav className="hidden md:flex items-center space-x-7 text-xs font-mono tracking-wider text-[#a5adce]">
           <Link href="#synopsis" className="hover:text-white transition-colors">
             Synopsis
           </Link>
@@ -41,7 +41,7 @@ export function Navigation() {
             rel="noopener noreferrer"
             className="flex items-center space-x-1.5 hover:text-white transition-colors"
           >
-            <span className="h-1.5 w-1.5 rounded-full bg-[#a6e3a1]" />
+            <span className="h-1.5 w-1.5 rounded-full bg-[#a6d189]" />
             <span>Discord</span>
           </a>
           <Link href="/read" className="hover:text-white transition-colors">
@@ -55,7 +55,7 @@ export function Navigation() {
             href="https://discord.gg/YbwBb6DjXH"
             target="_blank"
             rel="noopener noreferrer"
-            className="md:hidden inline-flex items-center p-2 text-[#a6adc8] hover:text-white"
+            className="md:hidden inline-flex items-center p-2 text-[#a5adce] hover:text-white"
             aria-label="Discord Server"
           >
             <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -64,7 +64,7 @@ export function Navigation() {
           </a>
           <Link
             href="/read"
-            className="inline-flex items-center space-x-1.5 rounded-md border border-[#45475a] bg-[#313244] px-3.5 py-1.5 text-xs font-mono font-medium tracking-wide text-[#cdd6f4] hover:bg-[#45475a] hover:text-white transition-colors focus:outline-none focus:ring-1 focus:ring-[#89b4fa]"
+            className="inline-flex items-center space-x-1.5 rounded-md border border-[#51576d] bg-[#414559] px-3.5 py-1.5 text-xs font-mono font-medium tracking-wide text-[#c6d0f5] hover:bg-[#51576d] hover:text-white transition-colors focus:outline-none focus:ring-1 focus:ring-[#8caaee]"
           >
             <BookOpen className="h-3 w-3" />
             <span>Read Ch. 1</span>
