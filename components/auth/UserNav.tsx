@@ -25,33 +25,21 @@ export interface UserIdentity {
 
 export function extractUserIdentity(user: User): UserIdentity {
   const metadata = user.user_metadata || {};
-  const rawUsername =
+  // Use their Discord username as display name
+  const rawDiscordUsername =
     metadata.preferred_username ||
     metadata.user_name ||
-    user.email?.split("@")[0] ||
-    null;
-  const username = cleanPublicUsername(rawUsername);
-
-  // Pick display name, but never use an email address
-  let candidateDisplayName =
     metadata.custom_claims?.global_name ||
-    metadata.full_name ||
     metadata.name ||
-    metadata.preferred_username;
+    metadata.full_name ||
+    user.email?.split("@")[0];
 
-  if (typeof candidateDisplayName === "string" && candidateDisplayName.includes("@")) {
-    candidateDisplayName = null;
-  }
-
-  const displayName = candidateDisplayName
-    ? String(candidateDisplayName).slice(0, 60)
-    : username || "Cultivator";
-
+  const discordUsername = cleanPublicUsername(rawDiscordUsername) || "Cultivator";
   const avatarUrl = sanitizeAvatarUrl(metadata.avatar_url || metadata.picture);
 
   return {
-    displayName,
-    username,
+    displayName: discordUsername,
+    username: discordUsername,
     avatarUrl,
   };
 }
@@ -131,7 +119,7 @@ export function AccountMenuContent({
         </div>
         <div className="min-w-0 flex-1">
           <p className="truncate text-xs font-semibold text-[#c6d0f5]">{displayName}</p>
-          {username && (
+          {username && username.toLowerCase() !== displayName.toLowerCase() && (
             <p className="truncate font-mono text-[10px] text-[#a5adce]">@{username}</p>
           )}
           <div className="mt-0.5 flex items-center space-x-1 font-mono text-[9px] uppercase tracking-wider text-[#a6d189]">

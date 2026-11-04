@@ -134,45 +134,36 @@ export function sanitizeAvatarUrl(url: string | null | undefined): string | null
 }
 
 /**
- * Cleans a username for public UI display.
- * Allows usernames, but strips any email domain or leading '@' so private emails
- * are never displayed publicly.
+ * Cleans a Discord username for public display.
+ * Strips any accidental email domain or leading '@', ensuring private emails
+ * are never shown while preserving the exact Discord username.
  */
 export function cleanPublicUsername(username: string | null | undefined): string | null {
   if (!username || typeof username !== "string") return null;
-  const stripped = username.trim().replace(/^@+/, "").split("@")[0].trim();
-  return stripped ? stripped.slice(0, 40) : null;
+  const stripped = username.trim().replace(/^@+/, "");
+  if (!stripped) return null;
+  // If an email address was passed, extract just the Discord username portion
+  const nameOnly = stripped.includes("@") ? stripped.split("@")[0].trim() : stripped;
+  return nameOnly ? nameOnly.slice(0, 40) : null;
 }
 
 /**
- * Formats author labels for comment cards and UI components.
- * Preserves custom display names and usernames, but masks any email addresses
- * so that private emails are never exposed publicly.
+ * Formats comment author names to display their Discord username.
+ * Uses the user's Discord username for their display name while keeping
+ * their email address private.
  */
 export function formatAuthorNames(
   displayName: string | null | undefined,
   username: string | null | undefined
 ): { authorLabel: string; displayUsername: string | null } {
+  // Use their Discord username
   const cleanUsername = cleanPublicUsername(username);
+  const cleanDisplayName = cleanPublicUsername(displayName);
 
-  let authorLabel = "Cultivator";
-  if (displayName && typeof displayName === "string") {
-    const trimmed = displayName.trim();
-    if (!trimmed.includes("@") && trimmed.length > 0) {
-      authorLabel = trimmed.slice(0, 60);
-    } else if (cleanUsername) {
-      authorLabel = cleanUsername;
-    }
-  } else if (cleanUsername) {
-    authorLabel = cleanUsername;
-  }
+  // Pick the Discord username
+  const authorLabel = cleanUsername || cleanDisplayName || "Cultivator";
 
-  const displayUsername =
-    cleanUsername && cleanUsername.toLowerCase() !== authorLabel.toLowerCase()
-      ? cleanUsername
-      : null;
-
-  return { authorLabel, displayUsername };
+  return { authorLabel, displayUsername: null };
 }
 
 export function normalizeCommentText(raw: string): string {

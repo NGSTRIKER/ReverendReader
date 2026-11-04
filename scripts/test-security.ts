@@ -332,10 +332,10 @@ await check("UI author formatting suppresses emails while showing usernames clea
   assert.equal(case2.authorLabel, "john.doe");
   assert.equal(case2.displayUsername, null);
 
-  // Normal user with display name and username
+  // User with display name and username uses Discord username for display name
   const case3 = formatAuthorNames("Fang Yuan", "great_love");
-  assert.equal(case3.authorLabel, "Fang Yuan");
-  assert.equal(case3.displayUsername, "great_love");
+  assert.equal(case3.authorLabel, "great_love");
+  assert.equal(case3.displayUsername, null);
 
   // Anonymous user
   const case4 = formatAuthorNames(null, null);

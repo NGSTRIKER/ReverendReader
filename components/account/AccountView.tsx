@@ -41,27 +41,21 @@ export function AccountView({
   );
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  // Metadata fallbacks - keep emails private, allow usernames
+  // Metadata fallbacks - use Discord username for display name
   const metadata = user.user_metadata || {};
-  const username = cleanPublicUsername(
+  const discordUsername = cleanPublicUsername(
     profile?.username ||
+      profile?.display_name ||
       metadata.preferred_username ||
       metadata.user_name ||
+      metadata.custom_claims?.global_name ||
+      metadata.name ||
+      metadata.full_name ||
       user.email?.split("@")[0]
   );
 
-  let rawDisplayName =
-    profile?.display_name ||
-    metadata.custom_claims?.global_name ||
-    metadata.full_name ||
-    metadata.name ||
-    metadata.preferred_username;
-
-  if (typeof rawDisplayName === "string" && rawDisplayName.includes("@")) {
-    rawDisplayName = null;
-  }
-
-  const displayName = rawDisplayName || username || "Cultivator";
+  const displayName = discordUsername || "Cultivator";
+  const username = discordUsername;
   const avatarUrl = sanitizeAvatarUrl(
     profile?.avatar_url || metadata.avatar_url || metadata.picture
   );
@@ -199,7 +193,7 @@ export function AccountView({
                 </span>
               </div>
 
-              {username && (
+              {username && username.toLowerCase() !== displayName.toLowerCase() && (
                 <p className="font-mono text-xs text-[#a5adce] mt-0.5">@{username.replace(/^@/, "")}</p>
               )}
 
