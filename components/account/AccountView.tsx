@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { sanitizeAvatarUrl } from "@/lib/supabase/social";
+import { sanitizeAvatarUrl, cleanPublicUsername } from "@/lib/supabase/social";
 import { Profile, ReadingProgress, DatabaseBookmark } from "@/types/database";
 import type { User } from "@supabase/supabase-js";
 import {
@@ -41,19 +41,27 @@ export function AccountView({
   );
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  // Metadata fallbacks
+  // Metadata fallbacks - keep emails private, allow usernames
   const metadata = user.user_metadata || {};
-  const displayName =
-    profile?.display_name ||
-    metadata.full_name ||
-    metadata.custom_claims?.global_name ||
-    metadata.name ||
-    metadata.preferred_username ||
-    user.email?.split("@")[0] ||
-    "Cultivator";
+  const username = cleanPublicUsername(
+    profile?.username ||
+      metadata.preferred_username ||
+      metadata.user_name ||
+      user.email?.split("@")[0]
+  );
 
-  const username =
-    profile?.username || metadata.preferred_username || metadata.user_name || user.email?.split("@")[0];
+  let rawDisplayName =
+    profile?.display_name ||
+    metadata.custom_claims?.global_name ||
+    metadata.full_name ||
+    metadata.name ||
+    metadata.preferred_username;
+
+  if (typeof rawDisplayName === "string" && rawDisplayName.includes("@")) {
+    rawDisplayName = null;
+  }
+
+  const displayName = rawDisplayName || username || "Cultivator";
   const avatarUrl = sanitizeAvatarUrl(
     profile?.avatar_url || metadata.avatar_url || metadata.picture
   );

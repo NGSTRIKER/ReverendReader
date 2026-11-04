@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { sanitizeAvatarUrl } from "@/lib/supabase/social";
+import { sanitizeAvatarUrl, cleanPublicUsername } from "@/lib/supabase/social";
 import type { User } from "@supabase/supabase-js";
 import {
   LogIn,
@@ -25,20 +25,33 @@ export interface UserIdentity {
 
 export function extractUserIdentity(user: User): UserIdentity {
   const metadata = user.user_metadata || {};
-  const displayName =
-    metadata.full_name ||
-    metadata.custom_claims?.global_name ||
-    metadata.name ||
+  const rawUsername =
     metadata.preferred_username ||
+    metadata.user_name ||
     user.email?.split("@")[0] ||
-    "Cultivator";
+    null;
+  const username = cleanPublicUsername(rawUsername);
 
-  const rawUsername = metadata.preferred_username || metadata.user_name || user.email?.split("@")[0] || null;
+  // Pick display name, but never use an email address
+  let candidateDisplayName =
+    metadata.custom_claims?.global_name ||
+    metadata.full_name ||
+    metadata.name ||
+    metadata.preferred_username;
+
+  if (typeof candidateDisplayName === "string" && candidateDisplayName.includes("@")) {
+    candidateDisplayName = null;
+  }
+
+  const displayName = candidateDisplayName
+    ? String(candidateDisplayName).slice(0, 60)
+    : username || "Cultivator";
+
   const avatarUrl = sanitizeAvatarUrl(metadata.avatar_url || metadata.picture);
 
   return {
-    displayName: String(displayName).slice(0, 60),
-    username: rawUsername ? String(rawUsername).replace(/^@/, "").slice(0, 40) : null,
+    displayName,
+    username,
     avatarUrl,
   };
 }

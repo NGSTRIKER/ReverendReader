@@ -41,6 +41,7 @@ import {
   validateCommentText,
   withActionLock,
   getRandomPollIntervalMs,
+  formatAuthorNames,
   type CommentRow,
   type CommentSortOrder,
   type CommentCursor,
@@ -784,8 +785,10 @@ export function CommentsDrawer({
     const isSpoilerConcealed = item.is_spoiler && !revealedSpoilers.has(item.id);
     const isEditing = editingCommentId === item.id;
     const isMenuOpen = openMenuId === item.id;
-    const authorLabel =
-      item.author_display_name || item.author_username || "Cultivator";
+    const { authorLabel, displayUsername } = formatAuthorNames(
+      item.author_display_name,
+      item.author_username
+    );
     const wasEdited =
       !item.is_deleted &&
       new Date(item.updated_at).getTime() - new Date(item.created_at).getTime() > 2000;
@@ -822,9 +825,9 @@ export function CommentsDrawer({
               <span className={`truncate text-xs font-semibold ${textPrimary}`}>
                 {item.is_deleted ? "[Deleted]" : authorLabel}
               </span>
-              {!item.is_deleted && item.author_username && (
+              {!item.is_deleted && displayUsername && (
                 <span className={`truncate font-mono text-[10px] ${textSecondary}`}>
-                  @{item.author_username}
+                  @{displayUsername}
                 </span>
               )}
               <span className={`font-mono text-[10px] ${textSecondary}`}>

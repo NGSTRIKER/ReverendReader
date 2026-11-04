@@ -25,6 +25,8 @@ import {
   getRandomPollIntervalMs,
   MIN_POLL_INTERVAL_MS,
   MAX_POLL_INTERVAL_MS,
+  cleanPublicUsername,
+  formatAuthorNames,
 } from "../lib/supabase/social.ts";
 
 class MemoryStorage implements Storage {
@@ -310,6 +312,35 @@ await check("active polling intervals are randomized between 10s and 40s to prev
   }
   const uniqueValues = new Set(sample);
   assert.ok(uniqueValues.size > 15, "polling intervals must be randomized across clients");
+});
+
+await check("UI author formatting suppresses emails while showing usernames cleanly", () => {
+  // Strips email domain from username
+  assert.equal(cleanPublicUsername("alice@gmail.com"), "alice");
+  assert.equal(cleanPublicUsername("@alice"), "alice");
+  assert.equal(cleanPublicUsername("fang_yuan"), "fang_yuan");
+  assert.equal(cleanPublicUsername(""), null);
+  assert.equal(cleanPublicUsername(null), null);
+
+  // Masks email if stored as display name and falls back to username
+  const case1 = formatAuthorNames("alice@gmail.com", "alice");
+  assert.equal(case1.authorLabel, "alice");
+  assert.equal(case1.displayUsername, null); // don't repeat @alice when authorLabel is alice
+
+  // When both are email, strips domain and shows username
+  const case2 = formatAuthorNames("john.doe@sect.org", "john.doe@sect.org");
+  assert.equal(case2.authorLabel, "john.doe");
+  assert.equal(case2.displayUsername, null);
+
+  // Normal user with display name and username
+  const case3 = formatAuthorNames("Fang Yuan", "great_love");
+  assert.equal(case3.authorLabel, "Fang Yuan");
+  assert.equal(case3.displayUsername, "great_love");
+
+  // Anonymous user
+  const case4 = formatAuthorNames(null, null);
+  assert.equal(case4.authorLabel, "Cultivator");
+  assert.equal(case4.displayUsername, null);
 });
 
 console.log(`\n${passed} offline security checks passed.`);
