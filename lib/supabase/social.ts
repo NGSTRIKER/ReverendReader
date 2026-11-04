@@ -19,6 +19,21 @@ export const REPORT_DETAILS_MAX_LENGTH = 500;
 export const COMMENTS_PAGE_SIZE = 20;
 export const REPLIES_PAGE_SIZE = 10;
 
+/** Client-jittered active poll interval bounds (10s to 40s) */
+export const MIN_POLL_INTERVAL_MS = 10_000;
+export const MAX_POLL_INTERVAL_MS = 40_000;
+
+/**
+ * Returns a randomized delay between 10s and 40s for each poll cycle and client.
+ * Disperses concurrent client traffic to prevent synchronized database load.
+ */
+export function getRandomPollIntervalMs(): number {
+  return (
+    Math.floor(Math.random() * (MAX_POLL_INTERVAL_MS - MIN_POLL_INTERVAL_MS + 1)) +
+    MIN_POLL_INTERVAL_MS
+  );
+}
+
 export const REACTION_DEFINITIONS: ReadonlyArray<{
   type: ReactionType;
   emoji: string;

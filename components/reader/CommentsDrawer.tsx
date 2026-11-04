@@ -40,6 +40,7 @@ import {
   formatRelativeTimestamp,
   validateCommentText,
   withActionLock,
+  getRandomPollIntervalMs,
   type CommentRow,
   type CommentSortOrder,
   type CommentCursor,
@@ -192,6 +193,72 @@ export function CommentsDrawer({
   useEffect(() => {
     loadedKeyRef.current = null;
   }, [chapter.id]);
+
+  // Actively poll for new comments while drawer is open (randomized 10s-40s per client)
+  useEffect(() => {
+    if (!isOpen) return;
+
+    let cancelled = false;
+    let pollTimer: NodeJS.Timeout | null = null;
+
+    const pollBackground = async () => {
+      if (
+        cancelled ||
+        typeof document === "undefined" ||
+        document.visibilityState === "hidden" ||
+        editingCommentId !== null ||
+        submittingComment ||
+        submittingReply ||
+        submittingEdit
+      ) {
+        return;
+      }
+
+      try {
+        const supabase = createClient();
+        const res = await fetchChapterComments(
+          supabase,
+          chapter.id,
+          sort,
+          null,
+          COMMENTS_PAGE_SIZE
+        );
+        if (!cancelled && res.success) {
+          setComments((prev) => {
+            const incomingIds = new Set(res.comments.map((c) => c.id));
+            const retainedOlder = prev.filter((c) => !incomingIds.has(c.id));
+            return [...res.comments, ...retainedOlder];
+          });
+        }
+      } catch {
+        // Silent background update ignore
+      }
+    };
+
+    const scheduleNext = () => {
+      if (cancelled) return;
+      const interval = getRandomPollIntervalMs();
+      pollTimer = setTimeout(async () => {
+        await pollBackground();
+        scheduleNext();
+      }, interval);
+    };
+
+    scheduleNext();
+
+    return () => {
+      cancelled = true;
+      if (pollTimer) clearTimeout(pollTimer);
+    };
+  }, [
+    isOpen,
+    chapter.id,
+    sort,
+    editingCommentId,
+    submittingComment,
+    submittingReply,
+    submittingEdit,
+  ]);
 
   // Escape key closes report modal, active menu, or drawer
   useEffect(() => {

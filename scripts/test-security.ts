@@ -22,6 +22,9 @@ import {
   createChapterComment,
   fetchChapterComments,
   reportComment,
+  getRandomPollIntervalMs,
+  MIN_POLL_INTERVAL_MS,
+  MAX_POLL_INTERVAL_MS,
 } from "../lib/supabase/social.ts";
 
 class MemoryStorage implements Storage {
@@ -293,6 +296,20 @@ await check("sidebar visibility defaults to visible and persists in localStorage
   assert.equal(loadSidebarVisibility(), false);
   saveSidebarVisibility(true);
   assert.equal(loadSidebarVisibility(), true);
+});
+
+await check("active polling intervals are randomized between 10s and 40s to prevent request clumping", () => {
+  assert.equal(MIN_POLL_INTERVAL_MS, 10_000);
+  assert.equal(MAX_POLL_INTERVAL_MS, 40_000);
+  const sample = Array.from({ length: 50 }, () => getRandomPollIntervalMs());
+  for (const interval of sample) {
+    assert.ok(
+      interval >= 10_000 && interval <= 40_000,
+      `interval ${interval} out of bounds`
+    );
+  }
+  const uniqueValues = new Set(sample);
+  assert.ok(uniqueValues.size > 15, "polling intervals must be randomized across clients");
 });
 
 console.log(`\n${passed} offline security checks passed.`);

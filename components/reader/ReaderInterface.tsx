@@ -27,6 +27,9 @@ import {
   updateChapterReaction,
   setCachedChapterSocial,
   withActionLock,
+  isActionLocked,
+  getRandomPollIntervalMs,
+  MIN_POLL_INTERVAL_MS,
   type ChapterSocialState,
   type ReactionType,
 } from "@/lib/supabase/social";
@@ -925,30 +928,79 @@ export function ReaderInterface({
     saveSidebarVisibility(nextVisible);
   }, []);
 
-  // Fetch interactions ONLY for the currently active chapter
+  // Fetch and actively poll interactions for the active chapter (randomized 10s-40s per client)
   useEffect(() => {
     let cancelled = false;
+    let pollTimer: NodeJS.Timeout | null = null;
+    let lastFetchedAt = 0;
+
     setSocialState((prev) =>
       prev.chapterId === String(currentChapterId)
         ? prev
         : createDefaultChapterSocialState(currentChapterId)
     );
 
-    try {
-      const supabase = createClient();
-      fetchChapterSocial(supabase, currentChapterId, {
-        viewerId: user?.id ?? null,
-      }).then((res) => {
+    const performFetch = async (bypassCache = false) => {
+      if (cancelled) return;
+      if (typeof document !== "undefined" && document.visibilityState === "hidden") {
+        return;
+      }
+      const chapterKey = String(currentChapterId);
+      if (
+        isActionLocked(`chapter-like:${chapterKey}`) ||
+        isActionLocked(`chapter-reaction:${chapterKey}`)
+      ) {
+        return;
+      }
+
+      try {
+        const supabase = createClient();
+        const res = await fetchChapterSocial(supabase, currentChapterId, {
+          viewerId: user?.id ?? null,
+          bypassCache,
+        });
         if (!cancelled && res.success) {
+          lastFetchedAt = Date.now();
           setSocialState(res.state);
         }
-      });
-    } catch {
-      // Public reading works even when Supabase is not configured locally
-    }
+      } catch {
+        // Public reading works even when Supabase is not configured locally
+      }
+    };
+
+    const scheduleNextPoll = () => {
+      if (cancelled) return;
+      const interval = getRandomPollIntervalMs();
+      pollTimer = setTimeout(async () => {
+        await performFetch(true);
+        scheduleNextPoll();
+      }, interval);
+    };
+
+    // Immediate initial fetch
+    void performFetch(false).then(() => {
+      scheduleNextPoll();
+    });
+
+    // Re-check when window returns to focus if at least 10s has passed
+    const handleVisibilityChange = () => {
+      if (
+        document.visibilityState === "visible" &&
+        Date.now() - lastFetchedAt >= MIN_POLL_INTERVAL_MS
+      ) {
+        if (pollTimer) clearTimeout(pollTimer);
+        void performFetch(true).then(() => {
+          scheduleNextPoll();
+        });
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
       cancelled = true;
+      if (pollTimer) clearTimeout(pollTimer);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, [currentChapterId, user?.id]);
 
