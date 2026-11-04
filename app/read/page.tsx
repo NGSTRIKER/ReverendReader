@@ -6,6 +6,7 @@ import { ManifestData, ChapterMetadata } from "@/types/novel";
 import { ReaderInterface, InitialChapterInfo } from "@/components/reader/ReaderInterface";
 import { parseSettingsFromRaw } from "@/lib/storage";
 import { cleanChapterContent } from "@/lib/chapterFetcher";
+import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
   title: "Read Reverend Insanity | Distraction-Free Novel Reader",
@@ -54,8 +55,13 @@ export default async function ReadPage({ searchParams }: ReadPageProps) {
   const manifest = getServerManifest();
   const resolvedParams = await searchParams;
 
-  const rawChapterParam = resolvedParams.c;
+  const rawChapterParam = resolvedParams.c || resolvedParams.id;
   let initialChapterId = 1;
+  let initialScroll: number | undefined;
+  let initialVersion: number | undefined;
+  let initialUserId: string | undefined;
+  let cloudChapterId: number | undefined;
+  let cloudScroll: number | undefined;
 
   const cookieStore = await cookies();
 
@@ -64,14 +70,57 @@ export default async function ReadPage({ searchParams }: ReadPageProps) {
     if (!isNaN(parsed) && parsed >= 1 && parsed <= manifest.totalChapters) {
       initialChapterId = parsed;
     }
-  } else {
-    // If no query param, check reverend_last_read cookie
+  }
+
+  // Fetch the authenticated user's version even when a chapter was explicitly
+  // selected. The version is the CAS baseline; chapter navigation still wins.
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (user) {
+      initialUserId = user.id;
+      const { data: progress, error } = await supabase
+        .from("reading_progress")
+        .select("*")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (!error) {
+        initialVersion = progress?.version ?? 0;
+        if (progress?.chapter_id) {
+          const parsed = parseInt(progress.chapter_id, 10);
+          if (!isNaN(parsed) && parsed >= 1 && parsed <= manifest.totalChapters) {
+            cloudChapterId = parsed;
+            cloudScroll = progress.scroll_position;
+          }
+        }
+      }
+    }
+  } catch {
+    // Public reading remains available if auth or the progress query is unavailable.
+  }
+
+  if (typeof rawChapterParam !== "string" && cloudChapterId !== undefined) {
+    initialChapterId = cloudChapterId;
+    initialScroll = cloudScroll;
+  } else if (typeof rawChapterParam !== "string" && initialChapterId === 1) {
     const lastReadCookie = cookieStore.get("reverend_last_read")?.value;
     if (lastReadCookie) {
       const parsedLast = parseInt(lastReadCookie, 10);
       if (!isNaN(parsedLast) && parsedLast >= 1 && parsedLast <= manifest.totalChapters) {
         initialChapterId = parsedLast;
       }
+    }
+  }
+
+  // If explicit scroll parameter is passed in URL (e.g. /read?id=5&scroll=0.45)
+  if (typeof resolvedParams.scroll === "string") {
+    const parsedScroll = parseFloat(resolvedParams.scroll);
+    if (!isNaN(parsedScroll) && parsedScroll >= 0 && parsedScroll <= 1) {
+      initialScroll = parsedScroll;
     }
   }
 
@@ -137,6 +186,9 @@ export default async function ReadPage({ searchParams }: ReadPageProps) {
       totalChapters={manifest.totalChapters}
       initialContent={initialContent}
       initialSettings={initialSettings}
+      initialScroll={initialScroll}
+      initialVersion={initialVersion}
+      initialUserId={initialUserId}
     />
   );
 }

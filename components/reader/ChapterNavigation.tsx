@@ -11,6 +11,7 @@ import {
   Home,
   Bookmark,
 } from "lucide-react";
+import { UserNav } from "@/components/auth/UserNav";
 
 interface ChapterNavigationProps {
   currentChapter: ChapterMetadata;
@@ -262,6 +263,10 @@ export function ChapterNavigation({
           >
             <SlidersHorizontal className={`h-4 w-4 ${navTheme.accent}`} />
           </button>
+
+          <div className="ml-1 pl-1 sm:ml-1.5 sm:pl-1.5 border-l border-[#414559]/50 flex items-center">
+            <UserNav compact />
+          </div>
         </div>
       </div>
     </header>

@@ -6,6 +6,53 @@ import { ManifestData } from "@/types/novel";
 let cachedManifest: ManifestData | null = null;
 let cachedManifestTime = 0;
 
+// Best-effort per-instance rate limiter. Serverless instances do not share this
+// map, so this is a local abuse throttle, not a deployment-wide quota.
+const ipRequestCounts = new Map<string, { count: number; resetAt: number }>();
+const MAX_TRACKED_IPS = 10_000;
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const windowMs = 60000;
+  const limit = 120;
+
+  const record = ipRequestCounts.get(ip);
+  if (!record || now > record.resetAt) {
+    if (!record && ipRequestCounts.size >= MAX_TRACKED_IPS) {
+      // Drop expired entries first; if still full, evict the earliest expiry.
+      for (const [key, value] of ipRequestCounts) {
+        if (now > value.resetAt) ipRequestCounts.delete(key);
+      }
+      if (ipRequestCounts.size >= MAX_TRACKED_IPS) {
+        let oldestKey: string | null = null;
+        let oldestExpiry = Infinity;
+        for (const [key, value] of ipRequestCounts) {
+          if (value.resetAt < oldestExpiry) {
+            oldestKey = key;
+            oldestExpiry = value.resetAt;
+          }
+        }
+        if (oldestKey) ipRequestCounts.delete(oldestKey);
+      }
+    }
+    ipRequestCounts.set(ip, { count: 1, resetAt: now + windowMs });
+    return false;
+  }
+
+  record.count += 1;
+  return record.count > limit;
+}
+
+// Clean up expired IP entries every 5 minutes to prevent memory growth
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, record] of ipRequestCounts.entries()) {
+    if (now > record.resetAt) {
+      ipRequestCounts.delete(ip);
+    }
+  }
+}, 300000).unref?.();
+
 function getManifest(): ManifestData | null {
   const now = Date.now();
   if (cachedManifest && now - cachedManifestTime < 60000) {
@@ -28,6 +75,24 @@ function getManifest(): ManifestData | null {
 }
 
 export async function GET(request: NextRequest) {
+  // Rate limiting check
+  const clientIp =
+    request.headers.get("x-real-ip")?.trim() ||
+    request.headers.get("x-forwarded-for")?.split(",").at(-1)?.trim() ||
+    "unknown-ip";
+
+  if (isRateLimited(clientIp)) {
+    return NextResponse.json(
+      { error: "Too many requests. Please slow down." },
+      {
+        status: 429,
+        headers: {
+          "Retry-After": "60",
+        },
+      }
+    );
+  }
+
   const { searchParams } = new URL(request.url);
   const idParam = searchParams.get("id");
 
@@ -35,10 +100,10 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Missing chapter ID" }, { status: 400 });
   }
 
-  const chapterId = parseInt(idParam, 10);
-  if (isNaN(chapterId) || chapterId < 1) {
+  if (!/^[1-9][0-9]{0,3}$/.test(idParam)) {
     return NextResponse.json({ error: "Invalid chapter ID" }, { status: 400 });
   }
+  const chapterId = Number(idParam);
 
   const manifest = getManifest();
   if (!manifest) {

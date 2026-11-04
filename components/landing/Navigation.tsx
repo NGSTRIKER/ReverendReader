@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, BookOpen } from "lucide-react";
+import { UserNav } from "@/components/auth/UserNav";
 
 export function Navigation() {
   return (
@@ -70,6 +71,7 @@ export function Navigation() {
             <span>Read Ch. 1</span>
             <ArrowRight className="h-3 w-3" />
           </Link>
+          <UserNav />
         </div>
       </div>
     </header>

@@ -6,9 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "verify:supabase": "node --experimental-strip-types scripts/verify-supabase.ts",
+    "test:security": "node --experimental-strip-types scripts/test-security.ts"
   },
   "dependencies": {
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.118.0",
     "@vercel/analytics": "^2.0.1",
     "lucide-react": "^0.475.0",
     "next": "^15.1.7",
@@ -17,16 +21,21 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.7",
-    "@next/eslint-plugin-next": "^16.4.2",
+    "@next/eslint-plugin-next": "^15.5.28",
     "@types/node": "^22.13.4",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "@typescript-eslint/parser": "^8.71.2",
     "autoprefixer": "^10.4.20",
     "eslint": "^9.39.5",
-    "eslint-config-next": "^16.4.2",
-    "postcss": "^8.5.2",
+    "eslint-config-next": "^15.5.28",
+    "postcss": "^8.5.32",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.7.3"
+  },
+  "overrides": {
+    "minimatch": "^11.0.1",
+    "postcss": "^8.5.32",
+    "postcss-selector-parser": "^6.1.5"
   }
 }

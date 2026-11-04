@@ -2,8 +2,10 @@ import { Navigation } from "@/components/landing/Navigation";
 import { HeroSection } from "@/components/landing/HeroSection";
 import { SynopsisSection } from "@/components/landing/SynopsisSection";
 import { Footer } from "@/components/landing/Footer";
+import { headers } from "next/headers";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://reverend-reader.vercel.app";
 
   const jsonLd = {
@@ -41,6 +43,7 @@ export default function HomePage() {
       {/* Structured Data */}
       <script
         type="application/ld+json"
+        nonce={nonce}
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 

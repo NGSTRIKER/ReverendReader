@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useRef, useEffect } from "react";
+import React, { useCallback, useRef, useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, BookOpen } from "lucide-react";
 
@@ -8,6 +8,19 @@ export function HeroSection() {
   const sectionRef = useRef<HTMLElement | null>(null);
   const bgRef = useRef<HTMLDivElement | null>(null);
   const rafId = useRef<number | null>(null);
+  const [continueChapter, setContinueChapter] = useState<number | null>(null);
+
+  useEffect(() => {
+    try {
+      const last = localStorage.getItem("reverend_last_read");
+      if (last) {
+        const num = parseInt(last, 10);
+        if (!isNaN(num) && num >= 1) {
+          setContinueChapter(num);
+        }
+      }
+    } catch {}
+  }, []);
 
   // Parallax mouse movement handler using requestAnimationFrame (zero React re-renders)
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLElement>) => {
@@ -136,11 +149,11 @@ export function HeroSection() {
         {/* Matte Action Buttons (Flat, crisp, 1px border, zero glow) */}
         <div className="flex flex-wrap items-center justify-center gap-3 mb-12">
           <Link
-            href="/read"
+            href={continueChapter ? `/read?c=${continueChapter}` : "/read"}
             className="group inline-flex items-center space-x-2 rounded-md bg-[#8caaee] px-6 py-2.5 text-xs font-mono font-medium tracking-wider uppercase text-[#232634] hover:bg-[#babbf1] transition-colors focus:outline-none focus:ring-1 focus:ring-[#8caaee]"
           >
             <BookOpen className="h-3.5 w-3.5" />
-            <span>Start Reading</span>
+            <span>{continueChapter ? `Continue Ch. ${continueChapter}` : "Start Reading"}</span>
             <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
           </Link>
 
