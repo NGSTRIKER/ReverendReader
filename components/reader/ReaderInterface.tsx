@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ManifestData, ReaderSettings, Bookmark, ChapterMetadata } from "@/types/novel";
 import { ChapterNavigation } from "./ChapterNavigation";
 import { ChapterContent } from "./ChapterContent";
+import { InteractionSidebar } from "./InteractionSidebar";
 import { fetchChapterContent, preloadChapter } from "@/lib/chapterFetcher";
 import {
   loadThemeSettings,
@@ -14,9 +15,21 @@ import {
   saveBookmarks,
   toggleBookmarkStorage,
   setCookie,
+  loadSidebarVisibility,
+  saveSidebarVisibility,
   DEFAULT_SETTINGS,
 } from "@/lib/storage";
 import { createClient } from "@/lib/supabase/client";
+import {
+  createDefaultChapterSocialState,
+  fetchChapterSocial,
+  setChapterLike,
+  updateChapterReaction,
+  setCachedChapterSocial,
+  withActionLock,
+  type ChapterSocialState,
+  type ReactionType,
+} from "@/lib/supabase/social";
 import {
   syncReadingProgress,
   fetchReadingProgress,
@@ -45,6 +58,11 @@ const ChapterSelectorModal = dynamic(
 
 const SettingsModal = dynamic(
   () => import("./SettingsModal").then((mod) => mod.SettingsModal),
+  { ssr: false }
+);
+
+const CommentsDrawer = dynamic(
+  () => import("./CommentsDrawer").then((mod) => mod.CommentsDrawer),
   { ssr: false }
 );
 
@@ -124,7 +142,15 @@ export function ReaderInterface({
 
   // Modals State
   const [isTocOpen, setIsTocOpen] = useState(false);
+  const [tocInitialTab, setTocInitialTab] = useState<"chapters" | "bookmarks">("chapters");
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isCommentsOpen, setIsCommentsOpen] = useState(false);
+
+  // Interaction Sidebar Visibility & Chapter Social State
+  const [sidebarVisible, setSidebarVisible] = useState<boolean>(true);
+  const [socialState, setSocialState] = useState<ChapterSocialState>(() =>
+    createDefaultChapterSocialState(initialId)
+  );
 
   // Toast / Feedback State
   const [toastNotice, setToastNotice] = useState<ToastNotice | null>(null);
@@ -174,7 +200,13 @@ export function ReaderInterface({
 
   // Check auth and load account-scoped cloud data.
   useEffect(() => {
-    const supabase = createClient();
+    let supabase: ReturnType<typeof createClient>;
+    try {
+      supabase = createClient();
+    } catch {
+      setBookmarks(loadBookmarks());
+      return;
+    }
     let disposed = false;
     let authEventReceived = false;
 
@@ -233,6 +265,7 @@ export function ReaderInterface({
     try {
       const stored = loadThemeSettings();
       setSettings(stored);
+      setSidebarVisible(loadSidebarVisibility());
 
       // If no initialChapterId was passed via URL and no cloud progress set it
       const lastRead = localStorage.getItem("reverend_last_read");
@@ -886,6 +919,165 @@ export function ReaderInterface({
     setCurrentChapterId(id);
   };
 
+  // Toggle sidebar visibility and persist to localStorage
+  const handleToggleSidebarVisible = useCallback((nextVisible: boolean) => {
+    setSidebarVisible(nextVisible);
+    saveSidebarVisibility(nextVisible);
+  }, []);
+
+  // Fetch interactions ONLY for the currently active chapter
+  useEffect(() => {
+    let cancelled = false;
+    setSocialState((prev) =>
+      prev.chapterId === String(currentChapterId)
+        ? prev
+        : createDefaultChapterSocialState(currentChapterId)
+    );
+
+    try {
+      const supabase = createClient();
+      fetchChapterSocial(supabase, currentChapterId, {
+        viewerId: user?.id ?? null,
+      }).then((res) => {
+        if (!cancelled && res.success) {
+          setSocialState(res.state);
+        }
+      });
+    } catch {
+      // Public reading works even when Supabase is not configured locally
+    }
+
+    return () => {
+      cancelled = true;
+    };
+  }, [currentChapterId, user?.id]);
+
+  // Toggle Chapter Like (optimistic UI with rollback & rapid-click lock)
+  const handleToggleChapterLike = useCallback(async () => {
+    if (!currentChapter) return;
+    const returnUrl = `/read?c=${currentChapter.id}`;
+
+    if (!user) {
+      showToast({
+        type: "info",
+        message: "Sign in with Discord to like chapters.",
+        action: {
+          label: "Sign In",
+          href: `/login?next=${encodeURIComponent(returnUrl)}`,
+        },
+      });
+      return;
+    }
+
+    const chapterKey = String(currentChapter.id);
+    const outcome = await withActionLock(`chapter-like:${chapterKey}`, async () => {
+      const snapshot = socialState;
+      const nextLiked = !snapshot.viewerLiked;
+      const optimisticState: ChapterSocialState = {
+        ...snapshot,
+        chapterId: chapterKey,
+        viewerLiked: nextLiked,
+        likeCount: Math.max(0, snapshot.likeCount + (nextLiked ? 1 : -1)),
+      };
+
+      setSocialState(optimisticState);
+      setCachedChapterSocial(optimisticState, user.id);
+
+      const supabase = createClient();
+      const res = await setChapterLike(supabase, chapterKey, nextLiked);
+      if (!res.success) {
+        setSocialState(snapshot);
+        setCachedChapterSocial(snapshot, user.id);
+        showToast({
+          type: "error",
+          message: res.error || ERROR_SAVE_FAILED,
+        });
+      }
+      return res;
+    });
+
+    void outcome;
+  }, [currentChapter, user, socialState, showToast]);
+
+  // Select / change / remove Chapter Reaction (optimistic UI with rollback & lock)
+  const handleSelectChapterReaction = useCallback(
+    async (nextReaction: ReactionType | null) => {
+      if (!currentChapter) return;
+      const returnUrl = `/read?c=${currentChapter.id}`;
+
+      if (!user) {
+        showToast({
+          type: "info",
+          message: "Sign in with Discord to react to chapters.",
+          action: {
+            label: "Sign In",
+            href: `/login?next=${encodeURIComponent(returnUrl)}`,
+          },
+        });
+        return;
+      }
+
+      const chapterKey = String(currentChapter.id);
+      const outcome = await withActionLock(`chapter-reaction:${chapterKey}`, async () => {
+        const snapshot = socialState;
+        const prevReaction = snapshot.viewerReaction;
+        if (prevReaction === nextReaction) return { success: true };
+
+        const updatedCounts = { ...snapshot.reactionCounts };
+        let nextTotal = snapshot.totalReactions;
+
+        if (prevReaction) {
+          updatedCounts[prevReaction] = Math.max(0, (updatedCounts[prevReaction] || 0) - 1);
+          nextTotal = Math.max(0, nextTotal - 1);
+        }
+        if (nextReaction) {
+          updatedCounts[nextReaction] = (updatedCounts[nextReaction] || 0) + 1;
+          nextTotal += 1;
+        }
+
+        const optimisticState: ChapterSocialState = {
+          ...snapshot,
+          chapterId: chapterKey,
+          reactionCounts: updatedCounts,
+          totalReactions: nextTotal,
+          viewerReaction: nextReaction,
+        };
+
+        setSocialState(optimisticState);
+        setCachedChapterSocial(optimisticState, user.id);
+
+        const supabase = createClient();
+        const res = await updateChapterReaction(supabase, chapterKey, nextReaction);
+        if (!res.success) {
+          setSocialState(snapshot);
+          setCachedChapterSocial(snapshot, user.id);
+          showToast({
+            type: "error",
+            message: res.error || ERROR_SAVE_FAILED,
+          });
+        }
+        return res;
+      });
+
+      void outcome;
+    },
+    [currentChapter, user, socialState, showToast]
+  );
+
+  const handleCommentCountDelta = useCallback(
+    (delta: number) => {
+      setSocialState((prev) => {
+        const next: ChapterSocialState = {
+          ...prev,
+          commentCount: Math.max(0, prev.commentCount + delta),
+        };
+        setCachedChapterSocial(next, user?.id ?? null);
+        return next;
+      });
+    },
+    [user?.id]
+  );
+
   const activeThemeStyle =
     THEME_PAGE_STYLES[settings.surfaceTheme] || THEME_PAGE_STYLES.catppuccin;
 
@@ -910,15 +1102,22 @@ export function ReaderInterface({
           hasNext={hasNext}
           onPrev={handlePrev}
           onNext={handleNext}
-          onOpenToc={() => setIsTocOpen(true)}
+          onOpenToc={() => {
+            setTocInitialTab("chapters");
+            setIsTocOpen(true);
+          }}
           onOpenSettings={() => setIsSettingsOpen(true)}
           isBookmarked={isCurrentBookmarked}
           onToggleBookmark={handleToggleBookmark}
           settings={settings}
         />
 
-        {/* Reading Canvas */}
-        <main className="flex-1 px-4 sm:px-6">
+        {/* Reading Canvas (reserves right padding only when sidebar is visible so text is never covered) */}
+        <main
+          className={`flex-1 transition-[padding] duration-300 ${
+            sidebarVisible ? "pl-4 pr-14 sm:pl-6 sm:pr-16" : "px-4 sm:px-6"
+          }`}
+        >
           <ChapterContent
             chapter={currentChapter}
             content={content}
@@ -934,6 +1133,38 @@ export function ReaderInterface({
         </main>
       </div>
 
+      {/* Slim Right-Side Chapter Interaction Sidebar */}
+      <InteractionSidebar
+        visible={sidebarVisible}
+        onToggleVisible={handleToggleSidebarVisible}
+        social={socialState}
+        isBookmarked={isCurrentBookmarked}
+        isCommentsOpen={isCommentsOpen}
+        onToggleLike={handleToggleChapterLike}
+        onOpenComments={() => setIsCommentsOpen(true)}
+        onToggleBookmark={handleToggleBookmark}
+        onSelectReaction={handleSelectChapterReaction}
+        onOpenBookmarksModal={() => {
+          setTocInitialTab("bookmarks");
+          setIsTocOpen(true);
+        }}
+        user={user}
+        currentChapterId={currentChapterId}
+        settings={settings}
+      />
+
+      {/* Chapter Comments Drawer (Lazy Loaded, fetches only when opened) */}
+      <CommentsDrawer
+        isOpen={isCommentsOpen}
+        onClose={() => setIsCommentsOpen(false)}
+        chapter={currentChapter}
+        totalCommentCount={socialState.commentCount}
+        onCommentCountDelta={handleCommentCountDelta}
+        user={user}
+        settings={settings}
+        onShowToast={showToast}
+      />
+
       {/* Table of Contents & Bookmarks Modal (Lazy Loaded) */}
       <ChapterSelectorModal
         isOpen={isTocOpen}
@@ -943,6 +1174,7 @@ export function ReaderInterface({
         onSelectChapter={handleSelectChapterFromModal}
         bookmarks={bookmarks}
         onRemoveBookmark={handleRemoveBookmark}
+        initialTab={tocInitialTab}
       />
 
       {/* Settings Modal (Lazy Loaded) */}

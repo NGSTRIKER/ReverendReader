@@ -12,6 +12,7 @@ interface ChapterSelectorModalProps {
   onSelectChapter: (id: number) => void;
   bookmarks: Bookmark[];
   onRemoveBookmark: (chapterId: number) => void;
+  initialTab?: "chapters" | "bookmarks";
 }
 
 export function ChapterSelectorModal({
@@ -22,12 +23,19 @@ export function ChapterSelectorModal({
   onSelectChapter,
   bookmarks,
   onRemoveBookmark,
+  initialTab = "chapters",
 }: ChapterSelectorModalProps) {
-  const [activeTab, setActiveTab] = useState<"chapters" | "bookmarks">("chapters");
+  const [activeTab, setActiveTab] = useState<"chapters" | "bookmarks">(initialTab);
   const [searchQuery, setSearchQuery] = useState("");
   const [jumpInput, setJumpInput] = useState("");
   const [sortAsc, setSortAsc] = useState(true);
   const activeItemRef = useRef<HTMLButtonElement | null>(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      setActiveTab(initialTab);
+    }
+  }, [isOpen, initialTab]);
 
   // Close on Escape key
   useEffect(() => {

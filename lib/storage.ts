@@ -1,4 +1,4 @@
-import { ReaderSettings, Bookmark } from "@/types/novel";
+import type { ReaderSettings, Bookmark } from "../types/novel.ts";
 
 export const DEFAULT_SETTINGS: ReaderSettings = {
   font: "serif",
@@ -283,4 +283,32 @@ export function toggleBookmarkStorage(bookmark: Bookmark): {
 export function isChapterBookmarked(chapterId: number, bookmarks?: Bookmark[]): boolean {
   const list = bookmarks ?? loadBookmarks();
   return list.some((b) => b.chapterId === chapterId);
+}
+
+export const SIDEBAR_VISIBILITY_KEY = "reverend_sidebar_visible";
+
+/**
+ * Load interaction sidebar visibility preference from localStorage (defaults to true).
+ */
+export function loadSidebarVisibility(): boolean {
+  if (typeof window === "undefined") return true;
+  try {
+    const raw = localStorage.getItem(SIDEBAR_VISIBILITY_KEY);
+    if (raw === "false" || raw === "0") return false;
+    return true;
+  } catch {
+    return true;
+  }
+}
+
+/**
+ * Persist interaction sidebar visibility preference in localStorage.
+ */
+export function saveSidebarVisibility(visible: boolean): void {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(SIDEBAR_VISIBILITY_KEY, visible ? "true" : "false");
+  } catch {
+    // Ignore storage quota / privacy mode errors
+  }
 }

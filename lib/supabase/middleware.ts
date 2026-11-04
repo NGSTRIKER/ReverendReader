@@ -1,6 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { getSupabaseEnv } from "./config";
+import { getOptionalSupabaseEnv } from "./config";
 import { createContentSecurityPolicy } from "@/lib/security/csp";
 
 /**
@@ -11,7 +11,8 @@ import { createContentSecurityPolicy } from "@/lib/security/csp";
  */
 export async function updateSession(request: NextRequest) {
   const nonce = btoa(crypto.randomUUID());
-  const supabaseUrl = getSupabaseEnv().url;
+  const env = getOptionalSupabaseEnv();
+  const supabaseUrl = env?.url || "https://placeholder.supabase.co";
   const csp = createContentSecurityPolicy(nonce, supabaseUrl, process.env.NODE_ENV !== "production");
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-nonce", nonce);
@@ -22,7 +23,10 @@ export async function updateSession(request: NextRequest) {
   });
 
   supabaseResponse.headers.set("Content-Security-Policy", csp);
-  const { url, key } = getSupabaseEnv();
+  if (!env) {
+    return supabaseResponse;
+  }
+  const { url, key } = env;
 
   const supabase = createServerClient(url, key, {
     cookies: {

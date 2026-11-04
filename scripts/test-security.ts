@@ -10,7 +10,19 @@ import {
   queueProgress,
   rebasePendingProgress,
 } from "../lib/supabase/progressQueue.ts";
-import { syncReadingProgress } from "../lib/supabase/sync.ts";
+import { syncReadingProgress, addCloudBookmark } from "../lib/supabase/sync.ts";
+import { loadSidebarVisibility, saveSidebarVisibility } from "../lib/storage.ts";
+import {
+  isValidChapterId,
+  isValidUuid,
+  sanitizeAvatarUrl,
+  validateCommentText,
+  withActionLock,
+  setChapterLike,
+  createChapterComment,
+  fetchChapterComments,
+  reportComment,
+} from "../lib/supabase/social.ts";
 
 class MemoryStorage implements Storage {
   private readonly values = new Map<string, string>();
@@ -125,6 +137,162 @@ await check("relative OAuth redirects reject external destinations", () => {
   assert.equal(getSafeRedirectUrl("https://evil.example"), "/");
   assert.equal(getSafeRedirectUrl("//evil.example"), "/");
   assert.equal(getSafeRedirectUrl("/read?c=42"), "/read?c=42");
+});
+
+await check("chapter ID validator enforces 1..2334 range and rejects SQL/path payloads", () => {
+  assert.equal(isValidChapterId(1), true);
+  assert.equal(isValidChapterId("2334"), true);
+  assert.equal(isValidChapterId(0), false);
+  assert.equal(isValidChapterId(2335), false);
+  assert.equal(isValidChapterId("01"), false);
+  assert.equal(isValidChapterId("1; DROP TABLE comments;"), false);
+});
+
+await check("avatar URL sanitizer allows only Discord CDN HTTPS URLs", () => {
+  assert.equal(
+    sanitizeAvatarUrl("https://cdn.discordapp.com/avatars/12345/abcdef.png?size=128"),
+    "https://cdn.discordapp.com/avatars/12345/abcdef.png?size=128"
+  );
+  assert.equal(sanitizeAvatarUrl("javascript:alert(1)"), null);
+  assert.equal(sanitizeAvatarUrl("https://evil.example/avatar.png"), null);
+});
+
+await check("comment validator strips control chars, trims, and enforces 1..1000 length", () => {
+  assert.equal(validateCommentText("   \n\t  ").valid, false);
+  const cleaned = validateCommentText("  Hello\x00\x07\r\n\r\n\r\nWorld  ");
+  assert.equal(cleaned.valid, true);
+  assert.equal(cleaned.normalized, "Hello\n\nWorld");
+  assert.equal(validateCommentText("a".repeat(1001)).valid, false);
+});
+
+await check("in-flight action lock prevents duplicate rapid-click writes", async () => {
+  let executions = 0;
+  let release!: () => void;
+  const gate = new Promise<void>((r) => {
+    release = r;
+  });
+
+  const firstPromise = withActionLock("like:1", async () => {
+    executions += 1;
+    await gate;
+    return "done";
+  });
+  const duplicateAttempt = await withActionLock("like:1", async () => {
+    executions += 1;
+    return "duplicate";
+  });
+
+  assert.equal(duplicateAttempt.locked, true);
+  release();
+  const firstResult = await firstPromise;
+  assert.equal(firstResult.locked, false);
+  assert.equal(executions, 1);
+});
+
+await check("social write helpers never send client-supplied user_id or reporter_id", async () => {
+  const insertedPayloads: Record<string, unknown>[] = [];
+  const mockSupabase = {
+    from: () => ({
+      insert: (row: Record<string, unknown>) => {
+        insertedPayloads.push(row);
+        return {
+          error: null,
+          select: () => ({
+            single: async () => ({
+              data: {
+                id: "11111111-1111-4111-8111-111111111111",
+                chapter_id: "1",
+                parent_id: null,
+                content: "Safe",
+                is_spoiler: false,
+                is_deleted: false,
+                like_count: 0,
+                reply_count: 0,
+                created_at: "2026-11-04T00:00:00Z",
+                updated_at: "2026-11-04T00:00:00Z",
+              },
+              error: null,
+            }),
+          }),
+        };
+      },
+    }),
+  } as never;
+
+  await setChapterLike(mockSupabase, 1, true);
+  await createChapterComment(mockSupabase, { chapterId: 1, content: "Safe", isSpoiler: true });
+  await reportComment(mockSupabase, {
+    commentId: "11111111-1111-4111-8111-111111111111",
+    reason: "spoiler",
+    details: "Unmarked spoiler",
+  });
+
+  assert.equal(insertedPayloads.length, 3);
+  for (const row of insertedPayloads) {
+    assert.equal("user_id" in row, false);
+    assert.equal("reporter_id" in row, false);
+  }
+});
+
+await check("cursor pagination slices pageSize and computes nextCursor", async () => {
+  const rows = Array.from({ length: 21 }, (_, idx) => ({
+    id: `00000000-0000-4000-8000-${String(idx + 1).padStart(12, "0")}`,
+    chapter_id: "1",
+    parent_id: null,
+    content: `Comment ${idx + 1}`,
+    is_spoiler: false,
+    is_deleted: false,
+    created_at: `2026-11-04T00:${String(idx).padStart(2, "0")}:00Z`,
+    updated_at: `2026-11-04T00:${String(idx).padStart(2, "0")}:00Z`,
+    like_count: 50 - idx,
+    reply_count: 0,
+    author_username: "user",
+    author_display_name: "User",
+    author_avatar_url: "https://evil.example/x.png",
+    viewer_liked: false,
+    is_own: false,
+  }));
+
+  const mockSupabase = {
+    rpc: async () => ({ data: rows, error: null }),
+  } as never;
+
+  const page = await fetchChapterComments(mockSupabase, 1, "top", null, 20);
+  assert.equal(page.success, true);
+  assert.equal(page.comments.length, 20);
+  assert.equal(page.hasMore, true);
+  assert.equal(page.nextCursor?.likeCount, 31);
+  assert.equal(page.comments[0].author_avatar_url, null);
+});
+
+await check("bookmark helper rejects out-of-range chapter IDs before querying DB", async () => {
+  let dbCalled = false;
+  const mockSupabase = {
+    from: () => {
+      dbCalled = true;
+      throw new Error("should not be called");
+    },
+  } as never;
+  const res = await addCloudBookmark(mockSupabase, "user-1", {
+    chapterId: 9999,
+    chapterNumber: 9999,
+    chapterTitle: "Invalid",
+    createdAt: new Date().toISOString(),
+  });
+  assert.equal(res.success, false);
+  assert.equal(dbCalled, false);
+  assert.equal(isValidUuid("11111111-1111-4111-8111-111111111111"), true);
+  assert.equal(isValidUuid("not-a-uuid"), false);
+});
+
+await check("sidebar visibility defaults to visible and persists in localStorage", () => {
+  Object.defineProperty(globalThis, "window", { configurable: true, value: globalThis });
+  storage.clear();
+  assert.equal(loadSidebarVisibility(), true);
+  saveSidebarVisibility(false);
+  assert.equal(loadSidebarVisibility(), false);
+  saveSidebarVisibility(true);
+  assert.equal(loadSidebarVisibility(), true);
 });
 
 console.log(`\n${passed} offline security checks passed.`);

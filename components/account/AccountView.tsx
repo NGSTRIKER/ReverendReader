@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { sanitizeAvatarUrl } from "@/lib/supabase/social";
 import { Profile, ReadingProgress, DatabaseBookmark } from "@/types/database";
 import type { User } from "@supabase/supabase-js";
 import {
@@ -53,7 +54,9 @@ export function AccountView({
 
   const username =
     profile?.username || metadata.preferred_username || metadata.user_name || user.email?.split("@")[0];
-  const avatarUrl = profile?.avatar_url || metadata.avatar_url || metadata.picture;
+  const avatarUrl = sanitizeAvatarUrl(
+    profile?.avatar_url || metadata.avatar_url || metadata.picture
+  );
 
   const joinDate = user.created_at
     ? new Date(user.created_at).toLocaleDateString(undefined, {
@@ -152,7 +155,10 @@ export function AccountView({
       )}
 
       {/* Profile Header Card */}
-      <div className="relative overflow-hidden rounded-2xl border border-[#414559] bg-[#303446]/80 p-6 shadow-xl backdrop-blur-md sm:p-8">
+      <div
+        id="profile"
+        className="relative scroll-mt-20 overflow-hidden rounded-2xl border border-[#414559] bg-[#303446]/80 p-6 shadow-xl backdrop-blur-md sm:p-8"
+      >
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
           <div className="flex items-center space-x-4 sm:space-x-5">
             {/* Avatar */}
@@ -217,7 +223,10 @@ export function AccountView({
       {/* Grid: Reading Progress & Bookmarks Count */}
       <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left 2 Cols: Current Reading Progress */}
-        <div className="lg:col-span-2 rounded-2xl border border-[#414559] bg-[#303446]/60 p-6 backdrop-blur-md">
+        <div
+          id="progress"
+          className="scroll-mt-20 lg:col-span-2 rounded-2xl border border-[#414559] bg-[#303446]/60 p-6 backdrop-blur-md"
+        >
           <div className="flex items-center justify-between border-b border-[#414559]/60 pb-4">
             <div className="flex items-center space-x-2">
               <Compass className="h-4 w-4 text-[#8caaee]" />
@@ -315,7 +324,10 @@ export function AccountView({
       </div>
 
       {/* Bookmarked Chapter List */}
-      <div className="mt-8 rounded-2xl border border-[#414559] bg-[#303446]/60 p-6 backdrop-blur-md">
+      <div
+        id="bookmarks"
+        className="mt-8 scroll-mt-20 rounded-2xl border border-[#414559] bg-[#303446]/60 p-6 backdrop-blur-md"
+      >
         <div className="flex items-center justify-between border-b border-[#414559]/60 pb-4">
           <div className="flex items-center space-x-2">
             <Bookmark className="h-4 w-4 text-[#8caaee]" />

@@ -166,12 +166,22 @@ export async function addCloudBookmark(
   userId: string,
   bookmark: Bookmark
 ): Promise<{ success: boolean; error?: string }> {
+  if (
+    !userId ||
+    !Number.isInteger(bookmark.chapterId) ||
+    bookmark.chapterId < 1 ||
+    bookmark.chapterId > 2334
+  ) {
+    return { success: false, error: ERROR_SAVE_FAILED };
+  }
+  const safeTitle = (bookmark.chapterTitle || `Chapter ${bookmark.chapterId}`).slice(0, 300);
+
   try {
     const { error } = await supabase.from("bookmarks").insert({
       user_id: userId,
       chapter_id: String(bookmark.chapterId),
       chapter_number: bookmark.chapterNumber,
-      chapter_title: bookmark.chapterTitle,
+      chapter_title: safeTitle,
       created_at: bookmark.createdAt || new Date().toISOString(),
     });
 
@@ -193,6 +203,10 @@ export async function removeCloudBookmark(
   userId: string,
   chapterId: number
 ): Promise<{ success: boolean; error?: string }> {
+  if (!userId || !Number.isInteger(chapterId) || chapterId < 1 || chapterId > 2334) {
+    return { success: false, error: ERROR_SAVE_FAILED };
+  }
+
   try {
     const { error } = await supabase
       .from("bookmarks")
