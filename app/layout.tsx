@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Newsreader } from "next/font/google";
+import { EB_Garamond, JetBrains_Mono } from "next/font/google";
 import { cookies } from "next/headers";
 import { Analytics } from "@vercel/analytics/next";
 import { THEME_COOKIE, parseThemeCookie } from "@/lib/theme";
@@ -7,14 +7,17 @@ import "./globals.css";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://reverend-reader.vercel.app";
 
-// The single typeface used across the product. Newsreader's optical size axis
-// keeps 12px interface labels crisp and 80px headlines tight from one file.
-const newsreader = Newsreader({
+const ebGaramond = EB_Garamond({
   subsets: ["latin"],
   style: ["normal", "italic"],
-  axes: ["opsz"],
   display: "swap",
-  variable: "--font-sig",
+  variable: "--font-serif",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-mono",
 });
 
 export const viewport: Viewport = {
@@ -87,7 +90,11 @@ export default async function RootLayout({
   const theme = parseThemeCookie((await cookies()).get(THEME_COOKIE)?.value);
 
   return (
-    <html lang="en" data-theme={theme} className={newsreader.variable}>
+    <html
+      lang="en"
+      data-theme={theme}
+      className={`${ebGaramond.variable} ${jetbrainsMono.variable}`}
+    >
       <body className="min-h-screen">
         {children}
         <Analytics />

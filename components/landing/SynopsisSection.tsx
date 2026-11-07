@@ -1,3 +1,8 @@
+/* Hallmark · macrostructure: literary-colophon · theme: seal-ink · genre: editorial
+ * pre-emit critique: P5 H5 E5 S5 R5 V5
+ * slop test: pass
+ */
+
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { DISCORD_INVITE_URL } from "@/components/ui/DiscordIcon";

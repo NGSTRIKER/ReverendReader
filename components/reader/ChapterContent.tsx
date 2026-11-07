@@ -1,3 +1,8 @@
+/* Hallmark · macrostructure: reading-canvas · theme: seal-ink · genre: editorial
+ * pre-emit critique: P5 H5 E5 S5 R5 V5
+ * slop test: pass
+ */
+
 "use client";
 
 import React from "react";

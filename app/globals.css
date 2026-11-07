@@ -3,43 +3,42 @@
 @tailwind utilities;
 
 /*
- * Design tokens.
- * Colors are stored as RGB channels so Tailwind can apply alpha (bg-accent/10).
- * Light: paper white + seal red. Dark: ink night + blue.
- * Theme resolution: [data-theme] set from the `reverend_theme` cookie wins,
- * otherwise the OS preference decides. No script, no flash.
+ * Design Tokens — Reverend Reader (Hallmark Anti-AI-Slop Architecture)
+ * Light Mode: Natural warm book paper, carbon ink, imperial Chinese seal vermilion.
+ * Dark Mode: Deep night void, slate surface, precision electric sapphire.
+ * Zero inline improvisation. All colors reference token channels.
  */
 :root {
-  --paper: 255 255 255;
+  --paper: 252 251 249;
   --surface: 255 255 255;
-  --sunken: 246 244 242;
-  --ink: 23 20 20;
-  --muted: 92 86 84;
-  --faint: 119 112 109;
-  --line: 233 229 226;
-  --line-strong: 212 206 202;
-  --accent: 190 18 40;
-  --accent-hover: 156 14 33;
+  --sunken: 245 243 238;
+  --ink: 18 19 22;
+  --muted: 86 85 82;
+  --faint: 142 140 134;
+  --line: 228 224 216;
+  --line-strong: 204 199 188;
+  --accent: 197 22 42;
+  --accent-hover: 165 14 32;
   --on-accent: 255 255 255;
-  --danger: 180 35 24;
-  --success: 21 128 61;
-  --shadow: 23 20 20;
+  --danger: 185 28 28;
+  --success: 22 101 52;
+  --shadow: 20 18 16;
   color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --paper: 11 14 20;
-    --surface: 17 21 29;
-    --sunken: 7 9 13;
-    --ink: 228 231 236;
-    --muted: 160 168 182;
-    --faint: 120 129 146;
-    --line: 31 37 48;
-    --line-strong: 48 57 72;
-    --accent: 92 152 255;
-    --accent-hover: 132 177 255;
-    --on-accent: 6 12 24;
+    --paper: 9 11 16;
+    --surface: 14 18 26;
+    --sunken: 6 8 12;
+    --ink: 236 240 248;
+    --muted: 146 156 174;
+    --faint: 96 106 124;
+    --line: 26 33 46;
+    --line-strong: 40 50 70;
+    --accent: 77 138 255;
+    --accent-hover: 110 160 255;
+    --on-accent: 6 9 15;
     --danger: 248 113 113;
     --success: 74 222 128;
     --shadow: 0 0 0;
@@ -48,17 +47,17 @@
 }
 
 :root[data-theme="dark"] {
-  --paper: 11 14 20;
-  --surface: 17 21 29;
-  --sunken: 7 9 13;
-  --ink: 228 231 236;
-  --muted: 160 168 182;
-  --faint: 120 129 146;
-  --line: 31 37 48;
-  --line-strong: 48 57 72;
-  --accent: 92 152 255;
-  --accent-hover: 132 177 255;
-  --on-accent: 6 12 24;
+  --paper: 9 11 16;
+  --surface: 14 18 26;
+  --sunken: 6 8 12;
+  --ink: 236 240 248;
+  --muted: 146 156 174;
+  --faint: 96 106 124;
+  --line: 26 33 46;
+  --line-strong: 40 50 70;
+  --accent: 77 138 255;
+  --accent-hover: 110 160 255;
+  --on-accent: 6 9 15;
   --danger: 248 113 113;
   --success: 74 222 128;
   --shadow: 0 0 0;
@@ -66,16 +65,18 @@
 }
 
 @layer base {
-  html {
+  /* Hard floor: overflow-x: clip on both html and body (Gate 62) */
+  html,
+  body {
+    overflow-x: clip;
     -webkit-text-size-adjust: 100%;
     text-rendering: optimizeLegibility;
   }
 
   body {
     @apply bg-paper text-ink antialiased;
-    font-family: var(--font-sig), Georgia, "Times New Roman", serif;
-    font-optical-sizing: auto;
-    font-feature-settings: "kern", "liga";
+    font-family: var(--font-serif), "EB Garamond", Garamond, Georgia, serif;
+    font-feature-settings: "kern", "liga", "onum";
   }
 
   ::selection {
@@ -88,30 +89,31 @@
     outline-offset: 2px;
   }
 
-  /* Native form controls follow the accent */
   input[type="range"] {
     accent-color: rgb(var(--accent));
   }
 }
 
 @layer components {
-  /* Small caps label used for metadata and section markers */
+  /* Hallmark telemetry & label: JetBrains Mono uppercase tracking */
   .label {
-    @apply text-[0.8125rem] tracking-[0.06em] text-muted;
-    font-variant-caps: all-small-caps;
-    font-variant-numeric: lining-nums;
+    @apply text-[0.72rem] tracking-[0.1em] text-muted uppercase;
+    font-family: var(--font-mono), ui-monospace, monospace;
+    font-variant-numeric: tabular-nums lining-nums;
   }
 
   .rule {
     @apply border-t border-line;
   }
 
+  /* Gate 59: Buttons enforce whitespace-nowrap so text never splits awkwardly on mobile */
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-[3px] px-4 py-2 text-[0.95rem] leading-none transition-colors duration-150 disabled:pointer-events-none disabled:opacity-40;
+    @apply inline-flex items-center justify-center gap-2 rounded-[2px] px-3.5 py-2 text-[0.9rem] leading-none whitespace-nowrap transition-colors duration-150 disabled:pointer-events-none disabled:opacity-40;
+    font-family: var(--font-mono), ui-monospace, monospace;
   }
 
   .btn-primary {
-    @apply btn bg-accent text-on-accent hover:bg-accent-hover;
+    @apply btn bg-accent text-on-accent font-medium hover:bg-accent-hover;
   }
 
   .btn-quiet {
@@ -119,11 +121,12 @@
   }
 
   .icon-btn {
-    @apply inline-flex h-9 w-9 items-center justify-center rounded-[3px] text-muted transition-colors duration-150 hover:bg-sunken hover:text-ink disabled:pointer-events-none disabled:opacity-30;
+    @apply inline-flex h-8 w-8 items-center justify-center rounded-[2px] text-muted transition-colors duration-150 hover:bg-sunken hover:text-ink disabled:pointer-events-none disabled:opacity-30;
   }
 
   .field {
-    @apply w-full rounded-[3px] border border-line-strong bg-paper px-3 py-2 text-[0.95rem] text-ink placeholder:text-faint focus:border-accent focus:outline-none;
+    @apply w-full rounded-[2px] border border-line-strong bg-paper px-3 py-2 text-[0.9rem] text-ink placeholder:text-faint focus:border-accent focus:outline-none;
+    font-family: var(--font-mono), ui-monospace, monospace;
   }
 
   .link {
@@ -132,7 +135,6 @@
 }
 
 @layer utilities {
-  /* Show/hide by resolved theme without JS (used by the theme toggle icon) */
   .only-dark {
     display: none;
   }
@@ -153,29 +155,40 @@
 
   .tnum {
     font-variant-numeric: tabular-nums lining-nums;
+    font-family: var(--font-mono), ui-monospace, monospace;
   }
 
-  /* Skip layout/paint for off-screen rows in very long lists */
+  .wrap-break {
+    overflow-wrap: anywhere;
+    min-width: 0;
+  }
+
   .cv-row {
     content-visibility: auto;
     contain-intrinsic-size: auto 44px;
   }
 }
 
-/* Reader prose */
+/* Reader prose formatting */
 .reader-content p {
-  margin: 0 0 var(--reader-paragraph-spacing, 1.1em);
-  hanging-punctuation: first;
+  margin: 0 0 var(--reader-paragraph-spacing, 1.25em);
+  text-indent: 1.5em;
   hyphens: auto;
   -webkit-hyphens: auto;
+  font-feature-settings: "kern", "liga", "onum";
+}
+
+.reader-content p:first-of-type {
+  text-indent: 0;
 }
 
 .reader-content p:first-of-type::first-letter {
   float: left;
-  font-size: 3.4em;
-  line-height: 0.82;
-  padding: 0.06em 0.09em 0 0;
+  font-size: 3.5em;
+  line-height: 0.8;
+  padding: 0.08em 0.1em 0 0;
   color: rgb(var(--accent));
+  font-family: var(--font-serif), "EB Garamond", serif;
   font-weight: 500;
 }
 
