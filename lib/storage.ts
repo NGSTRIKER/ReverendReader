@@ -1,24 +1,68 @@
-import type { ReaderSettings, Bookmark } from "../types/novel.ts";
+import type { ReaderSettings, Bookmark, ReaderFont, ReaderSurfaceTheme } from "../types/novel.ts";
 
 export const DEFAULT_SETTINGS: ReaderSettings = {
+  font: "mono",
   fontSize: 19,
   lineHeight: 1.85,
-  surfaceOpacity: 1,
-  maxWidth: 680,
-  letterSpacing: 0,
+  surfaceOpacity: 0.95,
+  surfaceTheme: "matte-terminal",
+  maxWidth: 760,
+  fontColor: "#e4e8f0",
+  letterSpacing: 0.2,
+  textAlign: "left",
 };
+
+const VALID_FONTS: ReaderFont[] = ["serif", "sans", "mono", "literary"];
+const VALID_THEMES: ReaderSurfaceTheme[] = [
+  "matte-terminal",
+  "terminal-grey",
+  "catppuccin",
+  "catppuccin-mocha",
+  "catppuccin-pink",
+  "catppuccin-coffee",
+  "catppuccin-jade",
+  "catppuccin-latte",
+  "dark",
+  "black",
+  "slate",
+  "sepia",
+  "acrylic",
+  "blur",
+  "transparent",
+];
 
 function sanitizeSettings(raw: Record<string, unknown>): ReaderSettings {
   const clamp = (val: unknown, fallback: number, min: number, max: number) => {
     const n = typeof val === "number" ? val : Number(val);
     return Number.isFinite(n) ? Math.min(max, Math.max(min, n)) : fallback;
   };
+
+  const font = typeof raw.font === "string" && VALID_FONTS.includes(raw.font as ReaderFont)
+    ? (raw.font as ReaderFont)
+    : DEFAULT_SETTINGS.font;
+
+  const surfaceTheme =
+    typeof raw.surfaceTheme === "string" && VALID_THEMES.includes(raw.surfaceTheme as ReaderSurfaceTheme)
+      ? (raw.surfaceTheme as ReaderSurfaceTheme)
+      : DEFAULT_SETTINGS.surfaceTheme;
+
+  const fontColor =
+    typeof raw.fontColor === "string" && /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(raw.fontColor)
+      ? raw.fontColor
+      : DEFAULT_SETTINGS.fontColor;
+
+  const textAlign = raw.textAlign === "justify" ? "justify" : "left";
+
   return {
-    fontSize: clamp(raw.fontSize, DEFAULT_SETTINGS.fontSize, 14, 28),
+    font,
+    fontSize: clamp(raw.fontSize, DEFAULT_SETTINGS.fontSize, 14, 32),
     lineHeight: clamp(raw.lineHeight, DEFAULT_SETTINGS.lineHeight, 1.3, 2.6),
     surfaceOpacity: clamp(raw.surfaceOpacity, DEFAULT_SETTINGS.surfaceOpacity, 0, 1),
+    surfaceTheme,
     maxWidth: clamp(raw.maxWidth, DEFAULT_SETTINGS.maxWidth, 560, 9999),
-    letterSpacing: clamp(raw.letterSpacing ?? 0, 0, -0.5, 2.5),
+    fontColor,
+    letterSpacing: clamp(raw.letterSpacing ?? DEFAULT_SETTINGS.letterSpacing, 0.2, -0.5, 2.5),
+    textAlign,
   };
 }
 
@@ -92,22 +136,40 @@ export function saveThemeSettings(settings: ReaderSettings): void {
   const serialized = JSON.stringify(clean);
 
   setCookie("reverend_theme_settings", serialized);
+  setCookie("reverend_font", clean.font);
   setCookie("reverend_font_size", String(clean.fontSize));
   setCookie("reverend_line_height", String(clean.lineHeight));
   setCookie("reverend_surface_opacity", String(clean.surfaceOpacity));
+  setCookie("reverend_surface_theme", clean.surfaceTheme);
   setCookie("reverend_max_width", String(clean.maxWidth));
+  if (clean.fontColor) {
+    setCookie("reverend_font_color", clean.fontColor);
+  }
   if (typeof clean.letterSpacing === "number") {
     setCookie("reverend_letter_spacing", String(clean.letterSpacing));
+  }
+  if (clean.textAlign) {
+    setCookie("reverend_text_align", clean.textAlign);
   }
 
   try {
     if (typeof localStorage !== "undefined") {
       localStorage.setItem("reverend_theme_settings", serialized);
       localStorage.setItem("reverend_reader_settings", serialized);
+      localStorage.setItem("reverend_font", clean.font);
       localStorage.setItem("reverend_font_size", String(clean.fontSize));
       localStorage.setItem("reverend_line_height", String(clean.lineHeight));
+      localStorage.setItem("reverend_surface_theme", clean.surfaceTheme);
+      localStorage.setItem("reverend_surface_opacity", String(clean.surfaceOpacity));
+      localStorage.setItem("reverend_max_width", String(clean.maxWidth));
+      if (clean.fontColor) {
+        localStorage.setItem("reverend_font_color", clean.fontColor);
+      }
       if (typeof clean.letterSpacing === "number") {
         localStorage.setItem("reverend_letter_spacing", String(clean.letterSpacing));
+      }
+      if (clean.textAlign) {
+        localStorage.setItem("reverend_text_align", clean.textAlign);
       }
     }
   } catch {
@@ -129,12 +191,20 @@ export function loadThemeSettings(): ReaderSettings {
       hasLoaded = true;
     }
 
+    const fontCookie = getCookie("reverend_font");
     const fontSizeCookie = getCookie("reverend_font_size");
     const lineHeightCookie = getCookie("reverend_line_height");
     const opacityCookie = getCookie("reverend_surface_opacity");
+    const surfaceThemeCookie = getCookie("reverend_surface_theme");
     const maxWidthCookie = getCookie("reverend_max_width");
+    const fontColorCookie = getCookie("reverend_font_color");
     const letterSpacingCookie = getCookie("reverend_letter_spacing");
+    const textAlignCookie = getCookie("reverend_text_align");
 
+    if (fontCookie) {
+      currentSettings.font = fontCookie as ReaderSettings["font"];
+      hasLoaded = true;
+    }
     if (fontSizeCookie && !isNaN(parseInt(fontSizeCookie, 10))) {
       currentSettings.fontSize = parseInt(fontSizeCookie, 10);
       hasLoaded = true;
@@ -147,12 +217,24 @@ export function loadThemeSettings(): ReaderSettings {
       currentSettings.surfaceOpacity = parseFloat(opacityCookie);
       hasLoaded = true;
     }
+    if (surfaceThemeCookie) {
+      currentSettings.surfaceTheme = surfaceThemeCookie as ReaderSettings["surfaceTheme"];
+      hasLoaded = true;
+    }
     if (maxWidthCookie && !isNaN(parseInt(maxWidthCookie, 10))) {
       currentSettings.maxWidth = parseInt(maxWidthCookie, 10);
       hasLoaded = true;
     }
+    if (fontColorCookie) {
+      currentSettings.fontColor = fontColorCookie;
+      hasLoaded = true;
+    }
     if (letterSpacingCookie && !isNaN(parseFloat(letterSpacingCookie))) {
       currentSettings.letterSpacing = parseFloat(letterSpacingCookie);
+      hasLoaded = true;
+    }
+    if (textAlignCookie === "left" || textAlignCookie === "justify") {
+      currentSettings.textAlign = textAlignCookie;
       hasLoaded = true;
     }
 

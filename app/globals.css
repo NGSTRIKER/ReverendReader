@@ -28,17 +28,17 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --paper: 9 11 16;
-    --surface: 14 18 26;
-    --sunken: 6 8 12;
-    --ink: 236 240 248;
-    --muted: 146 156 174;
-    --faint: 96 106 124;
-    --line: 26 33 46;
-    --line-strong: 40 50 70;
+    --paper: 14 15 18;
+    --surface: 22 24 29;
+    --sunken: 10 11 13;
+    --ink: 228 232 240;
+    --muted: 140 148 160;
+    --faint: 88 95 106;
+    --line: 34 38 46;
+    --line-strong: 50 56 68;
     --accent: 77 138 255;
     --accent-hover: 110 160 255;
-    --on-accent: 6 9 15;
+    --on-accent: 10 11 13;
     --danger: 248 113 113;
     --success: 74 222 128;
     --shadow: 0 0 0;
@@ -47,17 +47,17 @@
 }
 
 :root[data-theme="dark"] {
-  --paper: 9 11 16;
-  --surface: 14 18 26;
-  --sunken: 6 8 12;
-  --ink: 236 240 248;
-  --muted: 146 156 174;
-  --faint: 96 106 124;
-  --line: 26 33 46;
-  --line-strong: 40 50 70;
+  --paper: 14 15 18;
+  --surface: 22 24 29;
+  --sunken: 10 11 13;
+  --ink: 228 232 240;
+  --muted: 140 148 160;
+  --faint: 88 95 106;
+  --line: 34 38 46;
+  --line-strong: 50 56 68;
   --accent: 77 138 255;
   --accent-hover: 110 160 255;
-  --on-accent: 6 9 15;
+  --on-accent: 10 11 13;
   --danger: 248 113 113;
   --success: 74 222 128;
   --shadow: 0 0 0;
@@ -108,11 +108,11 @@
 
   /* Gate 59: Buttons enforce whitespace-nowrap so text never splits awkwardly on mobile */
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-[2px] px-3.5 py-2 text-[0.9rem] leading-none whitespace-nowrap transition-colors duration-150 disabled:pointer-events-none disabled:opacity-40 font-medium;
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-3.5 py-2 text-[0.88rem] leading-none whitespace-nowrap transition-all duration-150 disabled:pointer-events-none disabled:opacity-40 font-medium;
   }
 
   .btn-primary {
-    @apply btn bg-accent text-on-accent hover:bg-accent-hover;
+    @apply btn bg-accent text-on-accent hover:bg-accent-hover shadow-sm;
   }
 
   .btn-quiet {
@@ -120,11 +120,23 @@
   }
 
   .icon-btn {
-    @apply inline-flex h-8 w-8 items-center justify-center rounded-[2px] text-muted transition-colors duration-150 hover:bg-sunken hover:text-ink disabled:pointer-events-none disabled:opacity-30;
+    @apply inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted transition-colors duration-150 hover:bg-sunken hover:text-ink disabled:pointer-events-none disabled:opacity-30;
   }
 
   .field {
-    @apply w-full rounded-[2px] border border-line-strong bg-paper px-3 py-2 text-[0.9rem] text-ink placeholder:text-faint focus:border-accent focus:outline-none;
+    @apply w-full rounded-lg border border-line-strong bg-paper px-3 py-2 text-[0.9rem] text-ink placeholder:text-faint focus:border-accent focus:outline-none transition-colors;
+  }
+
+  .terminal-card {
+    @apply rounded-2xl border border-line bg-surface/95 backdrop-blur-md shadow-sheet;
+  }
+
+  .terminal-chip {
+    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[11px] font-mono font-medium border border-line bg-sunken text-muted;
+  }
+
+  .chinese-seal {
+    @apply inline-flex items-center justify-center rounded-md border border-accent/40 bg-accent/10 px-1.5 py-0.5 text-[11px] font-mono font-semibold text-accent;
   }
 
   .link {

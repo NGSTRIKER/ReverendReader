@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { ReaderSettings } from "@/types/novel";
 import { FontSelector } from "./FontSelector";
 import { BackgroundManager } from "./BackgroundManager";
-import { X } from "lucide-react";
+import { X, Type, Image as ImageIcon } from "lucide-react";
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -43,59 +43,69 @@ export function SettingsModal({
       aria-modal="true"
       aria-labelledby="reader-settings-heading"
       onClick={onClose}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-ink/50 backdrop-blur-[2px] p-4 sm:p-6"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 sm:p-6"
     >
       <div
-        className="relative flex w-full max-w-lg flex-col border border-line bg-surface text-ink shadow-sheet overflow-hidden"
+        className="relative flex w-full max-w-xl flex-col rounded-2xl border border-line bg-surface text-ink shadow-2xl overflow-hidden font-mono"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
-        <div className="flex items-center justify-between border-b border-line px-6 py-4 bg-paper">
-          <div>
-            <p className="label text-accent">Reader Preferences</p>
-            <h2 id="reader-settings-heading" className="text-lg font-semibold text-ink">
-              Typesetting &amp; Theme
-            </h2>
+        {/* Terminal Header */}
+        <div className="flex items-center justify-between border-b border-line px-5 py-3.5 bg-paper">
+          <div className="flex items-center gap-2.5">
+            {/* Terminal Window Dots */}
+            <div className="flex items-center gap-1.5" aria-hidden="true">
+              <span className="h-2.5 w-2.5 rounded-full bg-accent/80" />
+              <span className="h-2.5 w-2.5 rounded-full bg-line-strong" />
+              <span className="h-2.5 w-2.5 rounded-full bg-line-strong" />
+            </div>
+            <span className="text-xs font-semibold text-ink flex items-center gap-1.5">
+              <span>&gt;_</span>
+              <span id="reader-settings-heading">READER_SETTINGS / 配置中心</span>
+            </span>
+            <span className="chinese-seal text-[10px]">蛊</span>
           </div>
+
           <button
             type="button"
             onClick={onClose}
             aria-label="Close settings"
-            className="icon-btn"
+            className="icon-btn rounded-lg h-7 w-7"
           >
             <X className="h-4 w-4" />
           </button>
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex border-b border-line bg-sunken px-6">
+        <div className="flex border-b border-line bg-sunken px-5 gap-2 pt-2">
           <button
             type="button"
             onClick={() => setActiveTab("typography")}
-            className={`border-b-2 px-3 py-2.5 text-sm font-medium transition-colors ${
+            className={`flex items-center gap-1.5 rounded-t-xl px-4 py-2 text-xs font-semibold transition-all border-t border-x ${
               activeTab === "typography"
-                ? "border-accent text-accent"
+                ? "border-line bg-surface text-accent shadow-sm"
                 : "border-transparent text-muted hover:text-ink"
             }`}
           >
-            Theme &amp; Typography
+            <Type className="h-3.5 w-3.5" />
+            <span>[01: TYPOGRAPHY / 排版]</span>
           </button>
 
           <button
             type="button"
             onClick={() => setActiveTab("background")}
-            className={`border-b-2 px-3 py-2.5 text-sm font-medium transition-colors ${
+            className={`flex items-center gap-1.5 rounded-t-xl px-4 py-2 text-xs font-semibold transition-all border-t border-x ${
               activeTab === "background"
-                ? "border-accent text-accent"
+                ? "border-line bg-surface text-accent shadow-sm"
                 : "border-transparent text-muted hover:text-ink"
             }`}
           >
-            Wallpaper
+            <ImageIcon className="h-3.5 w-3.5" />
+            <span>[02: THEMES &amp; BG / 壁纸]</span>
           </button>
         </div>
 
         {/* Content */}
-        <div className="p-6 max-h-[70vh] overflow-y-auto">
+        <div className="p-5 max-h-[70vh] overflow-y-auto">
           {activeTab === "typography" ? (
             <FontSelector settings={settings} onChangeSettings={onChangeSettings} />
           ) : (
@@ -109,9 +119,13 @@ export function SettingsModal({
         </div>
 
         {/* Footer */}
-        <div className="border-t border-line px-6 py-3 bg-paper flex justify-between items-center text-xs text-muted">
-          <span>Saved automatically</span>
-          <button type="button" onClick={onClose} className="btn-primary px-4 py-1.5 text-xs">
+        <div className="border-t border-line px-5 py-3 bg-paper flex justify-between items-center text-xs text-muted">
+          <span className="text-[11px] text-faint">Persistent across devices · 自动保存</span>
+          <button
+            type="button"
+            onClick={onClose}
+            className="btn-primary rounded-xl px-4 py-1.5 text-xs font-semibold uppercase tracking-wider"
+          >
             Done
           </button>
         </div>

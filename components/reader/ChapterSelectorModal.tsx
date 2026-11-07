@@ -89,47 +89,61 @@ export function ChapterSelectorModal({
       aria-modal="true"
       aria-label="Chapter Index and Bookmarks"
       onClick={onClose}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-ink/50 backdrop-blur-[2px] p-4 sm:p-6"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 sm:p-6"
     >
       <div
-        className="relative flex h-[85vh] w-full max-w-2xl flex-col border border-line bg-surface text-ink shadow-sheet overflow-hidden"
+        className="relative flex h-[85vh] w-full max-w-2xl flex-col rounded-2xl border border-line bg-surface text-ink shadow-2xl overflow-hidden font-mono"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header & Tabs */}
-        <div className="flex items-center justify-between border-b border-line px-6 py-3.5 bg-paper">
-          <div className="flex items-center gap-6">
-            <button
-              type="button"
-              onClick={() => setActiveTab("chapters")}
-              className={`pb-1 border-b-2 text-sm font-semibold transition-colors tnum ${
-                activeTab === "chapters"
-                  ? "border-accent text-accent"
-                  : "border-transparent text-muted hover:text-ink"
-              }`}
-            >
-              Chapters ({chapters.length.toLocaleString()})
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setActiveTab("bookmarks")}
-              className={`pb-1 border-b-2 text-sm font-semibold transition-colors tnum ${
-                activeTab === "bookmarks"
-                  ? "border-accent text-accent"
-                  : "border-transparent text-muted hover:text-ink"
-              }`}
-            >
-              Bookmarks ({bookmarks.length})
-            </button>
+        {/* Terminal Header */}
+        <div className="flex items-center justify-between border-b border-line px-5 py-3.5 bg-paper">
+          <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-1.5" aria-hidden="true">
+              <span className="h-2.5 w-2.5 rounded-full bg-accent" />
+              <span className="h-2.5 w-2.5 rounded-full bg-line-strong" />
+              <span className="h-2.5 w-2.5 rounded-full bg-line-strong" />
+            </div>
+            <span className="text-xs font-semibold text-ink flex items-center gap-1.5">
+              <span>&gt;_</span>
+              <span>INDEX / 章节目录</span>
+            </span>
+            <span className="chinese-seal text-[10px]">卷</span>
           </div>
 
           <button
             type="button"
             onClick={onClose}
             aria-label="Close table of contents"
-            className="icon-btn"
+            className="icon-btn rounded-lg h-7 w-7"
           >
             <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        {/* Tab Switcher */}
+        <div className="flex border-b border-line bg-sunken px-5 gap-2 pt-2">
+          <button
+            type="button"
+            onClick={() => setActiveTab("chapters")}
+            className={`flex items-center gap-1.5 rounded-t-xl px-4 py-2 text-xs font-semibold transition-all border-t border-x ${
+              activeTab === "chapters"
+                ? "border-line bg-surface text-accent shadow-sm"
+                : "border-transparent text-muted hover:text-ink"
+            }`}
+          >
+            <span>[01: CHAPTERS / 章节 ({chapters.length.toLocaleString()})]</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab("bookmarks")}
+            className={`flex items-center gap-1.5 rounded-t-xl px-4 py-2 text-xs font-semibold transition-all border-t border-x ${
+              activeTab === "bookmarks"
+                ? "border-line bg-surface text-accent shadow-sm"
+                : "border-transparent text-muted hover:text-ink"
+            }`}
+          >
+            <span>[02: BOOKMARKS / 书签 ({bookmarks.length})]</span>
           </button>
         </div>
 
@@ -142,10 +156,10 @@ export function ChapterSelectorModal({
                 <Search className="absolute left-3 top-2.5 h-4 w-4 text-faint pointer-events-none" />
                 <input
                   type="text"
-                  placeholder="Search chapters by title or number..."
+                  placeholder="Search title, number, or keywords..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="field pl-9 py-1.5 text-sm"
+                  className="field pl-9 py-1.5 text-xs rounded-xl"
                 />
               </div>
 
@@ -157,11 +171,11 @@ export function ChapterSelectorModal({
                   placeholder="Jump to #"
                   value={jumpInput}
                   onChange={(e) => setJumpInput(e.target.value)}
-                  className="field py-1.5 text-sm tnum"
+                  className="field py-1.5 text-xs tabular-nums rounded-xl"
                 />
                 <button
                   type="submit"
-                  className="btn-primary px-3.5 py-1.5 text-xs font-medium whitespace-nowrap"
+                  className="btn-primary px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wider rounded-xl whitespace-nowrap"
                 >
                   Go
                 </button>
@@ -170,7 +184,7 @@ export function ChapterSelectorModal({
                   onClick={() => setSortAsc(!sortAsc)}
                   title={sortAsc ? "Sort descending" : "Sort ascending"}
                   aria-label={sortAsc ? "Sort descending" : "Sort ascending"}
-                  className="btn-quiet bg-paper px-2.5 py-1.5"
+                  className="btn-quiet bg-paper px-2.5 py-1.5 rounded-xl"
                 >
                   <ArrowUpDown className="h-3.5 w-3.5" />
                 </button>
@@ -180,7 +194,7 @@ export function ChapterSelectorModal({
             {/* Chapter List */}
             <div className="flex-1 overflow-y-auto divide-y divide-line">
               {filteredChapters.length === 0 ? (
-                <div className="py-12 text-center text-sm text-muted">
+                <div className="py-12 text-center text-xs text-muted">
                   No matching chapters found.
                 </div>
               ) : (
@@ -197,22 +211,27 @@ export function ChapterSelectorModal({
                       }}
                       className={`cv-row flex w-full items-baseline justify-between px-5 py-3 text-left transition-colors ${
                         isCurrent
-                          ? "bg-accent/10 text-accent border-l-2 border-accent font-medium"
+                          ? "bg-accent/15 text-accent border-l-2 border-accent font-semibold"
                           : "text-ink hover:bg-sunken"
                       }`}
                     >
                       <div className="flex items-baseline gap-3 truncate pr-4">
-                        <span className="text-xs text-muted w-12 flex-shrink-0 tnum">
-                          #{chapter.number}
+                        <span className="text-[11px] text-muted w-14 flex-shrink-0 tabular-nums">
+                          #{chapter.number.toString().padStart(4, "0")}
                         </span>
-                        <span className="truncate text-sm">
+                        <span className="truncate text-xs sm:text-sm">
                           {chapter.title}
                         </span>
                       </div>
 
-                      <span className="text-xs text-faint flex-shrink-0 tnum">
-                        {chapter.wordCount.toLocaleString()} w
-                      </span>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <span className="text-[10px] text-muted tabular-nums">
+                          第 {chapter.number} 章
+                        </span>
+                        <span className="text-[10px] text-faint tabular-nums hidden sm:inline">
+                          · {chapter.wordCount.toLocaleString()} w
+                        </span>
+                      </div>
                     </button>
                   );
                 })
@@ -220,11 +239,11 @@ export function ChapterSelectorModal({
             </div>
 
             {/* Footer */}
-            <div className="border-t border-line px-6 py-3 bg-paper flex justify-between items-center text-xs text-muted tnum">
-              <span>Press Esc to close</span>
+            <div className="border-t border-line px-5 py-2.5 bg-paper flex justify-between items-center text-[11px] text-muted tabular-nums">
+              <span>Press Esc to exit</span>
               <span>
                 Showing {filteredChapters.length.toLocaleString()} of{" "}
-                {chapters.length.toLocaleString()}
+                {chapters.length.toLocaleString()} chapters
               </span>
             </div>
           </>
@@ -236,18 +255,17 @@ export function ChapterSelectorModal({
             {bookmarks.length === 0 ? (
               <div className="my-auto py-16 text-center text-muted">
                 <BookmarkIcon className="mx-auto h-8 w-8 text-faint mb-3" strokeWidth={1.5} />
-                <p className="text-sm font-medium text-ink mb-1">No bookmarks saved</p>
-                <p className="text-xs text-muted max-w-xs mx-auto">
-                  Use the bookmark button in the top bar while reading any chapter to save your
-                  place.
+                <p className="text-xs font-semibold text-ink mb-1">No bookmarks recorded</p>
+                <p className="text-[11px] text-muted max-w-xs mx-auto">
+                  Click the bookmark icon in the reader header while reading any chapter to pin it.
                 </p>
               </div>
             ) : (
-              <div className="divide-y divide-line border-y border-line">
+              <div className="divide-y divide-line border-y border-line rounded-xl overflow-hidden">
                 {bookmarks.map((b) => (
                   <div
                     key={b.chapterId}
-                    className="flex items-center justify-between py-3 px-2 hover:bg-sunken transition-colors"
+                    className="flex items-center justify-between py-3 px-3 hover:bg-sunken transition-colors"
                   >
                     <button
                       type="button"
@@ -258,15 +276,15 @@ export function ChapterSelectorModal({
                       className="flex-1 text-left truncate mr-3"
                     >
                       <div className="flex items-baseline gap-2.5 truncate">
-                        <span className="text-xs font-medium text-accent tnum">
-                          Ch. {b.chapterNumber}
+                        <span className="text-xs font-semibold text-accent tabular-nums">
+                          [CH.{b.chapterNumber.toString().padStart(4, "0")}]
                         </span>
-                        <span className="text-sm font-medium text-ink truncate">
+                        <span className="text-xs font-medium text-ink truncate">
                           {b.chapterTitle}
                         </span>
                       </div>
-                      <div className="text-xs text-muted mt-0.5 tnum">
-                        Saved {new Date(b.createdAt).toLocaleDateString()}
+                      <div className="text-[10px] text-muted mt-0.5 tabular-nums">
+                        Pinned {new Date(b.createdAt).toLocaleDateString()}
                       </div>
                     </button>
 
@@ -275,7 +293,7 @@ export function ChapterSelectorModal({
                       onClick={() => onRemoveBookmark(b.chapterId)}
                       title="Remove bookmark"
                       aria-label="Remove bookmark"
-                      className="icon-btn hover:text-danger"
+                      className="icon-btn rounded-lg hover:text-danger hover:bg-danger/10"
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
@@ -284,9 +302,9 @@ export function ChapterSelectorModal({
               </div>
             )}
 
-            <div className="border-t border-line pt-3 mt-4 flex justify-between items-center text-xs text-muted tnum">
-              <span>Bookmarks</span>
-              <span>{bookmarks.length} saved</span>
+            <div className="border-t border-line pt-3 mt-4 flex justify-between items-center text-[11px] text-muted tabular-nums">
+              <span>Cloud &amp; Local Storage</span>
+              <span>{bookmarks.length} bookmarks</span>
             </div>
           </div>
         )}

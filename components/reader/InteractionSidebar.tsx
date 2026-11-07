@@ -127,7 +127,7 @@ export function InteractionSidebar({
         aria-hidden={!visible}
         data-testid="interaction-sidebar"
         data-state={visible ? "visible" : "hidden"}
-        className={`mr-1.5 sm:mr-3 flex flex-col items-center border border-line bg-surface/95 px-1.5 py-2.5 shadow-pop backdrop-blur-sm transition-all duration-200 ${
+        className={`mr-1.5 sm:mr-3 flex flex-col items-center rounded-2xl border border-line bg-surface/95 px-1.5 py-2.5 shadow-pop backdrop-blur-sm transition-all duration-200 ${
           visible
             ? "translate-x-0 opacity-100 pointer-events-auto"
             : "translate-x-[calc(100%+1.5rem)] opacity-0 pointer-events-none"
@@ -146,9 +146,9 @@ export function InteractionSidebar({
               aria-pressed={social.viewerLiked}
               title={social.viewerLiked ? "Unlike chapter" : "Like chapter"}
               data-testid="sidebar-like-btn"
-              className={`group flex h-9 w-9 items-center justify-center rounded-[3px] border transition-colors ${
+              className={`group flex h-9 w-9 items-center justify-center rounded-xl border transition-colors ${
                 social.viewerLiked
-                  ? "border-accent bg-accent/10 text-accent"
+                  ? "border-accent bg-accent/15 text-accent shadow-sm"
                   : "border-transparent text-muted hover:bg-sunken hover:text-ink"
               }`}
             >
@@ -181,9 +181,9 @@ export function InteractionSidebar({
               aria-expanded={isCommentsOpen}
               title="Chapter comments"
               data-testid="sidebar-comments-btn"
-              className={`group flex h-9 w-9 items-center justify-center rounded-[3px] border transition-colors ${
+              className={`group flex h-9 w-9 items-center justify-center rounded-xl border transition-colors ${
                 isCommentsOpen
-                  ? "border-accent bg-accent/10 text-accent"
+                  ? "border-accent bg-accent/15 text-accent shadow-sm"
                   : "border-transparent text-muted hover:bg-sunken hover:text-ink"
               }`}
             >
@@ -213,9 +213,9 @@ export function InteractionSidebar({
               aria-pressed={isBookmarked}
               title={isBookmarked ? "Remove bookmark" : "Bookmark chapter"}
               data-testid="sidebar-bookmark-btn"
-              className={`group flex h-9 w-9 items-center justify-center rounded-[3px] border transition-colors ${
+              className={`group flex h-9 w-9 items-center justify-center rounded-xl border transition-colors ${
                 isBookmarked
-                  ? "border-accent bg-accent/10 text-accent"
+                  ? "border-accent bg-accent/15 text-accent shadow-sm"
                   : "border-transparent text-muted hover:bg-sunken hover:text-ink"
               }`}
             >
@@ -238,9 +238,9 @@ export function InteractionSidebar({
               aria-haspopup="true"
               title="React to chapter"
               data-testid="sidebar-reaction-btn"
-              className={`group relative flex h-9 w-9 items-center justify-center rounded-[3px] border transition-colors ${
+              className={`group relative flex h-9 w-9 items-center justify-center rounded-xl border transition-colors ${
                 activePopover === "reactions" || activeReactionDef
-                  ? "border-accent bg-accent/10 text-accent"
+                  ? "border-accent bg-accent/15 text-accent shadow-sm"
                   : "border-transparent text-muted hover:bg-sunken hover:text-ink"
               }`}
             >
@@ -274,7 +274,7 @@ export function InteractionSidebar({
                 role="dialog"
                 aria-label="Chapter reactions"
                 data-testid="reaction-picker-popover"
-                className="absolute right-full mr-2.5 top-1/2 -translate-y-1/2 z-50 flex items-center gap-1 border border-line bg-surface p-1.5 shadow-pop"
+                className="absolute right-full mr-2.5 top-1/2 -translate-y-1/2 z-50 flex items-center gap-1 rounded-2xl border border-line bg-surface p-1.5 shadow-pop"
               >
                 {REACTION_DEFINITIONS.map((item) => {
                   const selected = social.viewerReaction === item.type;
@@ -292,9 +292,9 @@ export function InteractionSidebar({
                       aria-pressed={selected}
                       title={`${item.label}${itemCount ? ` (${itemCount})` : ""}`}
                       data-testid={`reaction-option-${item.type}`}
-                      className={`flex flex-col items-center rounded-[3px] px-2.5 py-1.5 transition-colors ${
+                      className={`flex flex-col items-center rounded-xl px-2.5 py-1.5 transition-colors ${
                         selected
-                          ? "bg-accent/10 text-accent border border-accent"
+                          ? "bg-accent/15 text-accent border border-accent shadow-sm"
                           : "border border-transparent text-muted hover:bg-sunken hover:text-ink"
                       }`}
                     >
@@ -330,9 +330,9 @@ export function InteractionSidebar({
             aria-haspopup="true"
             title={userIdentity ? `Account: ${userIdentity.displayName}` : "Account menu"}
             data-testid="sidebar-account-btn"
-            className={`group relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-[3px] border transition-colors ${
+            className={`group relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl border transition-colors ${
               activePopover === "account"
-                ? "border-accent bg-accent/10 text-accent"
+                ? "border-accent bg-accent/15 text-accent shadow-sm"
                 : "border-transparent text-muted hover:bg-sunken hover:text-ink"
             }`}
           >
@@ -362,7 +362,7 @@ export function InteractionSidebar({
               role="menu"
               aria-label="Account menu"
               data-testid="sidebar-account-popover"
-              className="absolute right-full mr-2.5 bottom-0 z-50 w-56 border border-line bg-surface p-1.5 shadow-pop"
+              className="absolute right-full mr-2.5 bottom-0 z-50 w-56 rounded-2xl border border-line bg-surface p-1.5 shadow-pop overflow-hidden"
             >
               <AccountMenuContent
                 user={user}
@@ -381,7 +381,7 @@ export function InteractionSidebar({
           aria-label="Hide interaction sidebar"
           title="Hide sidebar"
           data-testid="sidebar-hide-btn"
-          className="mt-2 flex h-6 w-7 items-center justify-center rounded-[3px] text-muted hover:bg-sunken hover:text-ink transition-colors"
+          className="mt-2 flex h-6 w-7 items-center justify-center rounded-lg text-muted hover:bg-sunken hover:text-ink transition-colors"
         >
           <ChevronRight className="h-3.5 w-3.5" />
         </button>

@@ -147,9 +147,25 @@ export default async function ReadPage({ searchParams }: ReadPageProps) {
   const fontSizeCookie = cookieStore.get("reverend_font_size")?.value;
   const lineHeightCookie = cookieStore.get("reverend_line_height")?.value;
   const opacityCookie = cookieStore.get("reverend_surface_opacity")?.value;
+  const surfaceThemeCookie = cookieStore.get("reverend_surface_theme")?.value;
+  const fontCookie = cookieStore.get("reverend_font")?.value;
+  const fontColorCookie = cookieStore.get("reverend_font_color")?.value;
   const maxWidthCookie = cookieStore.get("reverend_max_width")?.value;
   const letterSpacingCookie = cookieStore.get("reverend_letter_spacing")?.value;
+  const textAlignCookie = cookieStore.get("reverend_text_align")?.value;
 
+  if (fontCookie) {
+    initialSettings.font = fontCookie as typeof initialSettings.font;
+  }
+  if (surfaceThemeCookie) {
+    initialSettings.surfaceTheme = surfaceThemeCookie as typeof initialSettings.surfaceTheme;
+  }
+  if (fontColorCookie) {
+    initialSettings.fontColor = fontColorCookie;
+  }
+  if (textAlignCookie === "left" || textAlignCookie === "justify") {
+    initialSettings.textAlign = textAlignCookie;
+  }
   if (fontSizeCookie && !isNaN(parseInt(fontSizeCookie, 10))) {
     initialSettings.fontSize = parseInt(fontSizeCookie, 10);
   }

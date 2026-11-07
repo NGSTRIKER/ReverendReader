@@ -27,7 +27,8 @@ const config: Config = {
       fontFamily: {
         serif: ["var(--font-serif)", "EB Garamond", "Garamond", "Georgia", "serif"],
         mono: ["var(--font-mono)", "JetBrains Mono", "SFMono-Regular", "Menlo", "monospace"],
-        sans: ["var(--font-serif)", "EB Garamond", "Garamond", "Georgia", "serif"],
+        sans: ["system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "sans-serif"],
+        literary: ["var(--font-serif)", "Palatino", "Georgia", "serif"],
       },
       boxShadow: {
         pop: "0 1px 2px rgb(var(--shadow) / 0.05), 0 8px 24px -4px rgb(var(--shadow) / 0.14)",
