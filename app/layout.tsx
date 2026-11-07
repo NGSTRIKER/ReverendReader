@@ -16,6 +16,7 @@ const ebGaramond = EB_Garamond({
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
+  style: ["normal", "italic"],
   display: "swap",
   variable: "--font-mono",
 });

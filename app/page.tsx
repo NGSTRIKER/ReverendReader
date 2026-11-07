@@ -52,7 +52,7 @@ export default async function HomePage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-paper text-ink">
+    <div className="flex min-h-screen flex-col bg-paper text-ink font-mono selection:bg-accent/20">
       <script
         type="application/ld+json"
         nonce={nonce}
