@@ -14,9 +14,9 @@ interface HeroSectionProps {
 export function HeroSection({ continueChapter = null }: HeroSectionProps) {
   return (
     <section className="relative overflow-hidden border-b border-line bg-paper py-14 sm:py-24">
-      {/* Background illustration with flat solid tint overlay (no gradient, no glow) */}
+      {/* Background illustration with heavy solid flat tint (lot of tint, no gradient, no glow) */}
       <div className="absolute inset-0 pointer-events-none select-none overflow-hidden" aria-hidden="true">
-        <picture className="absolute inset-0 w-full h-full">
+        <picture className="absolute inset-0 w-full h-full opacity-20">
           <source
             media="(max-width: 639px) and (orientation: portrait)"
             type="image/webp"
@@ -33,11 +33,11 @@ export function HeroSection({ continueChapter = null }: HeroSectionProps) {
             loading="eager"
             fetchPriority="high"
             decoding="async"
-            className="h-full w-full object-cover object-center filter grayscale contrast-[1.08]"
+            className="h-full w-full object-cover object-center filter grayscale contrast-[1.05]"
           />
         </picture>
-        {/* Flat solid tint overlay: strict zero gradient, zero glow */}
-        <div className="absolute inset-0 bg-paper/88" />
+        {/* Flat solid tint overlay: heavy solid tint, strictly zero gradient, zero glow */}
+        <div className="absolute inset-0 bg-paper/95" />
       </div>
 
       {/* Foreground Content */}
@@ -99,7 +99,7 @@ export function HeroSection({ continueChapter = null }: HeroSectionProps) {
               href={DISCORD_INVITE_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-3 py-2 text-xs font-mono text-muted hover:text-accent transition-colors whitespace-nowrap"
+              className="px-3 py-2 text-xs text-muted hover:text-accent transition-colors whitespace-nowrap"
             >
               Discord Alliance &#8599;
             </a>

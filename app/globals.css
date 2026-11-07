@@ -95,10 +95,10 @@
 }
 
 @layer components {
-  /* Hallmark telemetry & label: JetBrains Mono uppercase tracking */
+  /* Hallmark telemetry & label */
   .label {
-    @apply text-[0.72rem] tracking-[0.1em] text-muted uppercase;
-    font-family: var(--font-mono), ui-monospace, monospace;
+    @apply text-[0.72rem] tracking-[0.08em] text-muted uppercase;
+    font-variant-caps: all-small-caps;
     font-variant-numeric: tabular-nums lining-nums;
   }
 
@@ -108,12 +108,11 @@
 
   /* Gate 59: Buttons enforce whitespace-nowrap so text never splits awkwardly on mobile */
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-[2px] px-3.5 py-2 text-[0.9rem] leading-none whitespace-nowrap transition-colors duration-150 disabled:pointer-events-none disabled:opacity-40;
-    font-family: var(--font-mono), ui-monospace, monospace;
+    @apply inline-flex items-center justify-center gap-2 rounded-[2px] px-3.5 py-2 text-[0.9rem] leading-none whitespace-nowrap transition-colors duration-150 disabled:pointer-events-none disabled:opacity-40 font-medium;
   }
 
   .btn-primary {
-    @apply btn bg-accent text-on-accent font-medium hover:bg-accent-hover;
+    @apply btn bg-accent text-on-accent hover:bg-accent-hover;
   }
 
   .btn-quiet {
@@ -126,7 +125,6 @@
 
   .field {
     @apply w-full rounded-[2px] border border-line-strong bg-paper px-3 py-2 text-[0.9rem] text-ink placeholder:text-faint focus:border-accent focus:outline-none;
-    font-family: var(--font-mono), ui-monospace, monospace;
   }
 
   .link {

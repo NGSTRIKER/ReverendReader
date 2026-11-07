@@ -984,7 +984,7 @@ export function CommentsDrawer({
                 <Eye className="h-3.5 w-3.5 flex-shrink-0" />
                 <span>Spoiler concealed · Click to reveal comment</span>
               </span>
-              <span className="font-mono text-[10px] uppercase tracking-wider underline">
+              <span className="text-[10px] uppercase tracking-wider underline">
                 Reveal
               </span>
             </button>
@@ -1047,7 +1047,7 @@ export function CommentsDrawer({
                   }
                 }}
                 data-testid="comment-reply-btn"
-                className={`inline-flex items-center space-x-1 font-mono text-[11px] ${textSecondary} hover:text-accent transition-colors`}
+                className={`inline-flex items-center space-x-1 text-[11px] ${textSecondary} hover:text-accent transition-colors`}
               >
                 <MessageSquareReply className="h-3.5 w-3.5" />
                 <span>Reply</span>
@@ -1059,7 +1059,7 @@ export function CommentsDrawer({
                 type="button"
                 onClick={() => void handleToggleReplies(item.id)}
                 data-testid="toggle-replies-btn"
-                className="inline-flex items-center space-x-1 font-mono text-[11px] font-medium text-accent hover:underline"
+                className="inline-flex items-center space-x-1 text-[11px] font-medium text-accent hover:underline"
               >
                 {replyThreads[item.id]?.expanded ? (
                   <>
@@ -1087,7 +1087,7 @@ export function CommentsDrawer({
               type="button"
               onClick={() => void handleToggleReplies(item.id)}
               data-testid="toggle-replies-btn"
-              className="inline-flex items-center space-x-1 font-mono text-[11px] font-medium text-accent hover:underline"
+              className="inline-flex items-center space-x-1 text-[11px] font-medium text-accent hover:underline"
             >
               {replyThreads[item.id]?.expanded ? (
                 <>
@@ -1184,7 +1184,7 @@ export function CommentsDrawer({
               <button
                 type="button"
                 onClick={() => void handleLoadMoreReplies(item.id)}
-                className="ml-6 font-mono text-[11px] font-medium text-accent hover:underline"
+                className="ml-6 text-[11px] font-medium text-accent hover:underline"
               >
                 Load more replies
               </button>
@@ -1223,7 +1223,7 @@ export function CommentsDrawer({
         <header className={`flex items-start justify-between gap-3 border-b ${drawerBorder} px-4 py-3.5`}>
           <div className="min-w-0 flex-1">
             <div className="flex items-center space-x-2">
-              <span className="rounded-md border border-accent/40 bg-accent/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-accent">
+              <span className="rounded-md border border-accent/40 bg-accent/10 px-2 py-0.5 text-[10px] uppercase tracking-wider text-accent">
                 Chapter {chapter.number}
               </span>
               <span
@@ -1258,7 +1258,7 @@ export function CommentsDrawer({
         <div
           className={`flex items-center justify-between border-b ${drawerBorder} px-4 py-2 text-xs`}
         >
-          <span className={`font-mono text-[11px] ${textSecondary}`}>Sort by</span>
+          <span className={`text-[11px] ${textSecondary}`}>Sort by</span>
           <div className="flex items-center space-x-1" role="tablist" aria-label="Sort comments">
             {(["top", "newest", "oldest"] as const).map((option) => {
               const active = sort === option;
@@ -1270,7 +1270,7 @@ export function CommentsDrawer({
                   aria-selected={active}
                   data-testid={`sort-comments-${option}`}
                   onClick={() => setSort(option)}
-                  className={`rounded-lg px-2.5 py-1 font-mono text-[11px] capitalize transition-colors ${
+                  className={`rounded-lg px-2.5 py-1 text-[11px] capitalize transition-colors ${
                     active
                       ? "bg-accent/15 text-accent font-semibold"
                       : `${textSecondary} hover:bg-sunken hover:text-ink`
@@ -1343,7 +1343,7 @@ export function CommentsDrawer({
                     onClick={() => void handleLoadMoreComments()}
                     disabled={loadingMore}
                     data-testid="load-more-comments-btn"
-                    className={`inline-flex items-center space-x-2 rounded-xl border ${drawerBorder} ${cardBg} px-4 py-2 font-mono text-xs ${textPrimary} hover:border-accent transition-colors disabled:opacity-50`}
+                    className={`inline-flex items-center space-x-2 rounded-xl border ${drawerBorder} ${cardBg} px-4 py-2 text-xs font-medium ${textPrimary} hover:border-accent transition-colors disabled:opacity-50`}
                   >
                     {loadingMore ? (
                       <>
