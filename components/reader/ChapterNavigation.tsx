@@ -8,10 +8,10 @@ import {
   ChevronRight,
   List,
   SlidersHorizontal,
-  Home,
   Bookmark,
 } from "lucide-react";
 import { UserNav } from "@/components/auth/UserNav";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 interface ChapterNavigationProps {
   currentChapter: ChapterMetadata;
@@ -27,126 +27,6 @@ interface ChapterNavigationProps {
   settings?: ReaderSettings;
 }
 
-const THEME_NAV_STYLES: Record<string, { bg: string; border: string; btnBg: string; btnBorder: string; text: string; subtext: string; accent: string }> = {
-  catppuccin: {
-    bg: "bg-[#181825]/95",
-    border: "border-[#313244]/80",
-    btnBg: "bg-[#1e1e2e]/80",
-    btnBorder: "border-[#313244]",
-    text: "text-[#cdd6f4]",
-    subtext: "text-[#a6adc8]",
-    accent: "text-[#89b4fa]",
-  },
-  "catppuccin-mocha": {
-    bg: "bg-[#11111b]/95",
-    border: "border-[#45475a]/80",
-    btnBg: "bg-[#181825]/80",
-    btnBorder: "border-[#45475a]",
-    text: "text-[#cdd6f4]",
-    subtext: "text-[#a6adc8]",
-    accent: "text-[#cba6f7]",
-  },
-  "catppuccin-pink": {
-    bg: "bg-[#231522]/95",
-    border: "border-[#56324e]/80",
-    btnBg: "bg-[#2d1c2b]/80",
-    btnBorder: "border-[#56324e]",
-    text: "text-[#f5e0dc]",
-    subtext: "text-[#f5c2e7]/70",
-    accent: "text-[#f5c2e7]",
-  },
-  "catppuccin-coffee": {
-    bg: "bg-[#201713]/95",
-    border: "border-[#483329]/80",
-    btnBg: "bg-[#2b1f1a]/80",
-    btnBorder: "border-[#483329]",
-    text: "text-[#f4ebd0]",
-    subtext: "text-[#fab387]/70",
-    accent: "text-[#fab387]",
-  },
-  "catppuccin-jade": {
-    bg: "bg-[#111c16]/95",
-    border: "border-[#274235]/80",
-    btnBg: "bg-[#192b21]/80",
-    btnBorder: "border-[#274235]",
-    text: "text-[#e8f5e9]",
-    subtext: "text-[#a6e3a1]/70",
-    accent: "text-[#a6e3a1]",
-  },
-  "catppuccin-latte": {
-    bg: "bg-[#e6e9ef]/95",
-    border: "border-[#ccd0da]/90",
-    btnBg: "bg-[#dce0e8]/80",
-    btnBorder: "border-[#ccd0da]",
-    text: "text-[#4c4f69]",
-    subtext: "text-[#6c6f85]",
-    accent: "text-[#1e66f5]",
-  },
-  black: {
-    bg: "bg-[#09090b]/95",
-    border: "border-zinc-800",
-    btnBg: "bg-zinc-900/80",
-    btnBorder: "border-zinc-800",
-    text: "text-[#e4e4e7]",
-    subtext: "text-zinc-400",
-    accent: "text-zinc-200",
-  },
-  slate: {
-    bg: "bg-[#0b1120]/95",
-    border: "border-slate-800",
-    btnBg: "bg-slate-900/80",
-    btnBorder: "border-slate-800",
-    text: "text-[#cbd5e1]",
-    subtext: "text-slate-400",
-    accent: "text-sky-400",
-  },
-  sepia: {
-    bg: "bg-[#161210]/95",
-    border: "border-amber-950/80",
-    btnBg: "bg-[#221c18]/80",
-    btnBorder: "border-amber-950/60",
-    text: "text-[#f3ede2]",
-    subtext: "text-amber-200/60",
-    accent: "text-amber-400",
-  },
-  dark: {
-    bg: "bg-[#121212]/95",
-    border: "border-zinc-800",
-    btnBg: "bg-zinc-900/80",
-    btnBorder: "border-zinc-800",
-    text: "text-[#e0e0e0]",
-    subtext: "text-zinc-400",
-    accent: "text-zinc-200",
-  },
-  acrylic: {
-    bg: "bg-[#181825]/80",
-    border: "border-white/10",
-    btnBg: "bg-white/5",
-    btnBorder: "border-white/15",
-    text: "text-[#cdd6f4]",
-    subtext: "text-[#a6adc8]",
-    accent: "text-[#89b4fa]",
-  },
-  blur: {
-    bg: "bg-[#11111b]/80",
-    border: "border-white/10",
-    btnBg: "bg-white/5",
-    btnBorder: "border-white/15",
-    text: "text-[#cdd6f4]",
-    subtext: "text-[#a6adc8]",
-    accent: "text-[#89b4fa]",
-  },
-  transparent: {
-    bg: "bg-black/50",
-    border: "border-white/10",
-    btnBg: "bg-black/30",
-    btnBorder: "border-white/15",
-    text: "text-white",
-    subtext: "text-zinc-300",
-    accent: "text-[#89b4fa]",
-  },
-};
-
 export function ChapterNavigation({
   currentChapter,
   totalChapters,
@@ -158,12 +38,9 @@ export function ChapterNavigation({
   onOpenSettings,
   isBookmarked,
   onToggleBookmark,
-  settings,
 }: ChapterNavigationProps) {
-  // Arrow key navigation listener
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Don't trigger if user is typing in an input
       if (
         e.target instanceof HTMLInputElement ||
         e.target instanceof HTMLTextAreaElement
@@ -184,89 +61,103 @@ export function ChapterNavigation({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [hasPrev, hasNext, onPrev, onNext]);
 
-  const navTheme = THEME_NAV_STYLES[settings?.surfaceTheme || "catppuccin"] || THEME_NAV_STYLES.catppuccin;
-
   return (
-    <header className={`sticky top-0 z-30 w-full border-b ${navTheme.border} ${navTheme.bg} backdrop-blur-md transition-colors duration-200`}>
-      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
-        {/* Left: Home & TOC */}
-        <div className="flex items-center space-x-2">
+    <header className="sticky top-0 z-30 w-full border-b border-line bg-paper/95 backdrop-blur-sm">
+      <div className="mx-auto flex h-13 max-w-[1180px] items-center justify-between gap-2 px-3 sm:px-6 py-2">
+        {/* Left: Brand return & Contents */}
+        <div className="flex items-center gap-1.5 sm:gap-2">
           <Link
             href="/"
-            title="Return to Home"
-            className={`flex items-center space-x-1.5 rounded border ${navTheme.btnBorder} ${navTheme.btnBg} px-2.5 py-1.5 text-xs ${navTheme.text} hover:opacity-80 transition-colors`}
+            title="Return to Index"
+            className="inline-flex items-center gap-2 rounded-[3px] px-2.5 py-1.5 text-sm font-semibold text-ink hover:bg-sunken transition-colors"
           >
-            <Home className={`h-3.5 w-3.5 ${navTheme.accent}`} />
-            <span className="hidden sm:inline">Home</span>
+            <span className="h-2 w-2 bg-accent" aria-hidden="true" />
+            <span className="hidden sm:inline">Reverend Insanity</span>
+            <span className="sm:hidden">Home</span>
           </Link>
 
+          <span className="h-4 w-px bg-line" aria-hidden="true" />
+
           <button
+            type="button"
             onClick={onOpenToc}
-            title="Open Table of Contents & Bookmarks"
-            className={`flex items-center space-x-1.5 rounded border ${navTheme.btnBorder} ${navTheme.btnBg} px-2.5 py-1.5 text-xs ${navTheme.text} hover:opacity-80 transition-colors`}
+            title="Table of contents and bookmarks"
+            className="inline-flex items-center gap-1.5 rounded-[3px] border border-line-strong bg-surface px-2.5 py-1 text-xs sm:text-sm text-ink hover:border-ink/40 hover:bg-sunken transition-colors"
           >
-            <List className={`h-3.5 w-3.5 ${navTheme.accent}`} />
-            <span className="hidden sm:inline">Chapters</span>
+            <List className="h-3.5 w-3.5 text-accent" strokeWidth={1.75} />
+            <span>Index</span>
+            <span className="hidden md:inline text-muted tnum">
+              · {currentChapter.number}/{totalChapters}
+            </span>
           </button>
         </div>
 
-        {/* Center: Current Chapter Metadata */}
-        <div className="mx-2 max-w-[200px] sm:max-w-md md:max-w-lg truncate text-center">
-          <div className={`truncate text-xs sm:text-sm font-serif font-medium ${navTheme.text}`}>
+        {/* Center: Running header */}
+        <div className="hidden sm:block min-w-0 max-w-md md:max-w-lg truncate text-center px-2">
+          <div className="truncate text-sm font-medium text-ink">
             {currentChapter.title}
           </div>
-          <div className={`text-[10px] sm:text-[11px] ${navTheme.subtext} font-mono`}>
-            Chapter {currentChapter.number} of {totalChapters.toLocaleString()}
-          </div>
         </div>
 
-        {/* Right: Bookmark / Prev / Next / Settings */}
-        <div className="flex items-center space-x-1 sm:space-x-2">
+        {/* Right: Controls */}
+        <div className="flex items-center gap-1">
           <button
-            onClick={onToggleBookmark}
-            title={isBookmarked ? "Remove Bookmark" : "Bookmark this Chapter"}
-            aria-label={isBookmarked ? "Remove Bookmark" : "Bookmark this Chapter"}
-            className={`rounded border p-1.5 transition-colors ${
-              isBookmarked
-                ? "border-[#89b4fa] bg-[#89b4fa]/20 text-[#89b4fa]"
-                : `${navTheme.btnBorder} ${navTheme.btnBg} ${navTheme.subtext} hover:text-white`
-            }`}
-          >
-            <Bookmark className={`h-4 w-4 ${isBookmarked ? "fill-[#89b4fa]" : ""}`} />
-          </button>
-
-          <button
+            type="button"
             onClick={onPrev}
             disabled={!hasPrev}
             aria-label="Previous chapter"
-            title="Previous chapter (← Arrow Left)"
-            className={`rounded border ${navTheme.btnBorder} ${navTheme.btnBg} p-1.5 ${navTheme.text} hover:opacity-80 disabled:opacity-30 disabled:pointer-events-none transition-colors`}
+            title="Previous chapter (Left Arrow)"
+            className="icon-btn"
           >
-            <ChevronLeft className="h-4 w-4" />
+            <ChevronLeft className="h-4 w-4" strokeWidth={1.75} />
           </button>
 
+          <span className="sm:hidden px-1 text-xs text-muted tnum">
+            {currentChapter.number}
+          </span>
+
           <button
+            type="button"
             onClick={onNext}
             disabled={!hasNext}
             aria-label="Next chapter"
-            title="Next chapter (→ Arrow Right)"
-            className={`rounded border ${navTheme.btnBorder} ${navTheme.btnBg} p-1.5 ${navTheme.text} hover:opacity-80 disabled:opacity-30 disabled:pointer-events-none transition-colors`}
+            title="Next chapter (Right Arrow)"
+            className="icon-btn"
           >
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-4 w-4" strokeWidth={1.75} />
           </button>
 
           <button
-            onClick={onOpenSettings}
-            aria-label="Reader appearance settings"
-            title="Appearance and typography settings"
-            className={`rounded border ${navTheme.btnBorder} ${navTheme.btnBg} p-1.5 ${navTheme.text} hover:opacity-80 transition-colors ml-1`}
+            type="button"
+            onClick={onToggleBookmark}
+            title={isBookmarked ? "Remove bookmark" : "Bookmark this chapter"}
+            aria-label={isBookmarked ? "Remove bookmark" : "Bookmark this chapter"}
+            aria-pressed={isBookmarked}
+            className={`icon-btn ${
+              isBookmarked ? "text-accent bg-accent/10" : ""
+            }`}
           >
-            <SlidersHorizontal className={`h-4 w-4 ${navTheme.accent}`} />
+            <Bookmark
+              className={`h-4 w-4 ${isBookmarked ? "fill-current" : ""}`}
+              strokeWidth={1.75}
+            />
           </button>
 
-          <div className="ml-1 pl-1 sm:ml-1.5 sm:pl-1.5 border-l border-[#414559]/50 flex items-center">
-            <UserNav compact />
-          </div>
+          <button
+            type="button"
+            onClick={onOpenSettings}
+            aria-label="Reading preferences"
+            title="Reading preferences"
+            className="icon-btn"
+          >
+            <SlidersHorizontal className="h-4 w-4" strokeWidth={1.75} />
+          </button>
+
+          <ThemeToggle />
+
+          <span className="mx-0.5 h-4 w-px bg-line" aria-hidden="true" />
+
+          <UserNav compact />
         </div>
       </div>
     </header>

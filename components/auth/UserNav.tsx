@@ -25,7 +25,6 @@ export interface UserIdentity {
 
 export function extractUserIdentity(user: User): UserIdentity {
   const metadata = user.user_metadata || {};
-  // Use their Discord username as display name
   const rawDiscordUsername =
     metadata.preferred_username ||
     metadata.user_name ||
@@ -77,19 +76,19 @@ export function AccountMenuContent({
   if (!user) {
     return (
       <div className="p-2">
-        <div className="px-2.5 py-2 border-b border-[#414559]/60 mb-1.5">
-          <p className="text-xs font-semibold text-[#c6d0f5]">Cultivator Account</p>
-          <p className="mt-0.5 text-[11px] text-[#a5adce]">
+        <div className="px-2.5 py-2 border-b border-line mb-2">
+          <p className="text-xs font-semibold text-ink">Reader Account</p>
+          <p className="mt-0.5 text-xs text-muted">
             Sign in to like chapters, join discussions, and sync progress.
           </p>
         </div>
         <Link
           href={loginUrl}
           onClick={onClose}
-          className="flex w-full items-center justify-center space-x-2 rounded-lg bg-[#5865F2] px-3 py-2 text-xs font-semibold text-white shadow-sm hover:bg-[#4752c4] transition-colors"
+          className="btn-primary w-full py-2 text-xs font-medium"
         >
           <LogIn className="h-3.5 w-3.5" />
-          <span>Login with Discord</span>
+          <span>Sign in with Discord</span>
         </Link>
       </div>
     );
@@ -100,8 +99,8 @@ export function AccountMenuContent({
   return (
     <div>
       {/* User Info Header */}
-      <div className="flex items-center space-x-2.5 border-b border-[#414559] px-3 py-2.5">
-        <div className="relative h-8 w-8 flex-shrink-0 overflow-hidden rounded-full border border-[#51576d] bg-[#292c3c]">
+      <div className="flex items-center gap-2.5 border-b border-line px-3 py-2.5">
+        <div className="relative h-8 w-8 flex-shrink-0 overflow-hidden rounded-[3px] border border-line bg-sunken">
           {avatarUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -112,20 +111,17 @@ export function AccountMenuContent({
               className="h-full w-full object-cover"
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center bg-[#414559] text-xs font-mono text-[#8caaee]">
+            <div className="flex h-full w-full items-center justify-center text-xs text-accent">
               <UserIcon className="h-4 w-4" />
             </div>
           )}
         </div>
         <div className="min-w-0 flex-1">
-          <p className="truncate text-xs font-semibold text-[#c6d0f5]">{displayName}</p>
+          <p className="truncate text-xs font-semibold text-ink">{displayName}</p>
           {username && username.toLowerCase() !== displayName.toLowerCase() && (
-            <p className="truncate font-mono text-[10px] text-[#a5adce]">@{username}</p>
+            <p className="truncate text-[11px] text-muted">@{username}</p>
           )}
-          <div className="mt-0.5 flex items-center space-x-1 font-mono text-[9px] uppercase tracking-wider text-[#a6d189]">
-            <span className="h-1.5 w-1.5 rounded-full bg-[#a6d189]" />
-            <span>Discord Connected</span>
-          </div>
+          <p className="text-[10px] text-muted">Discord connected</p>
         </div>
       </div>
 
@@ -134,19 +130,19 @@ export function AccountMenuContent({
         <Link
           href="/account#profile"
           onClick={onClose}
-          className="flex items-center space-x-2.5 rounded-lg px-3 py-2 text-left text-xs font-medium text-[#c6d0f5] hover:bg-[#414559] hover:text-white transition-colors"
+          className="flex items-center gap-2.5 rounded-[3px] px-3 py-2 text-left text-xs text-ink hover:bg-sunken transition-colors"
         >
-          <UserCheck className="h-3.5 w-3.5 text-[#8caaee]" />
+          <UserCheck className="h-3.5 w-3.5 text-accent" />
           <span>Profile</span>
         </Link>
 
         <Link
           href="/account"
           onClick={onClose}
-          className="flex items-center space-x-2.5 rounded-lg px-3 py-2 text-left text-xs font-medium text-[#c6d0f5] hover:bg-[#414559] hover:text-white transition-colors"
+          className="flex items-center gap-2.5 rounded-[3px] px-3 py-2 text-left text-xs text-ink hover:bg-sunken transition-colors"
         >
-          <LayoutDashboard className="h-3.5 w-3.5 text-[#8caaee]" />
-          <span>Account dashboard</span>
+          <LayoutDashboard className="h-3.5 w-3.5 text-accent" />
+          <span>Account overview</span>
         </Link>
 
         {onOpenBookmarks ? (
@@ -156,18 +152,18 @@ export function AccountMenuContent({
               onClose();
               onOpenBookmarks();
             }}
-            className="flex w-full items-center space-x-2.5 rounded-lg px-3 py-2 text-left text-xs font-medium text-[#c6d0f5] hover:bg-[#414559] hover:text-white transition-colors"
+            className="flex w-full items-center gap-2.5 rounded-[3px] px-3 py-2 text-left text-xs text-ink hover:bg-sunken transition-colors"
           >
-            <Bookmark className="h-3.5 w-3.5 text-[#fab387]" />
+            <Bookmark className="h-3.5 w-3.5 text-accent" />
             <span>Bookmarks</span>
           </button>
         ) : (
           <Link
             href="/account#bookmarks"
             onClick={onClose}
-            className="flex items-center space-x-2.5 rounded-lg px-3 py-2 text-left text-xs font-medium text-[#c6d0f5] hover:bg-[#414559] hover:text-white transition-colors"
+            className="flex items-center gap-2.5 rounded-[3px] px-3 py-2 text-left text-xs text-ink hover:bg-sunken transition-colors"
           >
-            <Bookmark className="h-3.5 w-3.5 text-[#fab387]" />
+            <Bookmark className="h-3.5 w-3.5 text-accent" />
             <span>Bookmarks</span>
           </Link>
         )}
@@ -175,14 +171,14 @@ export function AccountMenuContent({
         <Link
           href="/account#progress"
           onClick={onClose}
-          className="flex items-center space-x-2.5 rounded-lg px-3 py-2 text-left text-xs font-medium text-[#c6d0f5] hover:bg-[#414559] hover:text-white transition-colors"
+          className="flex items-center gap-2.5 rounded-[3px] px-3 py-2 text-left text-xs text-ink hover:bg-sunken transition-colors"
         >
-          <Compass className="h-3.5 w-3.5 text-[#a6e3a1]" />
+          <Compass className="h-3.5 w-3.5 text-accent" />
           <span>Reading progress</span>
         </Link>
       </div>
 
-      <div className="border-t border-[#414559]/60 my-0.5" />
+      <div className="border-t border-line my-0.5" />
 
       {/* Logout */}
       <div className="py-1">
@@ -190,17 +186,17 @@ export function AccountMenuContent({
           type="button"
           onClick={handleSignOut}
           disabled={isLoggingOut}
-          className="flex w-full items-center space-x-2.5 rounded-lg px-3 py-2 text-left text-xs font-medium text-[#e78284] transition-colors hover:bg-[#e78284]/10 focus:outline-none disabled:opacity-50"
+          className="flex w-full items-center gap-2.5 rounded-[3px] px-3 py-2 text-left text-xs text-danger hover:bg-danger/10 transition-colors disabled:opacity-50"
         >
           {isLoggingOut ? (
             <>
               <Loader2 className="h-3.5 w-3.5 animate-spin" />
-              <span>Logging out...</span>
+              <span>Signing out...</span>
             </>
           ) : (
             <>
               <LogOut className="h-3.5 w-3.5" />
-              <span>Logout</span>
+              <span>Sign out</span>
             </>
           )}
         </button>
@@ -277,7 +273,7 @@ export function UserNav({ compact = false }: UserNavProps) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-8 w-8 rounded-full bg-[#303446] animate-pulse">
+      <div className="flex items-center justify-center h-8 w-8 rounded-[3px] bg-sunken">
         <span className="sr-only">Loading user...</span>
       </div>
     );
@@ -290,15 +286,13 @@ export function UserNav({ compact = false }: UserNavProps) {
     return (
       <Link
         href={loginUrl}
-        className={`inline-flex items-center space-x-1.5 rounded-md border border-[#51576d] bg-[#303446] text-[#c6d0f5] hover:border-[#8caaee] hover:bg-[#414559] hover:text-white transition-all focus:outline-none focus:ring-1 focus:ring-[#8caaee] ${
-          compact
-            ? "p-1.5 sm:px-2.5 sm:py-1 text-[11px] font-mono"
-            : "px-3 py-1.5 text-xs font-mono font-medium tracking-wide"
+        className={`btn-quiet ${
+          compact ? "px-2.5 py-1 text-xs" : "px-3 py-1.5 text-xs"
         }`}
         title="Sign in with Discord"
       >
-        <LogIn className="h-3.5 w-3.5 text-[#8caaee]" />
-        <span className={compact ? "hidden sm:inline" : ""}>Login</span>
+        <LogIn className="h-3.5 w-3.5 text-accent" />
+        <span className={compact ? "hidden sm:inline" : ""}>Sign in</span>
       </Link>
     );
   }
@@ -310,31 +304,31 @@ export function UserNav({ compact = false }: UserNavProps) {
       <button
         type="button"
         onClick={() => setIsDropdownOpen((prev) => !prev)}
-        className="group flex items-center space-x-2 rounded-full p-0.5 transition-all focus:outline-none focus:ring-2 focus:ring-[#8caaee]"
+        className="group flex items-center gap-2 rounded-[3px] p-0.5"
         aria-expanded={isDropdownOpen}
         aria-haspopup="true"
         title={`Account: ${displayName}`}
       >
-        <div className="relative h-8 w-8 overflow-hidden rounded-full border border-[#51576d] bg-[#303446] transition-transform group-hover:scale-105">
+        <div className="relative h-7 w-7 overflow-hidden rounded-[3px] border border-line-strong bg-sunken">
           {avatarUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={avatarUrl}
               alt={displayName}
-              width={32}
-              height={32}
+              width={28}
+              height={28}
               className="h-full w-full object-cover"
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center bg-[#414559] text-xs font-mono text-[#8caaee]">
-              <UserIcon className="h-4 w-4" />
+            <div className="flex h-full w-full items-center justify-center text-xs text-accent">
+              <UserIcon className="h-3.5 w-3.5" />
             </div>
           )}
         </div>
       </button>
 
       {isDropdownOpen && (
-        <div className="absolute right-0 z-50 mt-2 w-56 origin-top-right rounded-xl border border-[#414559] bg-[#303446] p-1.5 shadow-xl backdrop-blur-md ring-1 ring-black/20 focus:outline-none">
+        <div className="absolute right-0 z-50 mt-2 w-56 origin-top-right border border-line bg-surface p-1.5 shadow-pop">
           <AccountMenuContent
             user={user}
             loginUrl={loginUrl}

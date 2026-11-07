@@ -1,11 +1,24 @@
+import type { Metadata } from "next";
+import { cookies, headers } from "next/headers";
 import { Navigation } from "@/components/landing/Navigation";
 import { HeroSection } from "@/components/landing/HeroSection";
 import { SynopsisSection } from "@/components/landing/SynopsisSection";
 import { Footer } from "@/components/landing/Footer";
-import { headers } from "next/headers";
+
+export const metadata: Metadata = {
+  alternates: {
+    canonical: "/",
+  },
+};
 
 export default async function HomePage() {
   const nonce = (await headers()).get("x-nonce") ?? undefined;
+  const cookieStore = await cookies();
+  const lastReadRaw = cookieStore.get("reverend_last_read")?.value;
+  const parsedLast = lastReadRaw ? parseInt(lastReadRaw, 10) : NaN;
+  const continueChapter =
+    !isNaN(parsedLast) && parsedLast >= 1 && parsedLast <= 2334 ? parsedLast : null;
+
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://reverend-reader.vercel.app";
 
   const jsonLd = {
@@ -15,14 +28,14 @@ export default async function HomePage() {
         "@type": "WebSite",
         "@id": `${siteUrl}/#website`,
         url: siteUrl,
-        name: "Reverend Insanity Reader",
-        description: "Distraction-free, high performance novel reader for Reverend Insanity by Gu Zhenren.",
+        name: "Reverend Reader",
+        description: "Online reader for Reverend Insanity by Gu Zhenren.",
         inLanguage: "en-US",
       },
       {
         "@type": "Book",
         "@id": `${siteUrl}/#book`,
-        name: "Reverend Insanity (蛊真人)",
+        name: "Reverend Insanity",
         alternateName: ["Gu Zhenren", "蛊真人", "Master of Gu"],
         author: {
           "@type": "Person",
@@ -33,14 +46,13 @@ export default async function HomePage() {
         numberOfPages: 2334,
         inLanguage: "en",
         description:
-          "Humans are clever in tens of thousands of ways, Gu are the true refined essences of Heaven and Earth. Follow Fang Yuan's 500-year rebirth through a ruthless world of Gu cultivation.",
+          "Humans are the spirit of all living beings, Gu are the essence of heaven and earth. Follow Fang Yuan's five-hundred-year return through the world of Gu cultivation.",
       },
     ],
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#292c3c] text-[#c6d0f5]">
-      {/* Structured Data */}
+    <div className="flex min-h-screen flex-col bg-paper text-ink">
       <script
         type="application/ld+json"
         nonce={nonce}
@@ -50,7 +62,7 @@ export default async function HomePage() {
       <Navigation />
 
       <main className="flex-1">
-        <HeroSection />
+        <HeroSection continueChapter={continueChapter} />
         <SynopsisSection />
       </main>
 

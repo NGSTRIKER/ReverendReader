@@ -1,8 +1,14 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { ReaderSettings, ReaderFont } from "@/types/novel";
-import { Type, Minus, Plus, Palette, RotateCcw, Check, AlignJustify } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { ReaderSettings } from "@/types/novel";
+import { Minus, Plus, RotateCcw } from "lucide-react";
+import { DEFAULT_SETTINGS } from "@/lib/storage";
+import {
+  ThemeChoice,
+  applyThemeChoice,
+  readThemeChoice,
+} from "@/lib/theme";
 
 interface FontSelectorProps {
   settings: ReaderSettings;
@@ -10,100 +16,93 @@ interface FontSelectorProps {
 }
 
 export function FontSelector({ settings, onChangeSettings }: FontSelectorProps) {
-  const currentFontColor = settings.fontColor || "#cdd6f4";
-  const [hexInput, setHexInput] = useState<string>(currentFontColor);
+  const [themeChoice, setThemeChoice] = useState<ThemeChoice>("system");
 
   useEffect(() => {
-    setHexInput(settings.fontColor || "#cdd6f4");
-  }, [settings.fontColor]);
+    setThemeChoice(readThemeChoice());
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent<ThemeChoice>).detail;
+      if (detail) setThemeChoice(detail);
+    };
+    window.addEventListener("reverend:theme", handler);
+    return () => window.removeEventListener("reverend:theme", handler);
+  }, []);
 
-  const handleHexInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value;
-    setHexInput(val);
-    // If valid 6-hex or 3-hex color code
-    if (/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(val)) {
-      onChangeSettings({ fontColor: val });
-    }
+  const handleSelectTheme = (next: ThemeChoice) => {
+    setThemeChoice(next);
+    applyThemeChoice(next);
   };
-
-  const fontOptions: { id: ReaderFont; label: string; preview: string; className: string }[] = [
-    { id: "serif", label: "Serif", preview: "Georgia Classic", className: "font-serif" },
-    { id: "literary", label: "Literary", preview: "Palatino Book", className: "font-literary" },
-    { id: "sans", label: "Sans", preview: "Inter System", className: "font-sans" },
-    { id: "mono", label: "Mono", preview: "Clean Monospace", className: "font-mono" },
-  ];
-
-  const colorPresets: { hex: string; name: string; tag?: string }[] = [
-    { hex: "#cdd6f4", name: "Catppuccin Text", tag: "Default" },
-    { hex: "#89b4fa", name: "Catppuccin Blue", tag: "Blue" },
-    { hex: "#b4befe", name: "Catppuccin Lavender" },
-    { hex: "#74c7ec", name: "Catppuccin Sapphire" },
-    { hex: "#a6e3a1", name: "Catppuccin Mint" },
-    { hex: "#f9e2af", name: "Catppuccin Gold" },
-    { hex: "#fab387", name: "Catppuccin Peach" },
-    { hex: "#f5c2e7", name: "Catppuccin Pink" },
-    { hex: "#f2cdcd", name: "Catppuccin Flamingo" },
-    { hex: "#e6d5b8", name: "Vintage Parchment" },
-    { hex: "#ffffff", name: "Crisp White" },
-    { hex: "#bac2de", name: "Catppuccin Subtext" },
-  ];
 
   return (
     <div className="space-y-6">
-      {/* Font Family */}
+      {/* Color Palette / Mode */}
       <div>
-        <label className="text-xs font-semibold uppercase tracking-wider text-[#a6adc8] mb-2.5 flex items-center space-x-1.5">
-          <Type className="h-3.5 w-3.5 text-[#89b4fa]" />
-          <span>Typeface</span>
-        </label>
-        <div className="grid grid-cols-2 gap-2">
-          {fontOptions.map((f) => (
-            <button
-              key={f.id}
-              onClick={() => onChangeSettings({ font: f.id })}
-              className={`flex flex-col items-start rounded-lg border px-3.5 py-2 text-left transition-colors ${
-                settings.font === f.id
-                  ? "border-[#89b4fa] bg-[#89b4fa]/15 text-white"
-                  : "border-[#313244] bg-[#11111b]/60 text-[#cdd6f4] hover:border-[#45475a] hover:text-white"
-              }`}
-            >
-              <span className={`text-sm font-medium ${f.className}`}>{f.label}</span>
-              <span className="text-[11px] text-[#a6adc8]">{f.preview}</span>
-            </button>
-          ))}
+        <div className="flex items-baseline justify-between mb-2">
+          <span className="label">Color Palette</span>
+          <span className="text-xs text-muted">Light (White &amp; Red) / Dark (Night &amp; Blue)</span>
+        </div>
+        <div className="grid grid-cols-3 gap-2">
+          {[
+            { id: "light" as const, label: "Light", sub: "White & Red", swatch: "bg-[#ffffff] border-[#be1228]" },
+            { id: "dark" as const, label: "Dark", sub: "Night & Blue", swatch: "bg-[#0b0e14] border-[#5c98ff]" },
+            { id: "system" as const, label: "System", sub: "Match OS", swatch: "bg-sunken border-line-strong" },
+          ].map((item) => {
+            const active = themeChoice === item.id;
+            return (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => handleSelectTheme(item.id)}
+                className={`flex items-center gap-2.5 rounded-[3px] border p-2.5 text-left transition-colors ${
+                  active
+                    ? "border-accent bg-accent/10 text-ink"
+                    : "border-line-strong bg-paper text-muted hover:text-ink"
+                }`}
+              >
+                <span className={`h-4 w-4 rounded-full border-2 flex-shrink-0 ${item.swatch}`} />
+                <div className="min-w-0">
+                  <div className="text-xs font-semibold text-ink">{item.label}</div>
+                  <div className="text-[11px] text-muted truncate">{item.sub}</div>
+                </div>
+              </button>
+            );
+          })}
         </div>
       </div>
 
       {/* Font Size */}
       <div>
-        <div className="flex justify-between items-center mb-2">
-          <label className="text-xs font-semibold uppercase tracking-wider text-[#a6adc8]">
-            Font Size
+        <div className="flex justify-between items-baseline mb-2">
+          <label htmlFor="reader-font-size" className="label">
+            Type Size
           </label>
-          <span className="font-mono text-xs text-[#89b4fa]">{settings.fontSize}px</span>
+          <span className="text-xs font-medium text-accent tnum">{settings.fontSize}px</span>
         </div>
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center gap-3">
           <button
+            type="button"
             onClick={() => onChangeSettings({ fontSize: Math.max(14, settings.fontSize - 1) })}
             disabled={settings.fontSize <= 14}
-            className="rounded border border-[#313244] bg-[#11111b] p-2 text-[#cdd6f4] hover:bg-[#313244] disabled:opacity-40"
+            className="btn-quiet p-2"
             aria-label="Decrease font size"
           >
             <Minus className="h-3.5 w-3.5" />
           </button>
           <input
+            id="reader-font-size"
             type="range"
             min="14"
             max="28"
             step="1"
             value={settings.fontSize}
             onChange={(e) => onChangeSettings({ fontSize: parseInt(e.target.value, 10) })}
-            className="flex-1 accent-[#89b4fa] cursor-pointer h-1.5 bg-[#313244] rounded-lg appearance-none"
+            className="flex-1 cursor-pointer h-1.5 bg-line-strong rounded appearance-none"
           />
           <button
+            type="button"
             onClick={() => onChangeSettings({ fontSize: Math.min(28, settings.fontSize + 1) })}
             disabled={settings.fontSize >= 28}
-            className="rounded border border-[#313244] bg-[#11111b] p-2 text-[#cdd6f4] hover:bg-[#313244] disabled:opacity-40"
+            className="btn-quiet p-2"
             aria-label="Increase font size"
           >
             <Plus className="h-3.5 w-3.5" />
@@ -111,316 +110,162 @@ export function FontSelector({ settings, onChangeSettings }: FontSelectorProps) 
         </div>
       </div>
 
-      {/* Line Spacing / Height with Slider and Presets */}
+      {/* Line Spacing */}
       <div>
-        <div className="flex justify-between items-center mb-2">
-          <label className="text-xs font-semibold uppercase tracking-wider text-[#a6adc8] flex items-center space-x-1.5">
-            <AlignJustify className="h-3.5 w-3.5 text-[#89b4fa]" />
-            <span>Line Spacing</span>
+        <div className="flex justify-between items-baseline mb-2">
+          <label htmlFor="reader-line-height" className="label">
+            Line Leading
           </label>
-          <span className="font-mono text-xs text-[#89b4fa]">
-            {settings.lineHeight.toFixed(2)}x
+          <span className="text-xs font-medium text-accent tnum">
+            {settings.lineHeight.toFixed(2)}
           </span>
         </div>
 
-        {/* Line Spacing Slider with - and + buttons */}
-        <div className="flex items-center space-x-3 mb-2.5">
+        <div className="flex items-center gap-3 mb-2.5">
           <button
+            type="button"
             onClick={() =>
               onChangeSettings({
                 lineHeight: Math.max(1.3, Number((settings.lineHeight - 0.05).toFixed(2))),
               })
             }
             disabled={settings.lineHeight <= 1.3}
-            className="rounded border border-[#313244] bg-[#11111b] p-2 text-[#cdd6f4] hover:bg-[#313244] disabled:opacity-40 transition-colors"
+            className="btn-quiet p-2"
             aria-label="Decrease line spacing"
           >
             <Minus className="h-3.5 w-3.5" />
           </button>
           <input
+            id="reader-line-height"
             type="range"
             min="1.30"
             max="2.60"
             step="0.05"
             value={settings.lineHeight}
-            onChange={(e) =>
-              onChangeSettings({ lineHeight: parseFloat(e.target.value) })
-            }
-            className="flex-1 accent-[#89b4fa] cursor-pointer h-1.5 bg-[#313244] rounded-lg appearance-none"
+            onChange={(e) => onChangeSettings({ lineHeight: parseFloat(e.target.value) })}
+            className="flex-1 cursor-pointer h-1.5 bg-line-strong rounded appearance-none"
           />
           <button
+            type="button"
             onClick={() =>
               onChangeSettings({
                 lineHeight: Math.min(2.6, Number((settings.lineHeight + 0.05).toFixed(2))),
               })
             }
             disabled={settings.lineHeight >= 2.6}
-            className="rounded border border-[#313244] bg-[#11111b] p-2 text-[#cdd6f4] hover:bg-[#313244] disabled:opacity-40 transition-colors"
+            className="btn-quiet p-2"
             aria-label="Increase line spacing"
           >
             <Plus className="h-3.5 w-3.5" />
           </button>
         </div>
 
-        {/* Line Spacing Quick Presets */}
         <div className="grid grid-cols-4 gap-1.5">
           {[
             { label: "Tight", value: 1.5 },
             { label: "Compact", value: 1.65 },
-            { label: "Standard", value: 1.85 },
-            { label: "Spacious", value: 2.15 },
-          ].map((item) => (
-            <button
-              key={item.label}
-              onClick={() => onChangeSettings({ lineHeight: item.value })}
-              className={`rounded-lg border py-1.5 px-2 text-xs transition-colors ${
-                Math.abs(settings.lineHeight - item.value) < 0.04
-                  ? "border-[#89b4fa] bg-[#89b4fa]/20 text-white font-medium shadow-sm"
-                  : "border-[#313244] bg-[#11111b]/60 text-[#a6adc8] hover:text-white hover:border-[#45475a]"
-              }`}
-            >
-              <span className="block text-[11px] font-medium">{item.label}</span>
-              <span className="block text-[9px] text-[#6c7086]">{item.value.toFixed(2)}x</span>
-            </button>
-          ))}
+            { label: "Book", value: 1.85 },
+            { label: "Open", value: 2.1 },
+          ].map((item) => {
+            const active = Math.abs(settings.lineHeight - item.value) < 0.04;
+            return (
+              <button
+                key={item.label}
+                type="button"
+                onClick={() => onChangeSettings({ lineHeight: item.value })}
+                className={`rounded-[3px] border py-1.5 px-2 text-xs transition-colors ${
+                  active
+                    ? "border-accent bg-accent/10 text-ink font-medium"
+                    : "border-line-strong bg-paper text-muted hover:text-ink"
+                }`}
+              >
+                <span className="block">{item.label}</span>
+                <span className="block text-[10px] text-faint tnum">{item.value.toFixed(2)}</span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
-      {/* Letter Spacing with Slider and Presets */}
+      {/* Letter Spacing */}
       <div>
-        <div className="flex justify-between items-center mb-2">
-          <label className="text-xs font-semibold uppercase tracking-wider text-[#a6adc8]">
-            Letter Spacing
+        <div className="flex justify-between items-baseline mb-2">
+          <label htmlFor="reader-letter-spacing" className="label">
+            Tracking
           </label>
-          <span className="font-mono text-xs text-[#89b4fa]">
-            {(settings.letterSpacing ?? 0.2) > 0
-              ? `+${(settings.letterSpacing ?? 0.2).toFixed(2)}px`
-              : `${(settings.letterSpacing ?? 0.2).toFixed(2)}px`}
+          <span className="text-xs font-medium text-accent tnum">
+            {(settings.letterSpacing ?? 0) > 0
+              ? `+${(settings.letterSpacing ?? 0).toFixed(2)}px`
+              : `${(settings.letterSpacing ?? 0).toFixed(2)}px`}
           </span>
         </div>
 
-        {/* Letter Spacing Slider with - and + buttons */}
-        <div className="flex items-center space-x-3 mb-2.5">
-          <button
-            onClick={() =>
-              onChangeSettings({
-                letterSpacing: Math.max(
-                  -0.5,
-                  Number(((settings.letterSpacing ?? 0.2) - 0.1).toFixed(2))
-                ),
-              })
-            }
-            disabled={(settings.letterSpacing ?? 0.2) <= -0.5}
-            className="rounded border border-[#313244] bg-[#11111b] p-2 text-[#cdd6f4] hover:bg-[#313244] disabled:opacity-40 transition-colors"
-            aria-label="Decrease letter spacing"
-          >
-            <Minus className="h-3.5 w-3.5" />
-          </button>
-          <input
-            type="range"
-            min="-0.5"
-            max="2.5"
-            step="0.05"
-            value={settings.letterSpacing ?? 0.2}
-            onChange={(e) =>
-              onChangeSettings({ letterSpacing: parseFloat(e.target.value) })
-            }
-            className="flex-1 accent-[#89b4fa] cursor-pointer h-1.5 bg-[#313244] rounded-lg appearance-none"
-          />
-          <button
-            onClick={() =>
-              onChangeSettings({
-                letterSpacing: Math.min(
-                  2.5,
-                  Number(((settings.letterSpacing ?? 0.2) + 0.1).toFixed(2))
-                ),
-              })
-            }
-            disabled={(settings.letterSpacing ?? 0.2) >= 2.5}
-            className="rounded border border-[#313244] bg-[#11111b] p-2 text-[#cdd6f4] hover:bg-[#313244] disabled:opacity-40 transition-colors"
-            aria-label="Increase letter spacing"
-          >
-            <Plus className="h-3.5 w-3.5" />
-          </button>
-        </div>
-
-        {/* Letter Spacing Quick Presets */}
         <div className="grid grid-cols-4 gap-1.5">
           {[
             { label: "Normal", value: 0 },
-            { label: "Clean", value: 0.2 },
-            { label: "Wide", value: 0.6 },
-            { label: "Airy", value: 1.2 },
-          ].map((item) => (
-            <button
-              key={item.label}
-              onClick={() => onChangeSettings({ letterSpacing: item.value })}
-              className={`rounded-lg border py-1.5 px-2 text-xs transition-colors ${
-                Math.abs((settings.letterSpacing ?? 0.2) - item.value) < 0.06
-                  ? "border-[#89b4fa] bg-[#89b4fa]/20 text-white font-medium shadow-sm"
-                  : "border-[#313244] bg-[#11111b]/60 text-[#a6adc8] hover:text-white hover:border-[#45475a]"
-              }`}
-            >
-              <span className="block text-[11px] font-medium">{item.label}</span>
-              <span className="block text-[9px] text-[#6c7086]">{item.value}px</span>
-            </button>
-          ))}
+            { label: "Loose", value: 0.2 },
+            { label: "Wide", value: 0.5 },
+            { label: "Open", value: 1.0 },
+          ].map((item) => {
+            const active = Math.abs((settings.letterSpacing ?? 0) - item.value) < 0.06;
+            return (
+              <button
+                key={item.label}
+                type="button"
+                onClick={() => onChangeSettings({ letterSpacing: item.value })}
+                className={`rounded-[3px] border py-1.5 px-2 text-xs transition-colors ${
+                  active
+                    ? "border-accent bg-accent/10 text-ink font-medium"
+                    : "border-line-strong bg-paper text-muted hover:text-ink"
+                }`}
+              >
+                <span className="block">{item.label}</span>
+                <span className="block text-[10px] text-faint tnum">{item.value}px</span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
-      {/* Font Color & Color Wheel */}
+      {/* Reading Measure (Column Width) */}
       <div>
-        <div className="flex justify-between items-center mb-2.5">
-          <label className="text-xs font-semibold uppercase tracking-wider text-[#a6adc8] flex items-center space-x-1.5">
-            <Palette className="h-3.5 w-3.5 text-[#89b4fa]" />
-            <span>Font Color</span>
-          </label>
+        <div className="flex justify-between items-baseline mb-2">
+          <span className="label">Measure (Line Width)</span>
           <button
-            onClick={() => onChangeSettings({ fontColor: "#cdd6f4" })}
-            title="Reset to Catppuccin default"
-            className="inline-flex items-center space-x-1 text-[11px] text-[#a6adc8] hover:text-[#89b4fa] transition-colors"
+            type="button"
+            onClick={() => onChangeSettings(DEFAULT_SETTINGS)}
+            className="inline-flex items-center gap-1 text-xs text-muted hover:text-accent transition-colors"
           >
             <RotateCcw className="h-3 w-3" />
-            <span>Default</span>
+            <span>Reset defaults</span>
           </button>
         </div>
-
-        {/* Color Wheel Trigger & Direct Hex Input */}
-        <div className="flex items-center gap-2.5 mb-3.5 p-2.5 rounded-lg border border-[#313244] bg-[#11111b]/70">
-          {/* Active color swatch with color wheel launcher */}
-          <label
-            htmlFor="color-wheel-picker"
-            className="group relative flex items-center space-x-2 cursor-pointer rounded-md border border-[#45475a] bg-[#181825] px-2.5 py-1.5 hover:border-[#89b4fa] transition-all"
-            title="Open Color Wheel Selector"
-          >
-            {/* Color wheel visual gradient circle */}
-            <span
-              className="h-5 w-5 rounded-full shadow-inner flex-shrink-0 border border-white/20"
-              style={{
-                background: "conic-gradient(from 0deg, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000)",
-              }}
-            />
-            <span className="text-xs font-medium text-[#cdd6f4] group-hover:text-white">
-              Color Wheel
-            </span>
-            <input
-              id="color-wheel-picker"
-              type="color"
-              value={currentFontColor.startsWith("#") ? currentFontColor : "#cdd6f4"}
-              onChange={(e) => onChangeSettings({ fontColor: e.target.value })}
-              className="sr-only"
-            />
-          </label>
-
-          {/* Current Color Indicator Swatch */}
-          <div
-            className="h-7 w-7 rounded-md border border-[#45475a] shadow-sm flex-shrink-0"
-            style={{ backgroundColor: currentFontColor }}
-            title={`Active: ${currentFontColor}`}
-          />
-
-          {/* Hex Input */}
-          <div className="flex-1 flex items-center rounded-md border border-[#313244] bg-[#181825] px-2.5 py-1 focus-within:border-[#89b4fa]">
-            <span className="text-xs text-[#6c7086] mr-1 font-mono">#</span>
-            <input
-              type="text"
-              value={hexInput.startsWith("#") ? hexInput.slice(1) : hexInput}
-              onChange={(e) => {
-                const raw = e.target.value.replace(/[^0-9A-Fa-f]/g, "").slice(0, 6);
-                handleHexInputChange({
-                  target: { value: `#${raw}` },
-                } as React.ChangeEvent<HTMLInputElement>);
-              }}
-              placeholder="cdd6f4"
-              className="w-full bg-transparent font-mono text-xs uppercase text-white focus:outline-none"
-              maxLength={6}
-            />
-          </div>
-        </div>
-
-        {/* Curated Catppuccin & Reader Presets */}
-        <div>
-          <div className="text-[11px] font-medium text-[#6c7086] mb-2 uppercase tracking-wider">
-            Catppuccin Blue & Reading Presets
-          </div>
-          <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
-            {colorPresets.map((preset) => {
-              const isSelected = currentFontColor.toLowerCase() === preset.hex.toLowerCase();
-              return (
-                <button
-                  key={preset.hex}
-                  onClick={() => onChangeSettings({ fontColor: preset.hex })}
-                  title={`${preset.name} (${preset.hex})`}
-                  className={`group relative flex flex-col items-center justify-center rounded-lg border py-2 px-1 text-center transition-all ${
-                    isSelected
-                      ? "border-[#89b4fa] bg-[#89b4fa]/20 shadow-sm"
-                      : "border-[#313244] bg-[#11111b]/60 hover:border-[#45475a] hover:bg-[#181825]"
-                  }`}
-                >
-                  <span
-                    className="h-4 w-4 rounded-full border border-black/30 shadow-sm mb-1.5 flex items-center justify-center flex-shrink-0"
-                    style={{ backgroundColor: preset.hex }}
-                  >
-                    {isSelected && <Check className="h-2.5 w-2.5 text-black font-bold" />}
-                  </span>
-                  <span
-                    className="text-[10px] font-medium truncate max-w-full px-0.5"
-                    style={{ color: preset.hex }}
-                  >
-                    {preset.name.replace("Catppuccin ", "")}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Real-time typography & color preview */}
-        <div className="mt-3.5 rounded-lg border border-[#313244] bg-[#11111b]/80 p-3 text-center">
-          <div className="text-[10px] uppercase tracking-wider text-[#6c7086] mb-1">
-            Preview
-          </div>
-          <p
-            className={`transition-colors duration-150 font-${settings.font}`}
-            style={{
-              color: currentFontColor,
-              fontSize: `${Math.min(18, Math.max(14, settings.fontSize - 2))}px`,
-              lineHeight: settings.lineHeight,
-              letterSpacing: typeof settings.letterSpacing === "number" ? `${settings.letterSpacing}px` : "0.01em",
-            }}
-          >
-            “The world is boundless, who can grasp eternity?”
-          </p>
-        </div>
-      </div>
-
-      {/* Reading Column Width */}
-      <div>
-        <label className="text-xs font-semibold uppercase tracking-wider text-[#a6adc8] mb-2 block">
-          Reading Width
-        </label>
         <div className="grid grid-cols-3 gap-2">
           {[
-            { label: "Narrow", value: 680, desc: "680px" },
-            { label: "Default", value: 760, desc: "760px" },
-            { label: "Wide", value: 880, desc: "880px" },
-            { label: "Extra Wide", value: 1100, desc: "1100px" },
-            { label: "Ultra Wide", value: 1440, desc: "1440px" },
-            { label: "Full Wide", value: 9999, desc: "100%" },
-          ].map((item) => (
-            <button
-              key={item.label}
-              onClick={() => onChangeSettings({ maxWidth: item.value })}
-              className={`flex flex-col items-center justify-center rounded-lg border py-2 px-1 text-xs transition-colors ${
-                settings.maxWidth === item.value
-                  ? "border-[#89b4fa] bg-[#89b4fa]/20 text-white font-medium shadow-sm"
-                  : "border-[#313244] bg-[#11111b]/60 text-[#a6adc8] hover:text-white hover:border-[#45475a]"
-              }`}
-            >
-              <span className="font-medium truncate">{item.label}</span>
-              <span className="text-[10px] text-[#6c7086] mt-0.5">{item.desc}</span>
-            </button>
-          ))}
+            { label: "Narrow", value: 600, desc: "600px" },
+            { label: "Book", value: 680, desc: "680px" },
+            { label: "Medium", value: 780, desc: "780px" },
+            { label: "Wide", value: 920, desc: "920px" },
+            { label: "Broad", value: 1120, desc: "1120px" },
+            { label: "Full", value: 9999, desc: "100%" },
+          ].map((item) => {
+            const active = settings.maxWidth === item.value;
+            return (
+              <button
+                key={item.label}
+                type="button"
+                onClick={() => onChangeSettings({ maxWidth: item.value })}
+                className={`flex flex-col items-center justify-center rounded-[3px] border py-2 px-1 text-xs transition-colors ${
+                  active
+                    ? "border-accent bg-accent/10 text-ink font-medium"
+                    : "border-line-strong bg-paper text-muted hover:text-ink"
+                }`}
+              >
+                <span>{item.label}</span>
+                <span className="text-[10px] text-faint tnum mt-0.5">{item.desc}</span>
+              </button>
+            );
+          })}
         </div>
       </div>
     </div>

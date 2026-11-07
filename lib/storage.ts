@@ -1,15 +1,26 @@
 import type { ReaderSettings, Bookmark } from "../types/novel.ts";
 
 export const DEFAULT_SETTINGS: ReaderSettings = {
-  font: "serif",
   fontSize: 19,
   lineHeight: 1.85,
-  surfaceOpacity: 0.95,
-  surfaceTheme: "catppuccin", // Catppuccin Blue
-  maxWidth: 760,
-  fontColor: "#cdd6f4", // Catppuccin Text Lavender
-  letterSpacing: 0.2,
+  surfaceOpacity: 1,
+  maxWidth: 680,
+  letterSpacing: 0,
 };
+
+function sanitizeSettings(raw: Record<string, unknown>): ReaderSettings {
+  const clamp = (val: unknown, fallback: number, min: number, max: number) => {
+    const n = typeof val === "number" ? val : Number(val);
+    return Number.isFinite(n) ? Math.min(max, Math.max(min, n)) : fallback;
+  };
+  return {
+    fontSize: clamp(raw.fontSize, DEFAULT_SETTINGS.fontSize, 14, 28),
+    lineHeight: clamp(raw.lineHeight, DEFAULT_SETTINGS.lineHeight, 1.3, 2.6),
+    surfaceOpacity: clamp(raw.surfaceOpacity, DEFAULT_SETTINGS.surfaceOpacity, 0, 1),
+    maxWidth: clamp(raw.maxWidth, DEFAULT_SETTINGS.maxWidth, 560, 9999),
+    letterSpacing: clamp(raw.letterSpacing ?? 0, 0, -0.5, 2.5),
+  };
+}
 
 /**
  * Helper to parse a raw JSON or URI-encoded string into ReaderSettings
@@ -25,14 +36,13 @@ export function parseSettingsFromRaw(raw: string | null | undefined): ReaderSett
     }
     const parsed = JSON.parse(jsonStr);
     if (parsed && typeof parsed === "object") {
-      return { ...DEFAULT_SETTINGS, ...parsed };
+      return sanitizeSettings(parsed as Record<string, unknown>);
     }
   } catch {
-    // If double encoded or plain string
     try {
       const parsed = JSON.parse(raw);
       if (parsed && typeof parsed === "object") {
-        return { ...DEFAULT_SETTINGS, ...parsed };
+        return sanitizeSettings(parsed as Record<string, unknown>);
       }
     } catch {
       // Fallback
@@ -52,12 +62,10 @@ export function setCookie(name: string, value: string, days = 365): void {
   const encName = encodeURIComponent(name);
   const encVal = encodeURIComponent(value);
 
-  // Clear any potential legacy path-specific duplicate cookie (e.g. created on /read)
   if (typeof window !== "undefined" && window.location.pathname && window.location.pathname !== "/") {
     document.cookie = `${encName}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=${window.location.pathname}; SameSite=Lax`;
   }
 
-  // Set the site-wide root cookie
   document.cookie = `${encName}=${encVal}; expires=${expires}; max-age=${maxAge}; path=/; SameSite=Lax`;
 }
 
@@ -77,53 +85,29 @@ export function getCookie(name: string): string | null {
 }
 
 /**
- * Save theme and typography settings to both cookie and localStorage.
- * Updates both the consolidated JSON cookie and individual cookies for every setting.
+ * Save typography settings to both cookie and localStorage.
  */
 export function saveThemeSettings(settings: ReaderSettings): void {
-  const serialized = JSON.stringify(settings);
+  const clean = sanitizeSettings(settings as unknown as Record<string, unknown>);
+  const serialized = JSON.stringify(clean);
 
-  // 1. Consolidated cookie for SSR & atomic restores
   setCookie("reverend_theme_settings", serialized);
-
-  // 2. Individual dedicated cookies updated immediately on every setting change
-  if (settings.surfaceTheme) {
-    setCookie("reverend_surface_theme", settings.surfaceTheme);
-  }
-  if (settings.font) {
-    setCookie("reverend_font", settings.font);
-  }
-  if (typeof settings.fontSize === "number") {
-    setCookie("reverend_font_size", String(settings.fontSize));
-  }
-  if (typeof settings.lineHeight === "number") {
-    setCookie("reverend_line_height", String(settings.lineHeight));
-  }
-  if (typeof settings.surfaceOpacity === "number") {
-    setCookie("reverend_surface_opacity", String(settings.surfaceOpacity));
-  }
-  if (typeof settings.maxWidth === "number") {
-    setCookie("reverend_max_width", String(settings.maxWidth));
-  }
-  if (settings.fontColor) {
-    setCookie("reverend_font_color", settings.fontColor);
-  }
-  if (typeof settings.letterSpacing === "number") {
-    setCookie("reverend_letter_spacing", String(settings.letterSpacing));
+  setCookie("reverend_font_size", String(clean.fontSize));
+  setCookie("reverend_line_height", String(clean.lineHeight));
+  setCookie("reverend_surface_opacity", String(clean.surfaceOpacity));
+  setCookie("reverend_max_width", String(clean.maxWidth));
+  if (typeof clean.letterSpacing === "number") {
+    setCookie("reverend_letter_spacing", String(clean.letterSpacing));
   }
 
-  // 3. Keep localStorage fully in sync
   try {
     if (typeof localStorage !== "undefined") {
       localStorage.setItem("reverend_theme_settings", serialized);
       localStorage.setItem("reverend_reader_settings", serialized);
-      localStorage.setItem("reverend_surface_theme", settings.surfaceTheme);
-      localStorage.setItem("reverend_font", settings.font);
-      localStorage.setItem("reverend_font_size", String(settings.fontSize));
-      localStorage.setItem("reverend_line_height", String(settings.lineHeight));
-      localStorage.setItem("reverend_font_color", settings.fontColor || "#cdd6f4");
-      if (typeof settings.letterSpacing === "number") {
-        localStorage.setItem("reverend_letter_spacing", String(settings.letterSpacing));
+      localStorage.setItem("reverend_font_size", String(clean.fontSize));
+      localStorage.setItem("reverend_line_height", String(clean.lineHeight));
+      if (typeof clean.letterSpacing === "number") {
+        localStorage.setItem("reverend_letter_spacing", String(clean.letterSpacing));
       }
     }
   } catch {
@@ -132,38 +116,25 @@ export function saveThemeSettings(settings: ReaderSettings): void {
 }
 
 /**
- * Load theme settings from cookies with localStorage fallback, merging individual cookies if present
+ * Load typography settings from cookies with localStorage fallback.
  */
 export function loadThemeSettings(): ReaderSettings {
   try {
     let currentSettings: ReaderSettings = { ...DEFAULT_SETTINGS };
     let hasLoaded = false;
 
-    // 1. Try reading from consolidated cookie
     const fromCookie = getCookie("reverend_theme_settings");
     if (fromCookie) {
       currentSettings = parseSettingsFromRaw(fromCookie);
       hasLoaded = true;
     }
 
-    // 2. Overlay individual cookies if set
-    const surfaceThemeCookie = getCookie("reverend_surface_theme");
-    const fontCookie = getCookie("reverend_font");
     const fontSizeCookie = getCookie("reverend_font_size");
     const lineHeightCookie = getCookie("reverend_line_height");
     const opacityCookie = getCookie("reverend_surface_opacity");
     const maxWidthCookie = getCookie("reverend_max_width");
-    const fontColorCookie = getCookie("reverend_font_color");
     const letterSpacingCookie = getCookie("reverend_letter_spacing");
 
-    if (surfaceThemeCookie) {
-      currentSettings.surfaceTheme = surfaceThemeCookie as ReaderSettings["surfaceTheme"];
-      hasLoaded = true;
-    }
-    if (fontCookie) {
-      currentSettings.font = fontCookie as ReaderSettings["font"];
-      hasLoaded = true;
-    }
     if (fontSizeCookie && !isNaN(parseInt(fontSizeCookie, 10))) {
       currentSettings.fontSize = parseInt(fontSizeCookie, 10);
       hasLoaded = true;
@@ -180,33 +151,27 @@ export function loadThemeSettings(): ReaderSettings {
       currentSettings.maxWidth = parseInt(maxWidthCookie, 10);
       hasLoaded = true;
     }
-    if (fontColorCookie) {
-      currentSettings.fontColor = fontColorCookie;
-      hasLoaded = true;
-    }
     if (letterSpacingCookie && !isNaN(parseFloat(letterSpacingCookie))) {
       currentSettings.letterSpacing = parseFloat(letterSpacingCookie);
       hasLoaded = true;
     }
 
     if (hasLoaded) {
-      // Keep localStorage in sync
+      const clean = sanitizeSettings(currentSettings as unknown as Record<string, unknown>);
       try {
         if (typeof localStorage !== "undefined") {
-          localStorage.setItem("reverend_theme_settings", JSON.stringify(currentSettings));
+          localStorage.setItem("reverend_theme_settings", JSON.stringify(clean));
         }
       } catch {}
-      return currentSettings;
+      return clean;
     }
 
-    // 3. Try reading from localStorage fallback
     if (typeof localStorage !== "undefined") {
       const fromLocal =
         localStorage.getItem("reverend_theme_settings") ||
         localStorage.getItem("reverend_reader_settings");
       if (fromLocal) {
         const parsed = parseSettingsFromRaw(fromLocal);
-        // Sync into cookies so server can read it
         saveThemeSettings(parsed);
         return parsed;
       }

@@ -39,12 +39,12 @@ async function verifyConnection() {
   // Step 1: Check required credentials
   console.log("\n[1/3] Checking environment configuration...");
   if (!url) {
-    console.error("❌ FAILED: NEXT_PUBLIC_SUPABASE_URL is missing.");
+    console.error("FAILED: NEXT_PUBLIC_SUPABASE_URL is missing.");
     process.exit(1);
   }
   if (!key) {
     console.error(
-      "❌ FAILED: NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY (or NEXT_PUBLIC_SUPABASE_ANON_KEY) is missing."
+      "FAILED: NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY (or NEXT_PUBLIC_SUPABASE_ANON_KEY) is missing."
     );
     process.exit(1);
   }
@@ -66,7 +66,7 @@ async function verifyConnection() {
     console.log("  Supabase client initialized successfully.");
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);
-    console.error(`❌ FAILED: Client initialization error: ${message}`);
+    console.error(`FAILED: Client initialization error: ${message}`);
     process.exit(1);
   }
 
@@ -77,13 +77,13 @@ async function verifyConnection() {
   try {
     const { error: authError } = await supabase.auth.getSession();
     if (authError) {
-      console.warn(`  ⚠️ Auth session check returned error: ${authError.message}`);
+      console.warn(`  WARNING: Auth session check returned error: ${authError.message}`);
     } else {
-      console.log("  ✓ Auth service reachable and responding.");
+      console.log("  OK: Auth service reachable and responding.");
     }
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);
-    console.error(`❌ FAILED: Could not reach Supabase Auth: ${message}`);
+    console.error(`FAILED: Could not reach Supabase Auth: ${message}`);
     process.exit(1);
   }
 
@@ -96,7 +96,7 @@ async function verifyConnection() {
 
     if (status === 401) {
       console.error(
-        "❌ FAILED: Authentication error (401 Unauthorized). The provided publishable/anon key is invalid or rejected."
+        "FAILED: Authentication error (401 Unauthorized). The provided publishable/anon key is invalid or rejected."
       );
       process.exit(1);
     }
@@ -104,22 +104,22 @@ async function verifyConnection() {
     if (error && error.code === "PGRST205") {
       // PGRST205 indicates PostgREST is online, authenticated, and queried schema cache successfully.
       console.log(
-        "  ✓ Database (PostgREST) reachable: Authenticated successfully against Supabase PostgreSQL."
+        "  OK: Database (PostgREST) reachable: Authenticated successfully against Supabase PostgreSQL."
       );
     } else if (!error) {
-      console.log("  ✓ Database query succeeded.");
+      console.log("  OK: Database query succeeded.");
     } else {
       console.log(
-        `  ✓ Database service responded with status ${status} (${error.code || "N/A"}). Connectivity established.`
+        `  OK: Database service responded with status ${status} (${error.code || "N/A"}). Connectivity established.`
       );
     }
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);
-    console.error(`❌ FAILED: Network error communicating with Supabase database: ${message}`);
+    console.error(`FAILED: Network error communicating with Supabase database: ${message}`);
     process.exit(1);
   }
 
-  console.log("\n✅ All connectivity tests succeeded! Supabase is properly configured and reachable.\n");
+  console.log("\nAll connectivity tests succeeded! Supabase is properly configured and reachable.\n");
 }
 
 verifyConnection().catch((err: unknown) => {

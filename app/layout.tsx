@@ -1,11 +1,27 @@
 import type { Metadata, Viewport } from "next";
+import { Newsreader } from "next/font/google";
+import { cookies } from "next/headers";
 import { Analytics } from "@vercel/analytics/next";
+import { THEME_COOKIE, parseThemeCookie } from "@/lib/theme";
 import "./globals.css";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://reverend-reader.vercel.app";
 
+// The single typeface used across the product. Newsreader's optical size axis
+// keeps 12px interface labels crisp and 80px headlines tight from one file.
+const newsreader = Newsreader({
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+  axes: ["opsz"],
+  display: "swap",
+  variable: "--font-sig",
+});
+
 export const viewport: Viewport = {
-  themeColor: "#1e1e2e",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#0b0e14" },
+  ],
   width: "device-width",
   initialScale: 1,
 };
@@ -13,11 +29,11 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Reverend Insanity | Masterpiece Dark Fantasy Cultivation Novel",
-    template: "%s | Reverend Insanity Reader",
+    default: "Reverend Insanity by Gu Zhenren | Read Online",
+    template: "%s | Reverend Reader",
   },
   description:
-    "An uncompromised reading experience for Reverend Insanity by Gu Zhenren (蛊真人). Follow Fang Yuan's 500-year rebirth through a ruthless world of Gu cultivation.",
+    "Read Reverend Insanity by Gu Zhenren (蛊真人) online. All 2,334 chapters of Fang Yuan's story in a quiet, fast reader with bookmarks and synced progress.",
   keywords: [
     "Reverend Insanity",
     "Gu Zhenren",
@@ -30,20 +46,20 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Gu Zhenren" }],
   creator: "Reverend Reader",
+  applicationName: "Reverend Reader",
   openGraph: {
-    title: "Reverend Insanity Reader — The Eternal Journey",
+    title: "Reverend Insanity, read online",
     description:
-      "Experience Reverend Insanity with an immaculate, distraction-free reading interface featuring customizable typography, fast chapter streaming, and custom themes.",
+      "All 2,334 chapters of Gu Zhenren's Reverend Insanity in a quiet reader with adjustable type, bookmarks and synced progress.",
     url: siteUrl,
-    siteName: "Reverend Insanity Reader",
+    siteName: "Reverend Reader",
     locale: "en_US",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Reverend Insanity Reader",
-    description:
-      "A fast, distraction-free reading interface for the literary dark fantasy classic Reverend Insanity.",
+    title: "Reverend Insanity, read online",
+    description: "A fast, quiet reader for Gu Zhenren's Reverend Insanity.",
   },
   robots: {
     index: true,
@@ -57,25 +73,22 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: [
-      { url: "/icon.svg", type: "image/svg+xml" },
-    ],
+    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
     shortcut: "/icon.svg",
     apple: "/icon.svg",
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const theme = parseThemeCookie((await cookies()).get(THEME_COOKIE)?.value);
+
   return (
-    <html lang="en" className="dark">
-      <head>
-        <link rel="canonical" href={siteUrl} />
-      </head>
-      <body className="min-h-screen bg-[#1e1e2e] text-[#cdd6f4] selection:bg-[#89b4fa]/30 selection:text-white">
+    <html lang="en" data-theme={theme} className={newsreader.variable}>
+      <body className="min-h-screen">
         {children}
         <Analytics />
       </body>

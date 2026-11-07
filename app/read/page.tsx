@@ -9,9 +9,12 @@ import { cleanChapterContent } from "@/lib/chapterFetcher";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
-  title: "Read Reverend Insanity | Distraction-Free Novel Reader",
+  title: "Read Reverend Insanity Online",
   description:
-    "Immerse yourself in Reverend Insanity with a fast, customizable reading experience. Browse 2,334 chapters with customizable typography, dark mode, and custom backgrounds.",
+    "Read all 2,334 chapters of Reverend Insanity by Gu Zhenren with adjustable type, light and dark themes, bookmarks, and synced progress.",
+  alternates: {
+    canonical: "/read",
+  },
 };
 
 // In-memory cached manifest on the server (avoids reading 520KB from disk on every SSR hit)
@@ -30,7 +33,7 @@ function getServerManifest(): ManifestData {
 
 /**
  * Reads initial chapter byte slice directly on server in ~0.5ms.
- * Guarantees zero loading skeleton on initial page load and 100 SEO indexability!
+ * Guarantees zero loading skeleton on initial page load and 100 SEO indexability.
  */
 function getServerChapterContent(chapter: ChapterMetadata): string | null {
   try {
@@ -124,7 +127,7 @@ export default async function ReadPage({ searchParams }: ReadPageProps) {
     }
   }
 
-  // Get current chapter metadata (only ~80 bytes serialized into HTML instead of 520KB!)
+  // Get current chapter metadata (only ~80 bytes serialized into HTML instead of 520KB)
   const chapterMeta =
     manifest.chapters.find((c) => c.id === initialChapterId) || manifest.chapters[0];
   const initialChapter: InitialChapterInfo = {
@@ -137,26 +140,16 @@ export default async function ReadPage({ searchParams }: ReadPageProps) {
   // Pre-render chapter text directly on server (eliminates spinner, maximizes LCP, 100 SEO)
   const initialContent = getServerChapterContent(chapterMeta);
 
-  // Read saved theme settings from server-side cookies
+  // Read saved typography settings from server-side cookies
   const themeCookie = cookieStore.get("reverend_theme_settings")?.value;
   const initialSettings = parseSettingsFromRaw(themeCookie);
 
-  // Overlay individual cookies if set
-  const surfaceThemeCookie = cookieStore.get("reverend_surface_theme")?.value;
-  const fontCookie = cookieStore.get("reverend_font")?.value;
   const fontSizeCookie = cookieStore.get("reverend_font_size")?.value;
   const lineHeightCookie = cookieStore.get("reverend_line_height")?.value;
   const opacityCookie = cookieStore.get("reverend_surface_opacity")?.value;
   const maxWidthCookie = cookieStore.get("reverend_max_width")?.value;
-  const fontColorCookie = cookieStore.get("reverend_font_color")?.value;
   const letterSpacingCookie = cookieStore.get("reverend_letter_spacing")?.value;
 
-  if (surfaceThemeCookie) {
-    initialSettings.surfaceTheme = surfaceThemeCookie as ManifestData extends never ? never : typeof initialSettings.surfaceTheme;
-  }
-  if (fontCookie) {
-    initialSettings.font = fontCookie as typeof initialSettings.font;
-  }
   if (fontSizeCookie && !isNaN(parseInt(fontSizeCookie, 10))) {
     initialSettings.fontSize = parseInt(fontSizeCookie, 10);
   }
@@ -168,13 +161,6 @@ export default async function ReadPage({ searchParams }: ReadPageProps) {
   }
   if (maxWidthCookie && !isNaN(parseInt(maxWidthCookie, 10))) {
     initialSettings.maxWidth = parseInt(maxWidthCookie, 10);
-  }
-  if (fontColorCookie) {
-    try {
-      initialSettings.fontColor = decodeURIComponent(fontColorCookie);
-    } catch {
-      initialSettings.fontColor = fontColorCookie;
-    }
   }
   if (letterSpacingCookie && !isNaN(parseFloat(letterSpacingCookie))) {
     initialSettings.letterSpacing = parseFloat(letterSpacingCookie);

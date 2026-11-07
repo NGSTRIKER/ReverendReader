@@ -100,22 +100,6 @@ interface ToastNotice {
   };
 }
 
-const THEME_PAGE_STYLES: Record<string, { bg: string; text: string }> = {
-  catppuccin: { bg: "bg-[#1e1e2e]", text: "text-[#cdd6f4]" },
-  "catppuccin-mocha": { bg: "bg-[#11111b]", text: "text-[#cdd6f4]" },
-  "catppuccin-pink": { bg: "bg-[#1d101a]", text: "text-[#f5e0dc]" },
-  "catppuccin-coffee": { bg: "bg-[#1a120e]", text: "text-[#f4ebd0]" },
-  "catppuccin-jade": { bg: "bg-[#0f1b14]", text: "text-[#e0ede4]" },
-  "catppuccin-latte": { bg: "bg-[#dce0e8]", text: "text-[#4c4f69]" },
-  acrylic: { bg: "bg-[#11111b]", text: "text-[#cdd6f4]" },
-  blur: { bg: "bg-[#11111b]", text: "text-[#cdd6f4]" },
-  transparent: { bg: "bg-[#11111b]", text: "text-[#cdd6f4]" },
-  black: { bg: "bg-[#09090b]", text: "text-zinc-100" },
-  slate: { bg: "bg-[#0f172a]", text: "text-slate-100" },
-  sepia: { bg: "bg-[#171412]", text: "text-[#f4ebd0]" },
-  dark: { bg: "bg-[#121212]", text: "text-[#e0e0e0]" },
-};
-
 export function ReaderInterface({
   manifest,
   initialChapter,
@@ -1130,16 +1114,13 @@ export function ReaderInterface({
     [user?.id]
   );
 
-  const activeThemeStyle =
-    THEME_PAGE_STYLES[settings.surfaceTheme] || THEME_PAGE_STYLES.catppuccin;
-
   return (
-    <div className={`relative min-h-screen ${activeThemeStyle.bg} ${activeThemeStyle.text} transition-colors duration-200`}>
+    <div className="relative min-h-screen bg-paper text-ink">
       {/* Custom Background Image Layer */}
       {customBgUrl && (
         <div
           aria-hidden="true"
-          className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat pointer-events-none transition-all duration-300"
+          className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat pointer-events-none"
           style={{ backgroundImage: `url(${customBgUrl})` }}
         />
       )}
@@ -1166,7 +1147,7 @@ export function ReaderInterface({
 
         {/* Reading Canvas (reserves right padding only when sidebar is visible so text is never covered) */}
         <main
-          className={`flex-1 transition-[padding] duration-300 ${
+          className={`flex-1 transition-[padding] duration-200 ${
             sidebarVisible ? "pl-4 pr-14 sm:pl-6 sm:pr-16" : "px-4 sm:px-6"
           }`}
         >
@@ -1181,6 +1162,7 @@ export function ReaderInterface({
             onPrev={handlePrev}
             onNext={handleNext}
             settings={settings}
+            hasCustomBg={Boolean(customBgUrl)}
           />
         </main>
       </div>
@@ -1241,22 +1223,22 @@ export function ReaderInterface({
 
       {/* Floating Toast Notification */}
       {toastNotice && (
-        <div className="fixed bottom-5 right-5 z-50 max-w-sm animate-in fade-in slide-in-from-bottom-5 duration-200">
+        <div className="fixed bottom-5 right-5 z-50 max-w-sm">
           <div
-            className={`flex items-start space-x-3 rounded-xl border p-3.5 shadow-2xl backdrop-blur-md text-xs ${
+            className={`flex items-start gap-3 border p-3.5 shadow-pop bg-surface text-xs ${
               toastNotice.type === "error"
-                ? "border-[#e78284]/60 bg-[#292c3c]/95 text-[#e78284]"
+                ? "border-danger/60 text-danger"
                 : toastNotice.type === "success"
-                ? "border-[#a6d189]/60 bg-[#292c3c]/95 text-[#a6d189]"
-                : "border-[#8caaee]/60 bg-[#292c3c]/95 text-[#c6d0f5]"
+                ? "border-success/60 text-ink"
+                : "border-line-strong text-ink"
             }`}
           >
             {toastNotice.type === "error" ? (
-              <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#e78284]" />
+              <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-danger" />
             ) : toastNotice.type === "success" ? (
-              <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#a6d189]" />
+              <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-success" />
             ) : (
-              <LogIn className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#8caaee]" />
+              <LogIn className="mt-0.5 h-4 w-4 flex-shrink-0 text-accent" />
             )}
 
             <div className="flex-1">
@@ -1266,15 +1248,16 @@ export function ReaderInterface({
                   {toastNotice.action.href ? (
                     <Link
                       href={toastNotice.action.href}
-                      className="inline-flex items-center space-x-1 font-mono text-[11px] font-semibold text-[#8caaee] hover:underline"
+                      className="inline-flex items-center gap-1 text-xs font-semibold text-accent hover:underline"
                     >
                       <span>{toastNotice.action.label}</span>
-                      <span>&rarr;</span>
+                      <span>&#8594;</span>
                     </Link>
                   ) : toastNotice.action.onClick ? (
                     <button
+                      type="button"
                       onClick={toastNotice.action.onClick}
-                      className="inline-flex items-center space-x-1 font-mono text-[11px] font-semibold text-[#8caaee] hover:underline"
+                      className="inline-flex items-center gap-1 text-xs font-semibold text-accent hover:underline"
                     >
                       <RefreshCw className="h-3 w-3" />
                       <span>{toastNotice.action.label}</span>
@@ -1287,8 +1270,9 @@ export function ReaderInterface({
                   {toastNotice.actions.map((action) => (
                     <button
                       key={action.label}
+                      type="button"
                       onClick={action.onClick}
-                      className="font-mono text-[11px] font-semibold text-[#8caaee] hover:underline"
+                      className="text-xs font-semibold text-accent hover:underline"
                     >
                       {action.label}
                     </button>
@@ -1298,8 +1282,9 @@ export function ReaderInterface({
             </div>
 
             <button
+              type="button"
               onClick={() => setToastNotice(null)}
-              className="text-[#a5adce] hover:text-white focus:outline-none p-0.5"
+              className="text-muted hover:text-ink p-0.5"
               aria-label="Dismiss notification"
             >
               <X className="h-3.5 w-3.5" />

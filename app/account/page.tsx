@@ -6,8 +6,9 @@ import { AccountView } from "@/components/account/AccountView";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "My Cultivator Account — Reverend Reader",
-  description: "View and manage your Reverend Insanity reading progress, saved bookmarks, and cultivator profile.",
+  title: "Reader Account",
+  description:
+    "View and manage your Reverend Insanity reading progress, saved bookmarks, and reader profile.",
 };
 
 export default async function AccountPage() {
@@ -21,21 +22,18 @@ export default async function AccountPage() {
     redirect("/login?next=/account");
   }
 
-  // 1. Fetch profile with error tolerance
   const { data: profile } = await supabase
     .from("profiles")
     .select("*")
     .eq("id", user.id)
     .maybeSingle();
 
-  // 2. Fetch current reading progress
   const { data: progress } = await supabase
     .from("reading_progress")
     .select("*")
     .eq("user_id", user.id)
     .maybeSingle();
 
-  // 3. Fetch bookmarks
   const { data: bookmarks } = await supabase
     .from("bookmarks")
     .select("*")
@@ -43,10 +41,10 @@ export default async function AccountPage() {
     .order("created_at", { ascending: false });
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#292c3c] text-[#c6d0f5] selection:bg-[#8caaee]/30">
+    <div className="flex min-h-screen flex-col bg-paper text-ink">
       <Navigation />
 
-      <main className="flex-1 py-6 sm:py-10">
+      <main className="flex-1 py-8 sm:py-12">
         <AccountView
           user={user}
           profile={profile}

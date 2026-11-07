@@ -130,13 +130,12 @@ export function CommentsDrawer({
   const listContainerRef = useRef<HTMLDivElement>(null);
   const loadedKeyRef = useRef<string | null>(null);
 
-  const isLatte = settings.surfaceTheme === "catppuccin-latte";
-  const drawerBg = isLatte ? "bg-[#eff1f5]" : "bg-[#181825]";
-  const drawerBorder = isLatte ? "border-[#ccd0da]" : "border-[#313244]";
-  const cardBg = isLatte ? "bg-[#e6e9ef]/75" : "bg-[#1e1e2e]/85";
-  const textPrimary = isLatte ? "text-[#4c4f69]" : "text-[#cdd6f4]";
-  const textSecondary = isLatte ? "text-[#6c6f85]" : "text-[#a6adc8]";
-  const inputBg = isLatte ? "bg-[#dce0e8]" : "bg-[#11111b]";
+  const drawerBg = "bg-surface";
+  const drawerBorder = "border-line";
+  const cardBg = "bg-paper";
+  const textPrimary = "text-ink";
+  const textSecondary = "text-muted";
+  const inputBg = "bg-sunken";
 
   const loginUrl = `/login?next=${encodeURIComponent(`/read?c=${chapter.id}`)}`;
 
@@ -798,13 +797,13 @@ export function CommentsDrawer({
         key={item.id}
         data-testid={isReply ? "comment-reply-card" : "comment-card"}
         className={`rounded-xl border ${drawerBorder} ${cardBg} p-3 transition-colors ${
-          isReply ? "ml-6 mt-2 border-l-2 border-l-[#89b4fa]/40" : ""
+          isReply ? "ml-6 mt-2 border-l-2 border-l-accent/50" : ""
         }`}
       >
         {/* Card Header: Avatar, Username, Timestamp, Spoiler badge, More menu */}
         <div className="flex items-center justify-between gap-2">
           <div className="flex min-w-0 items-center space-x-2">
-            <div className="relative h-6 w-6 flex-shrink-0 overflow-hidden rounded-full border border-[#45475a] bg-[#313244]">
+            <div className="relative h-6 w-6 flex-shrink-0 overflow-hidden rounded-full border border-line-strong bg-sunken">
               {item.author_avatar_url ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -815,7 +814,7 @@ export function CommentsDrawer({
                   className="h-full w-full object-cover"
                 />
               ) : (
-                <div className="flex h-full w-full items-center justify-center text-[10px] font-mono text-[#89b4fa]">
+                <div className="flex h-full w-full items-center justify-center text-[10px] font-mono text-accent">
                   <UserIcon className="h-3.5 w-3.5" />
                 </div>
               )}
@@ -845,7 +844,7 @@ export function CommentsDrawer({
             {item.is_spoiler && !item.is_deleted && (
               <span
                 data-testid="comment-spoiler-badge"
-                className="inline-flex items-center space-x-1 rounded-full border border-[#f9e2af]/40 bg-[#f9e2af]/10 px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider text-[#f9e2af]"
+                className="inline-flex items-center space-x-1 rounded-full border border-accent/40 bg-accent/10 px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider text-accent"
               >
                 <AlertTriangle className="h-2.5 w-2.5" />
                 <span>Spoiler</span>
@@ -860,7 +859,7 @@ export function CommentsDrawer({
                   aria-label="Comment actions"
                   aria-expanded={isMenuOpen}
                   data-testid="comment-more-btn"
-                  className={`rounded-lg p-1 ${textSecondary} hover:bg-[#313244]/60 hover:text-white focus:outline-none`}
+                  className={`rounded-lg p-1 ${textSecondary} hover:bg-sunken hover:text-ink focus:outline-none`}
                 >
                   <MoreHorizontal className="h-3.5 w-3.5" />
                 </button>
@@ -868,7 +867,7 @@ export function CommentsDrawer({
                 {isMenuOpen && (
                   <div
                     role="menu"
-                    className="absolute right-0 top-full z-30 mt-1 w-36 rounded-xl border border-[#45475a] bg-[#181825] p-1 shadow-xl"
+                    className="absolute right-0 top-full z-30 mt-1 w-36 rounded-xl border border-line-strong bg-surface p-1 shadow-xl"
                   >
                     {item.is_own && (
                       <>
@@ -880,9 +879,9 @@ export function CommentsDrawer({
                             setEditText(item.content);
                             setEditSpoiler(item.is_spoiler);
                           }}
-                          className="flex w-full items-center space-x-2 rounded-lg px-2.5 py-1.5 text-left text-xs text-[#cdd6f4] hover:bg-[#313244]"
+                          className="flex w-full items-center space-x-2 rounded-lg px-2.5 py-1.5 text-left text-xs text-ink hover:bg-sunken"
                         >
-                          <Pencil className="h-3 w-3 text-[#89b4fa]" />
+                          <Pencil className="h-3 w-3 text-accent" />
                           <span>Edit</span>
                         </button>
                         <button
@@ -891,7 +890,7 @@ export function CommentsDrawer({
                             setOpenMenuId(null);
                             void handleDeleteComment(item);
                           }}
-                          className="flex w-full items-center space-x-2 rounded-lg px-2.5 py-1.5 text-left text-xs text-[#f38ba8] hover:bg-[#f38ba8]/10"
+                          className="flex w-full items-center space-x-2 rounded-lg px-2.5 py-1.5 text-left text-xs text-danger hover:bg-danger/10"
                         >
                           <Trash2 className="h-3 w-3" />
                           <span>Delete</span>
@@ -915,7 +914,7 @@ export function CommentsDrawer({
                           setReportReason("spam");
                           setReportDetails("");
                         }}
-                        className="flex w-full items-center space-x-2 rounded-lg px-2.5 py-1.5 text-left text-xs text-[#f9e2af] hover:bg-[#313244]"
+                        className="flex w-full items-center space-x-2 rounded-lg px-2.5 py-1.5 text-left text-xs text-accent hover:bg-sunken"
                       >
                         <Flag className="h-3 w-3" />
                         <span>Report</span>
@@ -941,15 +940,15 @@ export function CommentsDrawer({
                 onChange={(e) => setEditText(e.target.value)}
                 maxLength={COMMENT_MAX_LENGTH}
                 rows={3}
-                className={`w-full rounded-lg border ${drawerBorder} ${inputBg} p-2 text-xs ${textPrimary} focus:border-[#89b4fa] focus:outline-none`}
+                className={`w-full rounded-lg border ${drawerBorder} ${inputBg} p-2 text-xs ${textPrimary} focus:border-accent focus:outline-none`}
               />
               <div className="flex items-center justify-between gap-2">
-                <label className="inline-flex cursor-pointer items-center space-x-1.5 text-[11px] text-[#f9e2af]">
+                <label className="inline-flex cursor-pointer items-center space-x-1.5 text-[11px] text-accent">
                   <input
                     type="checkbox"
                     checked={editSpoiler}
                     onChange={(e) => setEditSpoiler(e.target.checked)}
-                    className="rounded border-[#45475a] bg-[#181825]"
+                    className="rounded border-line-strong bg-surface"
                   />
                   <span>Contains spoilers</span>
                 </label>
@@ -958,7 +957,7 @@ export function CommentsDrawer({
                   <button
                     type="button"
                     onClick={() => setEditingCommentId(null)}
-                    className={`rounded-lg px-2.5 py-1 text-xs ${textSecondary} hover:text-white`}
+                    className={`rounded-lg px-2.5 py-1 text-xs ${textSecondary} hover:text-ink`}
                   >
                     Cancel
                   </button>
@@ -966,7 +965,7 @@ export function CommentsDrawer({
                     type="button"
                     disabled={submittingEdit}
                     onClick={() => void handleSaveEdit(item)}
-                    className="inline-flex items-center space-x-1 rounded-lg bg-[#89b4fa] px-3 py-1 text-xs font-semibold text-[#11111b] hover:bg-[#b4befe] disabled:opacity-50"
+                    className="inline-flex items-center space-x-1 rounded-lg bg-accent px-3 py-1 text-xs font-semibold text-on-accent hover:bg-accent-hover disabled:opacity-50"
                   >
                     {submittingEdit && <Loader2 className="h-3 w-3 animate-spin" />}
                     <span>Save</span>
@@ -979,11 +978,11 @@ export function CommentsDrawer({
               type="button"
               onClick={() => toggleRevealSpoiler(item.id)}
               data-testid="reveal-spoiler-btn"
-              className="flex w-full items-center justify-between rounded-lg border border-[#f9e2af]/30 bg-[#f9e2af]/10 px-3 py-2 text-left text-xs text-[#f9e2af] hover:bg-[#f9e2af]/15 transition-colors"
+              className="flex w-full items-center justify-between rounded-lg border border-accent/35 bg-accent/5 px-3 py-2 text-left text-xs text-accent hover:bg-accent/10 transition-colors"
             >
               <span className="inline-flex items-center space-x-2 font-medium">
                 <Eye className="h-3.5 w-3.5 flex-shrink-0" />
-                <span>Spoiler concealed — Click to reveal comment</span>
+                <span>Spoiler concealed · Click to reveal comment</span>
               </span>
               <span className="font-mono text-[10px] uppercase tracking-wider underline">
                 Reveal
@@ -1001,7 +1000,7 @@ export function CommentsDrawer({
                 <button
                   type="button"
                   onClick={() => toggleRevealSpoiler(item.id)}
-                  className="mt-1 inline-flex items-center space-x-1 font-mono text-[10px] text-[#f9e2af]/80 hover:text-[#f9e2af]"
+                  className="mt-1 inline-flex items-center space-x-1 font-mono text-[10px] text-muted hover:text-accent"
                 >
                   <EyeOff className="h-3 w-3" />
                   <span>Hide spoiler</span>
@@ -1022,13 +1021,13 @@ export function CommentsDrawer({
               data-testid="comment-like-btn"
               className={`inline-flex items-center space-x-1 font-mono text-[11px] transition-colors ${
                 item.viewer_liked
-                  ? "text-[#f38ba8] font-semibold"
-                  : `${textSecondary} hover:text-[#f38ba8]`
+                  ? "text-danger font-semibold"
+                  : `${textSecondary} hover:text-accent`
               }`}
             >
               <Heart
                 className={`h-3.5 w-3.5 ${
-                  item.viewer_liked ? "fill-[#f38ba8] text-[#f38ba8]" : ""
+                  item.viewer_liked ? "fill-current text-accent" : ""
                 }`}
               />
               <span>{item.like_count > 0 ? item.like_count : "Like"}</span>
@@ -1048,7 +1047,7 @@ export function CommentsDrawer({
                   }
                 }}
                 data-testid="comment-reply-btn"
-                className={`inline-flex items-center space-x-1 font-mono text-[11px] ${textSecondary} hover:text-[#89b4fa] transition-colors`}
+                className={`inline-flex items-center space-x-1 font-mono text-[11px] ${textSecondary} hover:text-accent transition-colors`}
               >
                 <MessageSquareReply className="h-3.5 w-3.5" />
                 <span>Reply</span>
@@ -1060,7 +1059,7 @@ export function CommentsDrawer({
                 type="button"
                 onClick={() => void handleToggleReplies(item.id)}
                 data-testid="toggle-replies-btn"
-                className="inline-flex items-center space-x-1 font-mono text-[11px] font-medium text-[#89b4fa] hover:underline"
+                className="inline-flex items-center space-x-1 font-mono text-[11px] font-medium text-accent hover:underline"
               >
                 {replyThreads[item.id]?.expanded ? (
                   <>
@@ -1088,7 +1087,7 @@ export function CommentsDrawer({
               type="button"
               onClick={() => void handleToggleReplies(item.id)}
               data-testid="toggle-replies-btn"
-              className="inline-flex items-center space-x-1 font-mono text-[11px] font-medium text-[#89b4fa] hover:underline"
+              className="inline-flex items-center space-x-1 font-mono text-[11px] font-medium text-accent hover:underline"
             >
               {replyThreads[item.id]?.expanded ? (
                 <>
@@ -1121,19 +1120,19 @@ export function CommentsDrawer({
               placeholder={`Reply to ${authorLabel}...`}
               maxLength={COMMENT_MAX_LENGTH}
               rows={2}
-              className={`w-full resize-none bg-transparent text-xs ${textPrimary} placeholder-[#6c7086] focus:outline-none`}
+              className={`w-full resize-none bg-transparent text-xs ${textPrimary} placeholder-faint focus:outline-none`}
             />
             {replyError && (
-              <p className="mt-1 text-[11px] text-[#f38ba8]">{replyError}</p>
+              <p className="mt-1 text-[11px] text-danger">{replyError}</p>
             )}
-            <div className="mt-2 flex flex-wrap items-center justify-between gap-2 border-t border-[#313244]/60 pt-2">
+            <div className="mt-2 flex flex-wrap items-center justify-between gap-2 border-t border-line pt-2">
               <div className="flex items-center space-x-3">
-                <label className="inline-flex cursor-pointer items-center space-x-1.5 text-[11px] text-[#f9e2af]">
+                <label className="inline-flex cursor-pointer items-center space-x-1.5 text-[11px] text-accent">
                   <input
                     type="checkbox"
                     checked={replySpoiler}
                     onChange={(e) => setReplySpoiler(e.target.checked)}
-                    className="rounded border-[#45475a]"
+                    className="rounded border-line-strong"
                   />
                   <span>Spoiler</span>
                 </label>
@@ -1146,14 +1145,14 @@ export function CommentsDrawer({
                 <button
                   type="button"
                   onClick={() => setReplyingToId(null)}
-                  className={`rounded-lg px-2 py-1 text-[11px] ${textSecondary} hover:text-white`}
+                  className={`rounded-lg px-2 py-1 text-[11px] ${textSecondary} hover:text-ink`}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submittingReply || !replyText.trim()}
-                  className="inline-flex items-center space-x-1 rounded-lg bg-[#89b4fa] px-2.5 py-1 text-[11px] font-semibold text-[#11111b] hover:bg-[#b4befe] disabled:opacity-40"
+                  className="inline-flex items-center space-x-1 rounded-lg bg-accent px-2.5 py-1 text-[11px] font-semibold text-on-accent hover:bg-accent-hover disabled:opacity-40"
                 >
                   {submittingReply ? (
                     <Loader2 className="h-3 w-3 animate-spin" />
@@ -1175,8 +1174,8 @@ export function CommentsDrawer({
             )}
 
             {replyThreads[item.id].loading && (
-              <div className="ml-6 flex items-center space-x-2 py-2 text-xs text-[#a6adc8]">
-                <Loader2 className="h-3.5 w-3.5 animate-spin text-[#89b4fa]" />
+              <div className="ml-6 flex items-center space-x-2 py-2 text-xs text-muted">
+                <Loader2 className="h-3.5 w-3.5 animate-spin text-accent" />
                 <span>Loading replies...</span>
               </div>
             )}
@@ -1185,7 +1184,7 @@ export function CommentsDrawer({
               <button
                 type="button"
                 onClick={() => void handleLoadMoreReplies(item.id)}
-                className="ml-6 font-mono text-[11px] font-medium text-[#89b4fa] hover:underline"
+                className="ml-6 font-mono text-[11px] font-medium text-accent hover:underline"
               >
                 Load more replies
               </button>
@@ -1224,7 +1223,7 @@ export function CommentsDrawer({
         <header className={`flex items-start justify-between gap-3 border-b ${drawerBorder} px-4 py-3.5`}>
           <div className="min-w-0 flex-1">
             <div className="flex items-center space-x-2">
-              <span className="rounded-md border border-[#89b4fa]/40 bg-[#89b4fa]/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-[#89b4fa]">
+              <span className="rounded-md border border-accent/40 bg-accent/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-accent">
                 Chapter {chapter.number}
               </span>
               <span
@@ -1249,7 +1248,7 @@ export function CommentsDrawer({
             onClick={onClose}
             aria-label="Close comments drawer"
             data-testid="close-comments-drawer-btn"
-            className={`rounded-lg p-1.5 ${textSecondary} hover:bg-[#313244]/60 hover:text-white focus:outline-none`}
+            className={`rounded-lg p-1.5 ${textSecondary} hover:bg-sunken hover:text-ink focus:outline-none`}
           >
             <X className="h-4 w-4" />
           </button>
@@ -1273,8 +1272,8 @@ export function CommentsDrawer({
                   onClick={() => setSort(option)}
                   className={`rounded-lg px-2.5 py-1 font-mono text-[11px] capitalize transition-colors ${
                     active
-                      ? "bg-[#89b4fa]/20 text-[#89b4fa] font-semibold"
-                      : `${textSecondary} hover:bg-[#313244]/50 hover:text-white`
+                      ? "bg-accent/15 text-accent font-semibold"
+                      : `${textSecondary} hover:bg-sunken hover:text-ink`
                   }`}
                 >
                   {option}
@@ -1298,24 +1297,24 @@ export function CommentsDrawer({
                   className={`animate-pulse rounded-xl border ${drawerBorder} ${cardBg} p-3 space-y-2`}
                 >
                   <div className="flex items-center space-x-2">
-                    <div className="h-6 w-6 rounded-full bg-[#313244]" />
-                    <div className="h-3 w-28 rounded bg-[#313244]" />
+                    <div className="h-6 w-6 rounded-full bg-sunken" />
+                    <div className="h-3 w-28 rounded bg-sunken" />
                   </div>
-                  <div className="h-3 w-full rounded bg-[#313244]" />
-                  <div className="h-3 w-3/4 rounded bg-[#313244]" />
+                  <div className="h-3 w-full rounded bg-sunken" />
+                  <div className="h-3 w-3/4 rounded bg-sunken" />
                 </div>
               ))}
             </div>
           ) : loadError ? (
             <div
               data-testid="comments-error-state"
-              className="my-8 rounded-xl border border-[#f38ba8]/40 bg-[#f38ba8]/10 p-5 text-center"
+              className="my-8 rounded-xl border border-danger/40 bg-danger/10 p-5 text-center"
             >
-              <p className="text-xs text-[#f38ba8]">{loadError}</p>
+              <p className="text-xs text-danger">{loadError}</p>
               <button
                 type="button"
                 onClick={() => void loadInitialComments(chapter.id, sort)}
-                className="mt-3 inline-flex items-center space-x-1.5 rounded-lg bg-[#89b4fa] px-3 py-1.5 text-xs font-semibold text-[#11111b]"
+                className="mt-3 inline-flex items-center space-x-1.5 rounded-lg bg-accent px-3 py-1.5 text-xs font-semibold text-on-accent"
               >
                 <RefreshCw className="h-3.5 w-3.5" />
                 <span>Retry</span>
@@ -1344,11 +1343,11 @@ export function CommentsDrawer({
                     onClick={() => void handleLoadMoreComments()}
                     disabled={loadingMore}
                     data-testid="load-more-comments-btn"
-                    className={`inline-flex items-center space-x-2 rounded-xl border ${drawerBorder} ${cardBg} px-4 py-2 font-mono text-xs ${textPrimary} hover:border-[#89b4fa] transition-colors disabled:opacity-50`}
+                    className={`inline-flex items-center space-x-2 rounded-xl border ${drawerBorder} ${cardBg} px-4 py-2 font-mono text-xs ${textPrimary} hover:border-accent transition-colors disabled:opacity-50`}
                   >
                     {loadingMore ? (
                       <>
-                        <Loader2 className="h-3.5 w-3.5 animate-spin text-[#89b4fa]" />
+                        <Loader2 className="h-3.5 w-3.5 animate-spin text-accent" />
                         <span>Loading...</span>
                       </>
                     ) : (
@@ -1368,7 +1367,7 @@ export function CommentsDrawer({
               onSubmit={(e) => void handleSubmitComment(e)}
               data-testid="comment-composer-form"
             >
-              <div className={`rounded-xl border ${drawerBorder} ${inputBg} p-2.5 focus-within:border-[#89b4fa]`}>
+              <div className={`rounded-xl border ${drawerBorder} ${inputBg} p-2.5 focus-within:border-accent`}>
                 <textarea
                   value={composerText}
                   onChange={(e) => {
@@ -1379,24 +1378,24 @@ export function CommentsDrawer({
                   maxLength={COMMENT_MAX_LENGTH}
                   rows={2}
                   data-testid="comment-composer-input"
-                  className={`w-full resize-none bg-transparent text-xs ${textPrimary} placeholder-[#6c7086] focus:outline-none`}
+                  className={`w-full resize-none bg-transparent text-xs ${textPrimary} placeholder-faint focus:outline-none`}
                 />
 
                 {composerError && (
-                  <p className="mt-1 text-[11px] text-[#f38ba8]" role="alert">
+                  <p className="mt-1 text-[11px] text-danger" role="alert">
                     {composerError}
                   </p>
                 )}
 
-                <div className="mt-2 flex items-center justify-between gap-2 border-t border-[#313244]/60 pt-2">
+                <div className="mt-2 flex items-center justify-between gap-2 border-t border-line pt-2">
                   <div className="flex items-center space-x-3">
-                    <label className="inline-flex cursor-pointer items-center space-x-1.5 text-[11px] text-[#f9e2af]">
+                    <label className="inline-flex cursor-pointer items-center space-x-1.5 text-[11px] text-accent">
                       <input
                         type="checkbox"
                         checked={composerSpoiler}
                         onChange={(e) => setComposerSpoiler(e.target.checked)}
                         data-testid="comment-spoiler-checkbox"
-                        className="rounded border-[#45475a]"
+                        className="rounded border-line-strong"
                       />
                       <span>Mark as spoiler</span>
                     </label>
@@ -1404,7 +1403,7 @@ export function CommentsDrawer({
                       data-testid="comment-char-counter"
                       className={`font-mono text-[10px] ${
                         composerText.length >= COMMENT_MAX_LENGTH
-                          ? "text-[#f38ba8]"
+                          ? "text-danger"
                           : textSecondary
                       }`}
                     >
@@ -1416,7 +1415,7 @@ export function CommentsDrawer({
                     type="submit"
                     disabled={submittingComment || !composerText.trim()}
                     data-testid="comment-submit-btn"
-                    className="inline-flex items-center space-x-1.5 rounded-lg bg-[#89b4fa] px-3 py-1.5 text-xs font-semibold text-[#11111b] hover:bg-[#b4befe] transition-colors disabled:opacity-40"
+                    className="inline-flex items-center space-x-1.5 rounded-lg bg-accent px-3 py-1.5 text-xs font-semibold text-on-accent hover:bg-accent-hover transition-colors disabled:opacity-40"
                   >
                     {submittingComment ? (
                       <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -1438,7 +1437,7 @@ export function CommentsDrawer({
               </span>
               <Link
                 href={loginUrl}
-                className="inline-flex items-center space-x-1.5 rounded-lg bg-[#5865F2] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#4752c4] transition-colors"
+                className="inline-flex items-center space-x-1.5 rounded-lg bg-accent px-3 py-1.5 text-xs font-semibold text-white hover:bg-accent-hover transition-colors"
               >
                 <LogIn className="h-3.5 w-3.5" />
                 <span>Login</span>
@@ -1460,15 +1459,15 @@ export function CommentsDrawer({
               onSubmit={(e) => void handleSubmitReport(e)}
               className={`w-full max-w-sm rounded-2xl border ${drawerBorder} ${drawerBg} p-5 shadow-2xl`}
             >
-              <div className="flex items-center justify-between border-b border-[#313244] pb-3">
+              <div className="flex items-center justify-between border-b border-line pb-3">
                 <div className="flex items-center space-x-2">
-                  <Flag className="h-4 w-4 text-[#f9e2af]" />
+                  <Flag className="h-4 w-4 text-accent" />
                   <h3 className="font-serif text-sm font-semibold">Report Comment</h3>
                 </div>
                 <button
                   type="button"
                   onClick={() => setReportingComment(null)}
-                  className={`${textSecondary} hover:text-white`}
+                  className={`${textSecondary} hover:text-ink`}
                   aria-label="Close report dialog"
                 >
                   <X className="h-4 w-4" />
@@ -1484,7 +1483,7 @@ export function CommentsDrawer({
                     key={item.reason}
                     className={`flex cursor-pointer items-start space-x-2.5 rounded-xl border p-2.5 text-xs transition-colors ${
                       reportReason === item.reason
-                        ? "border-[#89b4fa] bg-[#89b4fa]/10"
+                        ? "border-accent bg-accent/10"
                         : `${drawerBorder} ${cardBg}`
                     }`}
                   >
@@ -1512,7 +1511,7 @@ export function CommentsDrawer({
                     placeholder="Optional details (up to 500 characters)..."
                     maxLength={REPORT_DETAILS_MAX_LENGTH}
                     rows={2}
-                    className={`w-full rounded-lg border ${drawerBorder} ${inputBg} p-2 text-xs ${textPrimary} placeholder-[#6c7086] focus:border-[#89b4fa] focus:outline-none`}
+                    className={`w-full rounded-lg border ${drawerBorder} ${inputBg} p-2 text-xs ${textPrimary} placeholder-faint focus:border-accent focus:outline-none`}
                   />
                 </div>
               </div>
@@ -1521,7 +1520,7 @@ export function CommentsDrawer({
                 <button
                   type="button"
                   onClick={() => setReportingComment(null)}
-                  className={`rounded-lg px-3 py-1.5 text-xs ${textSecondary} hover:text-white`}
+                  className={`rounded-lg px-3 py-1.5 text-xs ${textSecondary} hover:text-ink`}
                 >
                   Cancel
                 </button>
@@ -1529,7 +1528,7 @@ export function CommentsDrawer({
                   type="submit"
                   disabled={submittingReport}
                   data-testid="submit-report-btn"
-                  className="inline-flex items-center space-x-1.5 rounded-lg bg-[#f38ba8] px-3.5 py-1.5 text-xs font-semibold text-[#11111b] hover:opacity-90 disabled:opacity-50"
+                  className="inline-flex items-center space-x-1.5 rounded-lg bg-danger px-3.5 py-1.5 text-xs font-semibold text-on-accent hover:opacity-90 disabled:opacity-50"
                 >
                   {submittingReport && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
                   <span>Submit Report</span>

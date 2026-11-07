@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { ReaderSettings } from "@/types/novel";
 import { FontSelector } from "./FontSelector";
 import { BackgroundManager } from "./BackgroundManager";
-import { X, SlidersHorizontal, Type, Image as ImageIcon } from "lucide-react";
+import { X } from "lucide-react";
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -25,7 +25,6 @@ export function SettingsModal({
 }: SettingsModalProps) {
   const [activeTab, setActiveTab] = useState<"typography" | "background">("typography");
 
-  // Close on Escape key
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape" && isOpen) {
@@ -43,53 +42,55 @@ export function SettingsModal({
       role="dialog"
       aria-modal="true"
       aria-labelledby="reader-settings-heading"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 sm:p-6"
+      onClick={onClose}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-ink/50 backdrop-blur-[2px] p-4 sm:p-6"
     >
       <div
-        className="relative flex w-full max-w-lg flex-col rounded-xl border border-[#313244] bg-[#181825] shadow-2xl overflow-hidden"
+        className="relative flex w-full max-w-lg flex-col border border-line bg-surface text-ink shadow-sheet overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-[#313244] px-6 py-4 bg-[#11111b]/60">
-          <div className="flex items-center space-x-2">
-            <SlidersHorizontal className="h-5 w-5 text-[#89b4fa]" />
-            <h2 id="reader-settings-heading" className="font-serif text-lg font-semibold text-[#cdd6f4]">
-              Reader Appearance
+        <div className="flex items-center justify-between border-b border-line px-6 py-4 bg-paper">
+          <div>
+            <p className="label text-accent">Reader Preferences</p>
+            <h2 id="reader-settings-heading" className="text-lg font-semibold text-ink">
+              Typesetting &amp; Theme
             </h2>
           </div>
           <button
+            type="button"
             onClick={onClose}
             aria-label="Close settings"
-            className="rounded p-1.5 text-[#a6adc8] hover:bg-[#313244] hover:text-white transition-colors"
+            className="icon-btn"
           >
-            <X className="h-5 w-5" />
+            <X className="h-4 w-4" />
           </button>
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex border-b border-[#313244] bg-[#1e1e2e]/40 px-6 pt-2">
+        <div className="flex border-b border-line bg-sunken px-6">
           <button
+            type="button"
             onClick={() => setActiveTab("typography")}
-            className={`flex items-center space-x-2 border-b-2 px-4 py-2.5 text-xs font-medium tracking-wide uppercase transition-colors ${
+            className={`border-b-2 px-3 py-2.5 text-sm font-medium transition-colors ${
               activeTab === "typography"
-                ? "border-[#89b4fa] text-[#89b4fa]"
-                : "border-transparent text-[#a6adc8] hover:text-[#cdd6f4]"
+                ? "border-accent text-accent"
+                : "border-transparent text-muted hover:text-ink"
             }`}
           >
-            <Type className="h-3.5 w-3.5" />
-            <span>Typography</span>
+            Theme &amp; Typography
           </button>
 
           <button
+            type="button"
             onClick={() => setActiveTab("background")}
-            className={`flex items-center space-x-2 border-b-2 px-4 py-2.5 text-xs font-medium tracking-wide uppercase transition-colors ${
+            className={`border-b-2 px-3 py-2.5 text-sm font-medium transition-colors ${
               activeTab === "background"
-                ? "border-[#89b4fa] text-[#89b4fa]"
-                : "border-transparent text-[#a6adc8] hover:text-[#cdd6f4]"
+                ? "border-accent text-accent"
+                : "border-transparent text-muted hover:text-ink"
             }`}
           >
-            <ImageIcon className="h-3.5 w-3.5" />
-            <span>Surface & Background</span>
+            Wallpaper
           </button>
         </div>
 
@@ -108,12 +109,9 @@ export function SettingsModal({
         </div>
 
         {/* Footer */}
-        <div className="border-t border-[#313244] px-6 py-3 bg-[#11111b]/80 flex justify-between items-center text-xs text-[#a6adc8]">
-          <span>Theme saved to cookies</span>
-          <button
-            onClick={onClose}
-            className="rounded bg-[#89b4fa] px-4 py-1.5 text-xs font-semibold text-[#11111b] hover:bg-[#b4befe] transition-colors"
-          >
+        <div className="border-t border-line px-6 py-3 bg-paper flex justify-between items-center text-xs text-muted">
+          <span>Saved automatically</span>
+          <button type="button" onClick={onClose} className="btn-primary px-4 py-1.5 text-xs">
             Done
           </button>
         </div>

@@ -36,14 +36,13 @@ export function getRandomPollIntervalMs(): number {
 
 export const REACTION_DEFINITIONS: ReadonlyArray<{
   type: ReactionType;
-  emoji: string;
   label: string;
 }> = [
-  { type: "love", emoji: "❤️", label: "Love" },
-  { type: "funny", emoji: "😂", label: "Funny" },
-  { type: "shock", emoji: "😮", label: "Shock" },
-  { type: "sad", emoji: "😢", label: "Sad" },
-  { type: "fire", emoji: "🔥", label: "Fire" },
+  { type: "love", label: "Love" },
+  { type: "funny", label: "Funny" },
+  { type: "shock", label: "Shock" },
+  { type: "sad", label: "Sad" },
+  { type: "fire", label: "Fire" },
 ];
 
 export const REPORT_REASON_DEFINITIONS: ReadonlyArray<{

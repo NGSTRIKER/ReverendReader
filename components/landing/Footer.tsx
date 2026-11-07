@@ -1,55 +1,35 @@
 import Link from "next/link";
-import { BookOpen } from "lucide-react";
+import { DISCORD_INVITE_URL } from "@/components/ui/DiscordIcon";
 
 export function Footer() {
   return (
-    <footer className="border-t border-[#414559] bg-[#232634] py-12 text-[#a5adce]">
-      <div className="mx-auto max-w-5xl px-4 sm:px-6">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
-          <div className="flex items-center space-x-3">
-            <div className="relative h-7 w-7 flex-shrink-0 overflow-hidden rounded-md border border-[#414559] bg-[#292c3c]">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/icon.svg" alt="Reverend Insanity" width="28" height="28" className="h-full w-full object-cover" />
-            </div>
-            <div>
-              <span className="font-sans text-sm font-medium tracking-wide text-white">
-                Reverend Insanity Reader
-              </span>
-              <span className="ml-2 font-mono text-[10px] text-[#8caaee]">[ 蛊真人 ]</span>
-            </div>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-6 text-xs font-mono tracking-wider text-[#a5adce]">
-            <Link href="#synopsis" className="hover:text-white transition-colors">
-              Synopsis
-            </Link>
-            <a
-              href="https://discord.gg/YbwBb6DjXH"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center space-x-1.5 hover:text-white transition-colors"
-            >
-              <span className="h-1.5 w-1.5 rounded-full bg-[#a6d189]" />
-              <span>Discord Alliance</span>
-            </a>
-            <Link href="/read" className="hover:text-white transition-colors">
-              Read (2,334 Ch)
-            </Link>
-          </div>
+    <footer className="border-t border-line bg-paper py-10 text-muted">
+      <div className="mx-auto max-w-[1120px] px-4 sm:px-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 text-sm">
+        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+          <span className="font-semibold text-ink">Reverend Insanity</span>
+          <span className="text-xs text-muted">by Gu Zhenren (蛊真人)</span>
+          <span className="text-xs text-faint">· 2,334 chapters</span>
         </div>
 
-        <div className="border-t border-[#414559] pt-6 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-[#a5adce] font-mono">
-          <div>
-            Gu Zhenren (蛊真人) · Distraction-free novel reader
-          </div>
-          <Link
-            href="/read"
-            className="inline-flex items-center space-x-1.5 text-[#8caaee] hover:text-[#babbf1] transition-colors"
-          >
-            <BookOpen className="h-3 w-3" />
-            <span>Begin Chapter 1 &rarr;</span>
+        <nav aria-label="Footer" className="flex flex-wrap items-center gap-6 text-sm">
+          <Link href="/#synopsis" className="hover:text-ink transition-colors">
+            Synopsis
           </Link>
-        </div>
+          <Link href="/#volumes" className="hover:text-ink transition-colors">
+            Volumes
+          </Link>
+          <a
+            href={DISCORD_INVITE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-ink transition-colors"
+          >
+            Discord
+          </a>
+          <Link href="/read" className="font-medium text-accent hover:text-accent-hover transition-colors">
+            Read Chapter 1 &#8594;
+          </Link>
+        </nav>
       </div>
     </footer>
   );

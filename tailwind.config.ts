@@ -1,45 +1,41 @@
 import type { Config } from "tailwindcss";
 
+const token = (name: string) => `rgb(var(--${name}) / <alpha-value>)`;
+
+// One typeface for the whole product. Every family alias resolves to it so a
+// stray `font-mono` or `font-sans` can never introduce a second face.
+const signature = ["var(--font-sig)", "Georgia", "Times New Roman", "serif"];
+
 const config: Config = {
   content: [
-    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     extend: {
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
-        catppuccin: {
-          base: "#1e1e2e",
-          mantle: "#181825",
-          crust: "#11111b",
-          surface0: "#313244",
-          surface1: "#45475a",
-          surface2: "#585b70",
-          overlay0: "#6c7086",
-          overlay1: "#7f849c",
-          overlay2: "#9399b2",
-          subtext0: "#a6adc8",
-          subtext1: "#bac2de",
-          text: "#cdd6f4",
-          blue: "#89b4fa",
-          sapphire: "#74c7ec",
-          sky: "#89dceb",
-          teal: "#94e2d5",
-          lavender: "#b4befe",
-          mauve: "#cba6f7",
-          red: "#f38ba8",
-          peach: "#fab387",
-          yellow: "#f9e2af",
-        },
+        paper: token("paper"),
+        surface: token("surface"),
+        sunken: token("sunken"),
+        ink: token("ink"),
+        muted: token("muted"),
+        faint: token("faint"),
+        line: token("line"),
+        "line-strong": token("line-strong"),
+        accent: token("accent"),
+        "accent-hover": token("accent-hover"),
+        "on-accent": token("on-accent"),
+        danger: token("danger"),
+        success: token("success"),
       },
       fontFamily: {
-        serif: ["var(--font-serif)", "Georgia", "Cambria", "'Times New Roman'", "Times", "serif"],
-        sans: ["var(--font-sans)", "-apple-system", "BlinkMacSystemFont", "'Segoe UI'", "Roboto", "sans-serif"],
-        mono: ["var(--font-mono)", "Menlo", "Monaco", "Consolas", "'Liberation Mono'", "monospace"],
-        literary: ["'Palatino Linotype'", "Palatino", "Book Antiqua", "Georgia", "serif"],
+        sans: signature,
+        serif: signature,
+        mono: signature,
+      },
+      boxShadow: {
+        pop: "0 1px 2px rgb(var(--shadow) / 0.06), 0 8px 24px -6px rgb(var(--shadow) / 0.18)",
+        sheet: "0 0 0 1px rgb(var(--line)), 0 24px 48px -12px rgb(var(--shadow) / 0.28)",
       },
     },
   },
