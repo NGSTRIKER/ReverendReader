@@ -33,5 +33,8 @@ __pycache__/
 .DS_Store
 Thumbs.db
 
+# Reference
+/twatf-reference/
+
 # TypeScript
 tsconfig.tsbuildinfo

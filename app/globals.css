@@ -1,6 +1,30 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,500;1,600&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@font-face {
+  font-family: "Bookerly";
+  src: url("/fonts/bookerly/bookerly-regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Bookerly";
+  src: url("/fonts/bookerly/bookerly-bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Bookerly";
+  src: url("/fonts/bookerly/bookerly-italic.ttf") format("truetype");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
 
 /*
  * Design Tokens — Reverend Reader (Hallmark Anti-AI-Slop Architecture)
@@ -200,6 +224,65 @@
   color: rgb(var(--accent));
   font-family: var(--font-serif), "EB Garamond", serif;
   font-weight: 500;
+}
+
+/* TWATF Reader Signature Aesthetics */
+.twatf-orbit {
+  position: absolute;
+  width: 112%;
+  height: 75%;
+  border: 1px solid rgb(var(--accent) / 0.28);
+  border-radius: 50%;
+  transform: rotate(-28deg);
+  left: -6%;
+  top: 12%;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.twatf-art-glow {
+  position: relative;
+  isolation: isolate;
+}
+
+.twatf-art-glow::before {
+  content: "";
+  position: absolute;
+  inset: -60px;
+  background: radial-gradient(ellipse, rgb(var(--accent) / 0.18), transparent 65%);
+  z-index: -2;
+  pointer-events: none;
+}
+
+.twatf-book-cover {
+  box-shadow: 15px 25px 60px rgb(0 0 0 / 0.65);
+  transform: rotate(-3.5deg);
+  border: 1px solid rgb(var(--accent) / 0.35);
+  border-radius: 4px;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+}
+
+.twatf-book-cover:hover {
+  transform: rotate(0deg) scale(1.02);
+  box-shadow: 18px 30px 70px rgb(0 0 0 / 0.75);
+}
+
+.twatf-circle-btn {
+  width: 38px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgb(var(--line));
+  border-radius: 50%;
+  color: rgb(var(--muted));
+  transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.twatf-circle-btn:hover {
+  color: rgb(var(--accent));
+  border-color: rgb(var(--accent));
+  background-color: rgb(var(--accent) / 0.08);
 }
 
 @media (prefers-reduced-motion: reduce) {

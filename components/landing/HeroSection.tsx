@@ -1,159 +1,259 @@
-/* Hallmark · macrostructure: editorial-frontispiece · theme: seal-ink · genre: editorial
- * pre-emit critique: P5 H5 E5 S5 R5 V5
- * slop test: pass
- */
+"use client";
 
+import React, { useState } from "react";
 import Link from "next/link";
-import { ArrowRight, BookOpen } from "lucide-react";
-import { DISCORD_INVITE_URL } from "@/components/ui/DiscordIcon";
+import { ArrowUpRight, Download, BookOpen, Layers } from "lucide-react";
 
 interface HeroSectionProps {
   continueChapter?: number | null;
 }
 
+interface VolumeOption {
+  id: string;
+  number: string;
+  title: string;
+  range: string;
+  startChapter: number;
+  chapterCount: number;
+}
+
+const VOLUMES: VolumeOption[] = [
+  {
+    id: "vol-1",
+    number: "I",
+    title: "Nature Does Not Change",
+    range: "Chapters 1–199",
+    startChapter: 1,
+    chapterCount: 199,
+  },
+  {
+    id: "vol-2",
+    number: "II",
+    title: "The Demon Leaves the Mountain",
+    range: "Chapters 200–405",
+    startChapter: 200,
+    chapterCount: 206,
+  },
+  {
+    id: "vol-3",
+    number: "III",
+    title: "The Demon's Rampage",
+    range: "Chapters 406–649",
+    startChapter: 406,
+    chapterCount: 244,
+  },
+  {
+    id: "vol-4",
+    number: "IV",
+    title: "The Demon Sovereign Rises",
+    range: "Chapters 650–1,021",
+    startChapter: 650,
+    chapterCount: 372,
+  },
+  {
+    id: "vol-5",
+    number: "V",
+    title: "A Demon King's Might",
+    range: "Chapters 1,022–1,966",
+    startChapter: 1022,
+    chapterCount: 945,
+  },
+  {
+    id: "vol-6",
+    number: "VI",
+    title: "Eternal Life",
+    range: "Chapters 1,967–2,334",
+    startChapter: 1967,
+    chapterCount: 368,
+  },
+];
+
 export function HeroSection({ continueChapter = null }: HeroSectionProps) {
+  const [selectedEdition, setSelectedEdition] = useState<"complete" | string>("complete");
+
+  const activeVolume =
+    selectedEdition === "complete"
+      ? null
+      : VOLUMES.find((v) => v.id === selectedEdition) || null;
+
+  // Determine target chapter and primary label
+  let primaryHref = "/read";
+  let primaryLabel = "Chapters";
+
+  if (activeVolume) {
+    primaryHref = `/read?c=${activeVolume.startChapter}`;
+    primaryLabel = `Read Book ${activeVolume.number}`;
+  } else if (continueChapter && continueChapter >= 1) {
+    primaryHref = `/read?c=${continueChapter}`;
+    primaryLabel = `Continue Chapter ${continueChapter}`;
+  } else {
+    primaryHref = "/read?c=1";
+    primaryLabel = "Begin Chapter 1";
+  }
+
   return (
-    <section className="relative overflow-hidden border-b border-line bg-paper py-14 sm:py-24 font-mono">
-      {/* Background illustration with heavy solid flat tint (lot of tint, no gradient, no glow) */}
-      <div className="absolute inset-0 pointer-events-none select-none overflow-hidden" aria-hidden="true">
-        <picture className="absolute inset-0 w-full h-full opacity-30 dark:opacity-20">
-          <source
-            media="(max-width: 639px) and (orientation: portrait)"
-            type="image/webp"
-            srcSet="/images/fang-yuan-snow.webp"
-          />
-          <source
-            media="(max-width: 639px) and (orientation: portrait)"
-            srcSet="/images/fang-yuan-snow.jpg"
-          />
-          <source type="image/webp" srcSet="/images/fang-yuan-creation.webp" />
-          <img
-            src="/images/fang-yuan-creation.png"
-            alt=""
-            loading="eager"
-            fetchPriority="high"
-            decoding="async"
-            className="h-full w-full object-cover object-center filter grayscale contrast-[1.1] brightness-[0.95]"
-          />
-        </picture>
-        {/* Flat solid tint overlay: heavy solid tint, strictly zero gradient, zero glow */}
-        <div className="absolute inset-0 bg-paper/90" />
-      </div>
+    <section className="relative overflow-hidden py-12 sm:py-20 lg:py-24 font-dmsans">
+      <div className="mx-auto max-w-[1250px] px-4 sm:px-8 lg:px-12">
+        {/* 2-Column Grid matching TWATF Reader */}
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.18fr] items-center gap-12 lg:gap-16">
+          {/* Left Column: 3D Art & Orbit Presentation */}
+          <div className="twatf-art-glow flex flex-col items-center text-center">
+            <div className="relative w-full max-w-[360px] sm:max-w-[420px] flex justify-center py-4">
+              {/* Planetary Orbit Ring */}
+              <div className="twatf-orbit" aria-hidden="true" />
 
-      {/* Foreground Content */}
-      <div className="relative z-10 mx-auto max-w-[1040px] px-4 sm:px-8">
-        {/* Top publication rule and classification */}
-        <div className="flex flex-wrap items-baseline justify-between gap-3 border-b border-line pb-3.5 mb-8 sm:mb-12">
-          <span className="font-light text-[11px] sm:text-xs tracking-[0.14em] uppercase text-muted">
-            Gu Zhenren · 蛊真人 · Complete Web Novel
-          </span>
-          <span className="font-medium text-[11px] sm:text-xs tracking-wider tabular-nums text-muted">
-            2,334 Chapters · 4,861,604 Words
-          </span>
-        </div>
+              {/* 3D Tilted Official Book Cover */}
+              <picture className="relative z-10 block">
+                <source type="image/webp" srcSet="/images/book-cover.webp" />
+                <img
+                  id="cover"
+                  src="/images/book-cover.jpg"
+                  alt="Reverend Insanity official book cover featuring Fang Yuan"
+                  width={800}
+                  height={1170}
+                  loading="eager"
+                  fetchPriority="high"
+                  className="twatf-book-cover w-[78%] max-w-[300px] sm:max-w-[340px] max-h-[480px] object-cover mx-auto"
+                />
+              </picture>
+            </div>
 
-        {/* Title, Monogram and Inscription */}
-        <div className="max-w-3xl">
-          <div className="inline-block border border-accent/40 bg-accent/10 px-2.5 py-1 mb-4">
-            <span className="font-semibold text-[10px] sm:text-[11px] tracking-[0.18em] uppercase text-accent">
-              Master of Gu
+            {/* Art Caption */}
+            <span className="art-caption mt-7 inline-block rounded-md border border-line bg-surface/85 px-4 py-1.5 text-[10px] font-mono tracking-[0.24em] uppercase text-muted backdrop-blur-md shadow-sm">
+              A WORLD GOVERNED BY GU &amp; HEAVENLY DAO
             </span>
           </div>
 
-          <h1 className="text-4xl sm:text-6xl lg:text-[4.5rem] font-extrabold tracking-[-0.035em] leading-[1.02] text-ink wrap-break">
-            Reverend Insanity
-          </h1>
-
-          <div className="mt-6 border-l-2 border-accent pl-4 sm:pl-5 py-0.5">
-            <p className="text-lg sm:text-xl md:text-2xl italic font-normal leading-relaxed text-ink">
-              &ldquo;Humans are clever in tens of thousands of ways, Gu are the true refined
-              essences of Heaven and Earth.&rdquo;
+          {/* Right Column: Frosted Intro Card */}
+          <div className="intro rounded-2xl border border-line bg-surface/85 p-6 sm:p-9 lg:p-10 shadow-2xl backdrop-blur-md">
+            {/* Eyebrow */}
+            <p className="eyebrow text-[10px] sm:text-[11px] font-mono font-semibold tracking-[0.24em] uppercase text-accent mb-3">
+              GU ZHEN REN · 蛊真人 · FANTASY EPIC
             </p>
-          </div>
 
-          <p className="mt-6 text-sm sm:text-[15px] font-normal leading-[1.8] text-muted max-w-[65ch]">
-            Five centuries of demonic cultivation end in encirclement on Mount Qing Mao. By
-            activating the supreme Spring Autumn Cicada, Fang Yuan reverses temporal flow five
-            hundred years into the past, indifferent to worldly morality, relentlessly pursuing
-            eternal life.
-          </p>
+            {/* Main Title */}
+            <h1 className="font-playfair text-4xl sm:text-6xl lg:text-[4.4rem] font-medium tracking-tight text-ink leading-[1.06] mb-4">
+              Reverend<br />
+              <em className="italic text-accent font-semibold">Insanity.</em>
+            </h1>
 
-          {/* Action Row */}
-          <div className="mt-8 flex flex-wrap items-center gap-3">
-            <Link
-              href={continueChapter ? `/read?c=${continueChapter}` : "/read"}
-              className="btn-primary font-semibold text-xs tracking-wider uppercase px-5 py-3"
-            >
-              <BookOpen className="h-4 w-4" strokeWidth={1.75} />
-              <span>
-                {continueChapter ? `Continue Chapter ${continueChapter}` : "Begin Chapter 1"}
-              </span>
-              <ArrowRight className="h-4 w-4" strokeWidth={1.75} />
-            </Link>
+            {/* Summary */}
+            <p className="summary text-muted text-sm sm:text-[15px] leading-relaxed mb-6 font-normal">
+              The tower of destiny collapses before the demonic path. Reborn five hundred years
+              into his youth with the supreme Spring Autumn Cicada, Fang Yuan walks an uncompromising
+              road through the five regions and nine heavens—indifferent to worldly morality,
+              relentlessly pursuing eternal life.
+            </p>
 
-            {continueChapter && continueChapter > 1 ? (
+            {/* Choose Your Volume / Edition Selector */}
+            <fieldset className="editions mb-6 border-0 p-0">
+              <legend className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted mb-2.5 font-medium flex items-center gap-1.5">
+                <Layers className="h-3 w-3 text-accent" />
+                CHOOSE YOUR EDITION OR VOLUME
+              </legend>
+
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {/* Complete Canon Button */}
+                <button
+                  type="button"
+                  onClick={() => setSelectedEdition("complete")}
+                  className={`text-left rounded-lg p-3 transition-all border ${
+                    selectedEdition === "complete"
+                      ? "border-accent bg-accent/10 shadow-sm"
+                      : "border-line bg-paper/60 hover:border-line-strong hover:bg-paper"
+                  }`}
+                >
+                  <span className="block text-xs font-semibold text-ink">
+                    Complete Canon
+                  </span>
+                  <span className="block text-[10px] text-muted font-mono mt-1">
+                    2,334 chapters
+                  </span>
+                </button>
+
+                {/* Volumes 1 to 6 */}
+                {VOLUMES.map((vol) => {
+                  const isSelected = selectedEdition === vol.id;
+                  return (
+                    <button
+                      key={vol.id}
+                      type="button"
+                      onClick={() => setSelectedEdition(vol.id)}
+                      className={`text-left rounded-lg p-3 transition-all border ${
+                        isSelected
+                          ? "border-accent bg-accent/10 shadow-sm"
+                          : "border-line bg-paper/60 hover:border-line-strong hover:bg-paper"
+                      }`}
+                    >
+                      <span className="block text-xs font-semibold text-ink truncate">
+                        Book {vol.number}
+                      </span>
+                      <span className="block text-[10px] text-muted font-mono mt-1">
+                        {vol.chapterCount} chs
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </fieldset>
+
+            {/* Primary Action Row */}
+            <div className="actions flex flex-wrap items-center gap-4 sm:gap-6 pt-1">
               <Link
-                href="/read?c=1"
-                className="btn-quiet font-medium text-xs tracking-wider uppercase px-4 py-3 bg-paper/90"
+                id="start"
+                href={primaryHref}
+                className="primary group inline-flex min-w-[200px] items-center justify-between gap-4 rounded-lg bg-accent px-6 py-3.5 text-sm font-semibold text-on-accent shadow-lg transition-all hover:brightness-110 active:scale-[0.99]"
               >
-                Read from Chapter 1
+                <span>{primaryLabel}</span>
+                <span className="text-base transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5">
+                  ↗
+                </span>
               </Link>
-            ) : (
-              <Link
-                href="#volumes"
-                className="btn-quiet font-medium text-xs tracking-wider uppercase px-4 py-3 bg-paper/90"
-              >
-                Browse Six Volumes
-              </Link>
-            )}
 
-            <a
-              href={DISCORD_INVITE_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-3 py-2 text-xs font-medium uppercase tracking-wider text-muted hover:text-accent transition-colors whitespace-nowrap"
+              {/* Download EPUB Link */}
+              <a
+                id="download"
+                href="/downloads/Reverend_Insanity.epub"
+                download="Reverend_Insanity.epub"
+                className="inline-flex items-center gap-1.5 text-xs uppercase tracking-wider font-mono text-muted hover:text-accent border-b border-line hover:border-accent py-2 transition-colors whitespace-nowrap"
+                title="Download complete 2,334 chapters EPUB (25 MB)"
+              >
+                <Download className="h-3.5 w-3.5" />
+                <span>Download EPUB ↓</span>
+              </a>
+
+              {/* Read from Ch 1 if continuing */}
+              {continueChapter && continueChapter > 1 && (
+                <Link
+                  href="/read?c=1"
+                  className="text-xs uppercase tracking-wider font-mono text-muted hover:text-accent border-b border-line hover:border-accent py-2 transition-colors whitespace-nowrap"
+                >
+                  Read from Chapter 1
+                </Link>
+              )}
+            </div>
+
+            {/* Resume Note */}
+            <p id="resume-note" className="text-xs font-mono text-muted/80 mt-5">
+              Your place is saved automatically on this device.
+            </p>
+
+            {/* Quick Volume Links (browse-editions) */}
+            <nav
+              className="browse-editions mt-3 flex flex-wrap gap-x-4 gap-y-2 text-xs font-mono"
+              aria-label="Resume reading by volume"
             >
-              Discord Alliance &#8599;
-            </a>
+              {VOLUMES.map((vol) => (
+                <Link
+                  key={vol.id}
+                  href={`/read?c=${vol.startChapter}`}
+                  className="text-muted hover:text-accent border-b border-dashed border-line hover:border-accent pb-0.5 transition-colors"
+                >
+                  Book {vol.number} (Ch {vol.startChapter})
+                </Link>
+              ))}
+            </nav>
           </div>
-        </div>
-
-        {/* Telemetry and Colophon Table */}
-        <div className="mt-12 sm:mt-16 border-t border-line pt-6">
-          <dl className="grid grid-cols-2 sm:grid-cols-4 gap-y-4 gap-x-6">
-            <div>
-              <dt className="font-light text-[10px] sm:text-[11px] tracking-[0.14em] uppercase text-muted">
-                Author
-              </dt>
-              <dd className="mt-1 text-xs sm:text-sm font-medium text-ink">
-                Gu Zhenren (蛊真人)
-              </dd>
-            </div>
-            <div>
-              <dt className="font-light text-[10px] sm:text-[11px] tracking-[0.14em] uppercase text-muted">
-                Protagonist
-              </dt>
-              <dd className="mt-1 text-xs sm:text-sm font-medium text-ink">
-                Gu Yue Fang Yuan (方源)
-              </dd>
-            </div>
-            <div>
-              <dt className="font-light text-[10px] sm:text-[11px] tracking-[0.14em] uppercase text-muted">
-                Canon Extent
-              </dt>
-              <dd className="mt-1 text-xs sm:text-sm font-medium tabular-nums text-ink">
-                2,334 Chapters
-              </dd>
-            </div>
-            <div>
-              <dt className="font-light text-[10px] sm:text-[11px] tracking-[0.14em] uppercase text-muted">
-                Total Words
-              </dt>
-              <dd className="mt-1 text-xs sm:text-sm font-medium tabular-nums text-ink">
-                4,861,604 Words
-              </dd>
-            </div>
-          </dl>
         </div>
       </div>
     </section>

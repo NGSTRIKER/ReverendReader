@@ -1,49 +1,69 @@
-/* Hallmark · macrostructure: editorial-frontispiece · theme: seal-ink · genre: editorial
- * pre-emit critique: P5 H5 E5 S5 R5 V5
- * slop test: pass
- */
-
+import React from "react";
 import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 import { DISCORD_INVITE_URL } from "@/components/ui/DiscordIcon";
 
 export function Footer() {
   return (
-    <footer className="border-t border-line bg-paper py-10 text-muted font-mono">
-      <div className="mx-auto max-w-[1120px] px-4 sm:px-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 text-xs">
-        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-          <span className="font-bold tracking-tight text-ink">Reverend Insanity</span>
-          <span className="font-light text-muted">by Gu Zhenren (蛊真人)</span>
-          <span className="font-medium text-faint tabular-nums">· 2,334 chapters</span>
-        </div>
+    <footer className="w-full pb-10 pt-4 px-4 sm:px-8 font-dmsans">
+      <div className="mx-auto max-w-[1250px] rounded-xl border border-line bg-surface/85 px-6 py-5 text-muted shadow-sm backdrop-blur-md">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-xs font-mono">
+          {/* Brand Info */}
+          <div className="flex flex-wrap items-center justify-center md:justify-start gap-x-3 gap-y-1 text-center md:text-left">
+            <span className="font-playfair font-bold text-ink text-sm">
+              Reverend Insanity
+            </span>
+            <span className="text-muted">by Gu Zhenren (蛊真人)</span>
+            <span className="text-faint tabular-nums">· 2,334 chapters · 4.86M words</span>
+          </div>
 
-        <nav aria-label="Footer" className="flex flex-wrap items-center gap-6">
-          <Link
-            href="/#synopsis"
-            className="font-medium uppercase tracking-wider text-muted hover:text-ink transition-colors"
-          >
-            Synopsis
-          </Link>
-          <Link
-            href="/#volumes"
-            className="font-medium uppercase tracking-wider text-muted hover:text-ink transition-colors"
-          >
-            Volumes
-          </Link>
-          <a
-            href={DISCORD_INVITE_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-medium uppercase tracking-wider text-muted hover:text-ink transition-colors"
-          >
-            Discord
-          </a>
-          <Link
-            href="/read"
-            className="font-semibold uppercase tracking-wider text-accent hover:text-accent-hover transition-colors"
-          >
-            Read Chapter 1 &#8594;
-          </Link>
-        </nav>
+          {/* Quick Links */}
+          <nav aria-label="Footer" className="flex flex-wrap items-center justify-center gap-5 sm:gap-6">
+            <Link
+              href="/#synopsis"
+              className="text-muted hover:text-accent transition-colors uppercase tracking-wider text-[11px]"
+            >
+              Synopsis
+            </Link>
+            <Link
+              href="/#volumes"
+              className="text-muted hover:text-accent transition-colors uppercase tracking-wider text-[11px]"
+            >
+              Volumes
+            </Link>
+            <a
+              href={DISCORD_INVITE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-muted hover:text-accent transition-colors uppercase tracking-wider text-[11px] inline-flex items-center gap-0.5"
+            >
+              <span>Discord</span>
+              <ArrowUpRight className="h-3 w-3" />
+            </a>
+            <a
+              href="https://github.com/NGSTRIKER/ReverendReader"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-muted hover:text-accent transition-colors uppercase tracking-wider text-[11px] inline-flex items-center gap-0.5"
+            >
+              <span>GitHub</span>
+              <ArrowUpRight className="h-3 w-3" />
+            </a>
+            <a
+              href="/downloads/Reverend_Insanity.epub"
+              download="Reverend_Insanity.epub"
+              className="text-muted hover:text-accent transition-colors uppercase tracking-wider text-[11px]"
+            >
+              EPUB ↓
+            </a>
+            <Link
+              href="/read?c=1"
+              className="font-semibold text-accent hover:brightness-125 transition-all uppercase tracking-wider text-[11px]"
+            >
+              Read Ch 1 &#8594;
+            </Link>
+          </nav>
+        </div>
       </div>
     </footer>
   );

@@ -25,9 +25,11 @@ const config: Config = {
         success: token("success"),
       },
       fontFamily: {
+        playfair: ["'Playfair Display'", "Georgia", "serif"],
+        dmsans: ["'DM Sans'", "system-ui", "-apple-system", "sans-serif"],
         serif: ["var(--font-serif)", "EB Garamond", "Garamond", "Georgia", "serif"],
         mono: ["var(--font-mono)", "JetBrains Mono", "SFMono-Regular", "Menlo", "monospace"],
-        sans: ["system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "sans-serif"],
+        sans: ["'DM Sans'", "system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "sans-serif"],
         literary: ["var(--font-serif)", "Palatino", "Georgia", "serif"],
       },
       boxShadow: {
