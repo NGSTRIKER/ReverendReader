@@ -3,8 +3,10 @@ import fs from "fs";
 import path from "path";
 import { ManifestData } from "@/types/novel";
 
-let cachedManifest: ManifestData | null = null;
-let cachedManifestTime = 0;
+let cachedManifestEn: ManifestData | null = null;
+let cachedManifestEnTime = 0;
+let cachedManifestZh: ManifestData | null = null;
+let cachedManifestZhTime = 0;
 
 // Best-effort per-instance rate limiter. Serverless instances do not share this
 // map, so this is a local abuse throttle, not a deployment-wide quota.
@@ -53,10 +55,26 @@ setInterval(() => {
   }
 }, 300000).unref?.();
 
-function getManifest(): ManifestData | null {
+function getManifest(edition: "en" | "zh" = "en"): ManifestData | null {
   const now = Date.now();
-  if (cachedManifest && now - cachedManifestTime < 60000) {
-    return cachedManifest;
+  if (edition === "zh") {
+    if (cachedManifestZh && now - cachedManifestZhTime < 60000) {
+      return cachedManifestZh;
+    }
+    const manifestPath = path.join(process.cwd(), "public", "chapters-zh.json");
+    if (!fs.existsSync(manifestPath)) return null;
+    try {
+      const raw = fs.readFileSync(manifestPath, "utf-8");
+      cachedManifestZh = JSON.parse(raw) as ManifestData;
+      cachedManifestZhTime = now;
+      return cachedManifestZh;
+    } catch {
+      return null;
+    }
+  }
+
+  if (cachedManifestEn && now - cachedManifestEnTime < 60000) {
+    return cachedManifestEn;
   }
 
   const manifestPath = path.join(process.cwd(), "public", "chapters.json");
@@ -66,9 +84,9 @@ function getManifest(): ManifestData | null {
 
   try {
     const raw = fs.readFileSync(manifestPath, "utf-8");
-    cachedManifest = JSON.parse(raw) as ManifestData;
-    cachedManifestTime = now;
-    return cachedManifest;
+    cachedManifestEn = JSON.parse(raw) as ManifestData;
+    cachedManifestEnTime = now;
+    return cachedManifestEn;
   } catch {
     return null;
   }
@@ -95,6 +113,8 @@ export async function GET(request: NextRequest) {
 
   const { searchParams } = new URL(request.url);
   const idParam = searchParams.get("id");
+  const rawEdition = searchParams.get("edition") || searchParams.get("lang");
+  const edition: "en" | "zh" = rawEdition === "zh" || rawEdition === "raw" ? "zh" : "en";
 
   if (!idParam) {
     return NextResponse.json({ error: "Missing chapter ID" }, { status: 400 });
@@ -105,7 +125,7 @@ export async function GET(request: NextRequest) {
   }
   const chapterId = Number(idParam);
 
-  const manifest = getManifest();
+  const manifest = getManifest(edition);
   if (!manifest) {
     return NextResponse.json({ error: "Manifest not found" }, { status: 500 });
   }
@@ -115,7 +135,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Chapter not found" }, { status: 404 });
   }
 
-  const novelPath = path.join(process.cwd(), "public", "novel.txt");
+  const novelFileName = edition === "zh" ? "novel-zh.txt" : "novel.txt";
+  const novelPath = path.join(process.cwd(), "public", novelFileName);
   if (!fs.existsSync(novelPath)) {
     return NextResponse.json({ error: "Novel asset not found" }, { status: 500 });
   }

@@ -44,8 +44,17 @@ export function Footer() {
               href="/downloads/Reverend_Insanity.epub"
               download="Reverend_Insanity.epub"
               className="text-muted hover:text-ink transition-colors uppercase tracking-wider text-[11px]"
+              title="Download English EPUB (25 MB)"
             >
-              EPUB ↓
+              EN EPUB ↓
+            </a>
+            <a
+              href="/downloads/Gu_Zhen_Ren_Raw.epub"
+              download="Gu_Zhen_Ren_Raw.epub"
+              className="text-muted hover:text-ink transition-colors uppercase tracking-wider text-[11px]"
+              title="Download Chinese Raw EPUB (19 MB)"
+            >
+              中文 EPUB ↓
             </a>
             <Link
               href="/read?c=1"

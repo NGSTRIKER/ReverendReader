@@ -12,7 +12,9 @@ interface HeroSectionProps {
 interface VolumeOption {
   id: string;
   number: string;
+  numberZh: string;
   title: string;
+  titleZh: string;
   range: string;
   startChapter: number;
   chapterCount: number;
@@ -22,7 +24,9 @@ const VOLUMES: VolumeOption[] = [
   {
     id: "vol-1",
     number: "I",
+    numberZh: "卷一",
     title: "Nature Does Not Change",
+    titleZh: "魔性不改",
     range: "Chapters 1–199",
     startChapter: 1,
     chapterCount: 199,
@@ -30,7 +34,9 @@ const VOLUMES: VolumeOption[] = [
   {
     id: "vol-2",
     number: "II",
+    numberZh: "卷二",
     title: "The Demon Leaves the Mountain",
+    titleZh: "魔头出山",
     range: "Chapters 200–405",
     startChapter: 200,
     chapterCount: 206,
@@ -38,7 +44,9 @@ const VOLUMES: VolumeOption[] = [
   {
     id: "vol-3",
     number: "III",
+    numberZh: "卷三",
     title: "The Demon's Rampage",
+    titleZh: "魔乱天下",
     range: "Chapters 406–649",
     startChapter: 406,
     chapterCount: 244,
@@ -46,7 +54,9 @@ const VOLUMES: VolumeOption[] = [
   {
     id: "vol-4",
     number: "IV",
+    numberZh: "卷四",
     title: "The Demon Sovereign Rises",
+    titleZh: "魔皇称雄",
     range: "Chapters 650–1,021",
     startChapter: 650,
     chapterCount: 372,
@@ -54,7 +64,9 @@ const VOLUMES: VolumeOption[] = [
   {
     id: "vol-5",
     number: "V",
+    numberZh: "卷五",
     title: "A Demon King's Might",
+    titleZh: "魔尊纵横",
     range: "Chapters 1,022–1,966",
     startChapter: 1022,
     chapterCount: 945,
@@ -62,7 +74,9 @@ const VOLUMES: VolumeOption[] = [
   {
     id: "vol-6",
     number: "VI",
+    numberZh: "卷六",
     title: "Eternal Life",
+    titleZh: "宿命天成",
     range: "Chapters 1,967–2,334",
     startChapter: 1967,
     chapterCount: 368,
@@ -70,28 +84,35 @@ const VOLUMES: VolumeOption[] = [
 ];
 
 export function HeroSection({ continueChapter = null }: HeroSectionProps) {
+  const [languageEdition, setLanguageEdition] = useState<"en" | "zh">("en");
   const [selectedEdition, setSelectedEdition] = useState<"complete" | string>("complete");
   const [isArtHovered, setIsArtHovered] = useState(false);
   const [isCardHovered, setIsCardHovered] = useState(false);
   const [pointerTilt, setPointerTilt] = useState({ x: 0, y: 0 });
+
+  const isZh = languageEdition === "zh";
 
   const activeVolume =
     selectedEdition === "complete"
       ? null
       : VOLUMES.find((v) => v.id === selectedEdition) || null;
 
-  let primaryHref = "/read";
-  let primaryLabel = "Chapters";
+  let primaryHref = isZh ? "/read?edition=zh" : "/read";
+  let primaryLabel = isZh ? "章节目录" : "Chapters";
 
   if (activeVolume) {
-    primaryHref = `/read?c=${activeVolume.startChapter}`;
-    primaryLabel = `Read Book ${activeVolume.number}`;
+    primaryHref = `/read?c=${activeVolume.startChapter}${isZh ? "&edition=zh" : ""}`;
+    primaryLabel = isZh
+      ? `阅读${activeVolume.numberZh} (${activeVolume.titleZh})`
+      : `Read Book ${activeVolume.number}`;
   } else if (continueChapter && continueChapter >= 1) {
-    primaryHref = `/read?c=${continueChapter}`;
-    primaryLabel = `Continue Chapter ${continueChapter}`;
+    primaryHref = `/read?c=${continueChapter}${isZh ? "&edition=zh" : ""}`;
+    primaryLabel = isZh
+      ? `继续阅读第 ${continueChapter} 节`
+      : `Continue Chapter ${continueChapter}`;
   } else {
-    primaryHref = "/read?c=1";
-    primaryLabel = "Begin Chapter 1";
+    primaryHref = `/read?c=1${isZh ? "&edition=zh" : ""}`;
+    primaryLabel = isZh ? "开始阅读第一节 (中文原版)" : "Begin Chapter 1";
   }
 
   const handlePointerMove = (e: React.MouseEvent<HTMLElement>) => {
@@ -178,18 +199,45 @@ export function HeroSection({ continueChapter = null }: HeroSectionProps) {
               </h1>
 
               {/* Summary */}
-              <p className="summary text-muted text-sm sm:text-base leading-relaxed mb-5 sm:mb-6">
+              <p className="summary text-muted text-sm sm:text-base leading-relaxed mb-4 sm:mb-5">
                 The tower of destiny collapses before the demonic path. Reborn five hundred years
                 into his youth with the supreme Spring Autumn Cicada, Fang Yuan walks an uncompromising
                 road through the five regions and nine heavens—indifferent to worldly morality,
                 relentlessly pursuing eternal life.
               </p>
 
+              {/* Language / Edition Switcher */}
+              <div className="flex items-center gap-1.5 p-1 rounded-lg border border-line bg-paper w-fit mb-5">
+                <button
+                  type="button"
+                  onClick={() => setLanguageEdition("en")}
+                  className={`px-3 py-1 rounded text-xs font-semibold transition-colors ${
+                    !isZh
+                      ? "bg-surface text-ink border border-line shadow-sm"
+                      : "text-muted hover:text-ink border border-transparent"
+                  }`}
+                >
+                  English Translation
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLanguageEdition("zh")}
+                  className={`px-3 py-1 rounded text-xs font-semibold transition-colors flex items-center gap-1.5 ${
+                    isZh
+                      ? "bg-surface text-ink border border-line shadow-sm"
+                      : "text-muted hover:text-ink border border-transparent"
+                  }`}
+                >
+                  <span>中文原版 (蛊真人)</span>
+                  <span className="text-[10px] text-accent font-bold">RAW</span>
+                </button>
+              </div>
+
               {/* Choose Your Volume / Edition Selector — Symmetrical on Phone */}
               <fieldset className="editions mb-5 sm:mb-6 border-0 p-0">
                 <legend className="text-[11px] tracking-[0.16em] uppercase text-muted mb-2.5 font-semibold flex items-center gap-1.5">
                   <Layers className="h-3.5 w-3.5 text-ink" />
-                  CHOOSE YOUR EDITION OR VOLUME
+                  {isZh ? "选择卷次或完整篇章" : "CHOOSE YOUR EDITION OR VOLUME"}
                 </legend>
 
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -204,10 +252,10 @@ export function HeroSection({ continueChapter = null }: HeroSectionProps) {
                     }`}
                   >
                     <span className="block text-xs sm:text-sm font-bold text-ink">
-                      Complete Canon
+                      {isZh ? "完整原版全本" : "Complete Canon"}
                     </span>
                     <span className="block text-[11px] text-muted mt-0.5">
-                      2,334 chapters
+                      {isZh ? "共 2,334 节" : "2,334 chapters"}
                     </span>
                   </button>
 
@@ -226,10 +274,10 @@ export function HeroSection({ continueChapter = null }: HeroSectionProps) {
                         }`}
                       >
                         <span className="block text-xs sm:text-sm font-bold text-ink truncate">
-                          Book {vol.number}
+                          {isZh ? `${vol.numberZh} · ${vol.titleZh}` : `Book ${vol.number}`}
                         </span>
                         <span className="block text-[11px] text-muted mt-0.5">
-                          {vol.chapterCount} chapters
+                          {isZh ? `${vol.chapterCount} 节` : `${vol.chapterCount} chapters`}
                         </span>
                       </button>
                     );
@@ -254,22 +302,26 @@ export function HeroSection({ continueChapter = null }: HeroSectionProps) {
                   {/* Download EPUB Link */}
                   <a
                     id="download"
-                    href="/downloads/Reverend_Insanity.epub"
-                    download="Reverend_Insanity.epub"
+                    href={isZh ? "/downloads/Gu_Zhen_Ren_Raw.epub" : "/downloads/Reverend_Insanity.epub"}
+                    download={isZh ? "Gu_Zhen_Ren_Raw.epub" : "Reverend_Insanity.epub"}
                     className="inline-flex items-center gap-1.5 text-xs uppercase tracking-wider text-muted hover:text-ink border-b border-line hover:border-ink py-1.5 transition-colors whitespace-nowrap"
-                    title="Download complete 2,334 chapters EPUB (25 MB)"
+                    title={
+                      isZh
+                        ? "Download complete 2,334 chapters Chinese raw EPUB (19 MB)"
+                        : "Download complete 2,334 chapters EPUB (25 MB)"
+                    }
                   >
                     <Download className="h-3.5 w-3.5" />
-                    <span>Download EPUB ↓</span>
+                    <span>{isZh ? "下载中文 EPUB ↓" : "Download EPUB ↓"}</span>
                   </a>
 
                   {/* Read from Ch 1 if continuing */}
                   {continueChapter && continueChapter > 1 && (
                     <Link
-                      href="/read?c=1"
+                      href={isZh ? "/read?c=1&edition=zh" : "/read?c=1"}
                       className="text-xs uppercase tracking-wider text-muted hover:text-ink border-b border-line hover:border-ink py-1.5 transition-colors whitespace-nowrap"
                     >
-                      Read Chapter 1
+                      {isZh ? "从第一节重读" : "Read Chapter 1"}
                     </Link>
                   )}
                 </div>
@@ -288,10 +340,10 @@ export function HeroSection({ continueChapter = null }: HeroSectionProps) {
                 {VOLUMES.map((vol) => (
                   <Link
                     key={vol.id}
-                    href={`/read?c=${vol.startChapter}`}
+                    href={`/read?c=${vol.startChapter}${isZh ? "&edition=zh" : ""}`}
                     className="text-muted hover:text-ink border-b border-dashed border-line hover:border-ink pb-0.5 transition-colors truncate"
                   >
-                    Book {vol.number} (Ch {vol.startChapter})
+                    {isZh ? `${vol.numberZh} (${vol.startChapter}节)` : `Book ${vol.number} (Ch ${vol.startChapter})`}
                   </Link>
                 ))}
               </nav>

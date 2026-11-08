@@ -216,10 +216,10 @@ export function InfoModal({ isOpen, onClose }: InfoModalProps) {
                 <div className="rounded-xl border border-line p-3.5 sm:p-4 bg-paper space-y-1">
                   <h4 className="text-xs font-bold text-ink flex items-center gap-1.5">
                     <Download className="h-3.5 w-3.5 text-ink" />
-                    Full EPUB Download
+                    Full EPUB &amp; Chinese Raw
                   </h4>
                   <p className="text-xs text-muted">
-                    Download the complete 2,334 chapters EPUB (25 MB) for offline reading on any e-reader.
+                    Read online or download the complete 2,334 chapters in English translation (25 MB) and Chinese original raw (19 MB).
                   </p>
                 </div>
 
@@ -301,15 +301,26 @@ export function InfoModal({ isOpen, onClose }: InfoModalProps) {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between border-t border-line px-4 sm:px-6 py-3 sm:py-3.5 bg-paper text-xs">
-          <a
-            href="/downloads/Reverend_Insanity.epub"
-            download="Reverend_Insanity.epub"
-            className="flex items-center gap-1.5 text-muted hover:text-ink transition-colors"
-          >
-            <Download className="h-3.5 w-3.5" />
-            <span>Download EPUB (25 MB)</span>
-          </a>
+        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-line px-4 sm:px-6 py-3 sm:py-3.5 bg-paper text-xs">
+          <div className="flex items-center gap-3">
+            <a
+              href="/downloads/Reverend_Insanity.epub"
+              download="Reverend_Insanity.epub"
+              className="flex items-center gap-1.5 text-muted hover:text-ink transition-colors"
+            >
+              <Download className="h-3.5 w-3.5" />
+              <span>EN EPUB (25 MB)</span>
+            </a>
+            <span className="text-line">|</span>
+            <a
+              href="/downloads/Gu_Zhen_Ren_Raw.epub"
+              download="Gu_Zhen_Ren_Raw.epub"
+              className="flex items-center gap-1.5 text-muted hover:text-ink transition-colors"
+            >
+              <Download className="h-3.5 w-3.5" />
+              <span>中文原版 (19 MB)</span>
+            </a>
+          </div>
           <button
             onClick={onClose}
             className="px-4 py-1.5 rounded-lg border border-line bg-surface hover:bg-sunken text-ink font-semibold transition-colors"

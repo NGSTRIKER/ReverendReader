@@ -1,6 +1,6 @@
-import { ChapterMetadata } from "@/types/novel";
+import { ChapterMetadata, NovelEdition } from "@/types/novel";
 
-const chapterCache = new Map<number, string>();
+const chapterCache = new Map<string, string>();
 
 /**
  * Strips the internal conversion delimiters from the raw chapter text
@@ -29,26 +29,30 @@ export function cleanChapterContent(rawText: string): string {
 /**
  * Fetches a single chapter with performance optimization:
  * 1. Returns from client memory cache if available.
- * 2. Fetches byte slice directly from /api/chapter?id=${id}
+ * 2. Fetches byte slice directly from /api/chapter?id=${id}&edition=${edition}
  * 3. Never keeps more than 50 chapters in memory cache to avoid memory leaks.
  */
-export async function fetchChapterContent(chapter: { id: number }): Promise<string> {
-  if (chapterCache.has(chapter.id)) {
-    return chapterCache.get(chapter.id)!;
+export async function fetchChapterContent(
+  chapter: { id: number },
+  edition: NovelEdition = "en"
+): Promise<string> {
+  const cacheKey = `${edition}-${chapter.id}`;
+  if (chapterCache.has(cacheKey)) {
+    return chapterCache.get(cacheKey)!;
   }
 
-  const apiRes = await fetch(`/api/chapter?id=${chapter.id}`);
+  const apiRes = await fetch(`/api/chapter?id=${chapter.id}&edition=${edition}`);
   if (!apiRes.ok) {
     throw new Error(`Failed to load chapter (${apiRes.status}: ${apiRes.statusText})`);
   }
 
   const rawText = await apiRes.text();
   const cleaned = cleanChapterContent(rawText);
-  cacheChapter(chapter.id, cleaned);
+  cacheChapter(cacheKey, cleaned);
   return cleaned;
 }
 
-function cacheChapter(id: number, content: string) {
+function cacheChapter(cacheKey: string, content: string) {
   // Evict oldest chapters if cache grows beyond 50 chapters
   if (chapterCache.size > 50) {
     const firstKey = chapterCache.keys().next().value;
@@ -56,14 +60,19 @@ function cacheChapter(id: number, content: string) {
       chapterCache.delete(firstKey);
     }
   }
-  chapterCache.set(id, content);
+  chapterCache.set(cacheKey, content);
 }
 
 /**
  * Preload adjacent chapter into cache in the background for instant navigation.
  */
-export function preloadChapter(chapter: { id: number } | undefined) {
-  if (!chapter || chapterCache.has(chapter.id)) return;
+export function preloadChapter(
+  chapter: { id: number } | undefined,
+  edition: NovelEdition = "en"
+) {
+  if (!chapter) return;
+  const cacheKey = `${edition}-${chapter.id}`;
+  if (chapterCache.has(cacheKey)) return;
   // Trigger background fetch without awaiting
-  fetchChapterContent(chapter).catch(() => {});
+  fetchChapterContent(chapter, edition).catch(() => {});
 }

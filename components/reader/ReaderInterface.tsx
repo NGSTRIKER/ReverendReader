@@ -8,7 +8,7 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { ManifestData, ReaderSettings, Bookmark, ChapterMetadata } from "@/types/novel";
+import { ManifestData, ReaderSettings, Bookmark, ChapterMetadata, NovelEdition } from "@/types/novel";
 import { ChapterNavigation } from "./ChapterNavigation";
 import { ChapterContent } from "./ChapterContent";
 import { InteractionSidebar } from "./InteractionSidebar";
@@ -83,6 +83,7 @@ export interface InitialChapterInfo {
 
 interface ReaderInterfaceProps {
   manifest?: ManifestData;
+  initialEdition?: NovelEdition;
   initialChapter?: InitialChapterInfo;
   totalChapters?: number;
   initialContent?: string | null;
@@ -107,6 +108,7 @@ interface ToastNotice {
 
 export function ReaderInterface({
   manifest,
+  initialEdition = "en",
   initialChapter,
   totalChapters,
   initialContent,
@@ -118,6 +120,13 @@ export function ReaderInterface({
 }: ReaderInterfaceProps) {
   const totalChaptersCount = totalChapters ?? manifest?.totalChapters ?? 2334;
   const initialId = initialChapter?.id ?? initialChapterId ?? 1;
+
+  // Language & Edition State (English translation vs Chinese raw)
+  const [edition, setEdition] = useState<NovelEdition>(initialEdition);
+  const manifestsRef = useRef<Record<NovelEdition, ChapterMetadata[] | null>>({
+    en: manifest && manifest.edition !== "zh" ? manifest.chapters : null,
+    zh: manifest && manifest.edition === "zh" ? manifest.chapters : null,
+  });
 
   // Current Chapter State
   const [currentChapterId, setCurrentChapterId] = useState<number>(initialId);
@@ -274,12 +283,17 @@ export function ReaderInterface({
 
   // Asynchronously fetch chapters manifest in the background (prevents 520KB SSR HTML payload)
   useEffect(() => {
-    if (chapters.length > 0) return;
+    if (manifestsRef.current[edition] && manifestsRef.current[edition]!.length > 0) {
+      setChapters(manifestsRef.current[edition]!);
+      return;
+    }
     let isMounted = true;
-    fetch("/chapters.json")
+    const manifestUrl = edition === "zh" ? "/chapters-zh.json" : "/chapters.json";
+    fetch(manifestUrl)
       .then((res) => res.json())
       .then((data: ManifestData) => {
         if (isMounted && data?.chapters) {
+          manifestsRef.current[edition] = data.chapters;
           setChapters(data.chapters);
         }
       })
@@ -287,7 +301,7 @@ export function ReaderInterface({
     return () => {
       isMounted = false;
     };
-  }, [chapters.length]);
+  }, [edition]);
 
   // Clean up object URLs when custom background changes or unmounts
   const handleSetCustomBg = useCallback((newUrl: string | null) => {
@@ -836,7 +850,7 @@ export function ReaderInterface({
       setError(null);
 
       try {
-        const text = await fetchChapterContent({ id });
+        const text = await fetchChapterContent({ id }, edition);
         setContent(text);
         setLoading(false);
 
@@ -849,6 +863,7 @@ export function ReaderInterface({
         // Update URL query parameter without triggering full reload
         const url = new URL(window.location.href);
         url.searchParams.set("c", String(id));
+        url.searchParams.set("edition", edition);
         url.searchParams.delete("scroll");
         window.history.replaceState({}, "", url.toString());
 
@@ -859,10 +874,10 @@ export function ReaderInterface({
 
         // Preload next and previous chapters in background
         if (id + 1 <= totalChaptersCount) {
-          preloadChapter({ id: id + 1 });
+          preloadChapter({ id: id + 1 }, edition);
         }
         if (id - 1 >= 1) {
-          preloadChapter({ id: id - 1 });
+          preloadChapter({ id: id - 1 }, edition);
         }
       } catch (err: unknown) {
         const message = err instanceof Error ? err.message : "Failed to load chapter content.";
@@ -870,7 +885,52 @@ export function ReaderInterface({
         setLoading(false);
       }
     },
-    [totalChaptersCount]
+    [totalChaptersCount, edition]
+  );
+
+  // Switch between English translation and Chinese raw
+  const handleToggleEdition = useCallback(
+    async (newEdition?: NovelEdition) => {
+      const targetEdition = newEdition || (edition === "en" ? "zh" : "en");
+      if (targetEdition === edition) return;
+      setEdition(targetEdition);
+      try {
+        localStorage.setItem("reverend_reader_edition", targetEdition);
+        setCookie("reverend_reader_edition", targetEdition);
+      } catch {}
+
+      const url = new URL(window.location.href);
+      url.searchParams.set("c", String(currentChapterId));
+      url.searchParams.set("edition", targetEdition);
+      window.history.replaceState({}, "", url.toString());
+
+      if (manifestsRef.current[targetEdition] && manifestsRef.current[targetEdition]!.length > 0) {
+        setChapters(manifestsRef.current[targetEdition]!);
+      } else {
+        const manifestUrl = targetEdition === "zh" ? "/chapters-zh.json" : "/chapters.json";
+        fetch(manifestUrl)
+          .then((res) => res.json())
+          .then((data: ManifestData) => {
+            if (data?.chapters) {
+              manifestsRef.current[targetEdition] = data.chapters;
+              setChapters(data.chapters);
+            }
+          })
+          .catch(() => {});
+      }
+
+      setLoading(true);
+      setError(null);
+      try {
+        const text = await fetchChapterContent({ id: currentChapterId }, targetEdition);
+        setContent(text);
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : "Failed to load chapter content.");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [edition, currentChapterId]
   );
 
   const isInitialMount = useRef(true);
@@ -881,16 +941,16 @@ export function ReaderInterface({
       if (initialContent && currentChapterId === initialId) {
         // Content was pre-rendered by SSR; preload adjacent chapters
         if (currentChapterId + 1 <= totalChaptersCount) {
-          preloadChapter({ id: currentChapterId + 1 });
+          preloadChapter({ id: currentChapterId + 1 }, edition);
         }
         if (currentChapterId > 1) {
-          preloadChapter({ id: currentChapterId - 1 });
+          preloadChapter({ id: currentChapterId - 1 }, edition);
         }
         return;
       }
     }
     loadChapter(currentChapterId);
-  }, [currentChapterId, loadChapter, initialContent, initialId, totalChaptersCount]);
+  }, [currentChapterId, loadChapter, initialContent, initialId, totalChaptersCount, edition]);
 
   const handlePrev = () => {
     if (hasPrev) {
@@ -1148,6 +1208,8 @@ export function ReaderInterface({
           isBookmarked={isCurrentBookmarked}
           onToggleBookmark={handleToggleBookmark}
           settings={settings}
+          edition={edition}
+          onToggleEdition={handleToggleEdition}
         />
 
         {/* Reading Canvas (reserves right padding only when sidebar is visible so text is never covered) */}
@@ -1214,6 +1276,8 @@ export function ReaderInterface({
         bookmarks={bookmarks}
         onRemoveBookmark={handleRemoveBookmark}
         initialTab={tocInitialTab}
+        edition={edition}
+        onToggleEdition={handleToggleEdition}
       />
 
       {/* Settings Modal (Lazy Loaded) */}

@@ -1,3 +1,5 @@
+export type NovelEdition = "en" | "zh";
+
 export interface ChapterMetadata {
   id: number;
   number: number;
@@ -11,6 +13,8 @@ export interface ChapterMetadata {
 export interface ManifestData {
   novelTitle: string;
   author: string;
+  edition?: NovelEdition;
+  language?: string;
   totalChapters: number;
   totalWords: number;
   totalBytes: number;

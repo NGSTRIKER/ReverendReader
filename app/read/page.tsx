@@ -17,27 +17,43 @@ export const metadata: Metadata = {
   },
 };
 
-// In-memory cached manifest on the server (avoids reading 520KB from disk on every SSR hit)
-let cachedManifest: ManifestData | null = null;
+// In-memory cached manifests on the server
+let cachedManifestEn: ManifestData | null = null;
+let cachedManifestZh: ManifestData | null = null;
 
-function getServerManifest(): ManifestData {
-  if (cachedManifest) return cachedManifest;
+function getServerManifest(edition: "en" | "zh" = "en"): ManifestData {
+  if (edition === "zh") {
+    if (cachedManifestZh) return cachedManifestZh;
+    const manifestPath = path.join(process.cwd(), "public", "chapters-zh.json");
+    if (!fs.existsSync(manifestPath)) {
+      throw new Error("Chinese chapters manifest not found.");
+    }
+    const raw = fs.readFileSync(manifestPath, "utf-8");
+    cachedManifestZh = JSON.parse(raw) as ManifestData;
+    return cachedManifestZh;
+  }
+
+  if (cachedManifestEn) return cachedManifestEn;
   const manifestPath = path.join(process.cwd(), "public", "chapters.json");
   if (!fs.existsSync(manifestPath)) {
     throw new Error("Chapters manifest not found. Please run: python scripts/convert_epub.py");
   }
   const raw = fs.readFileSync(manifestPath, "utf-8");
-  cachedManifest = JSON.parse(raw) as ManifestData;
-  return cachedManifest;
+  cachedManifestEn = JSON.parse(raw) as ManifestData;
+  return cachedManifestEn;
 }
 
 /**
  * Reads initial chapter byte slice directly on server in ~0.5ms.
  * Guarantees zero loading skeleton on initial page load and 100 SEO indexability.
  */
-function getServerChapterContent(chapter: ChapterMetadata): string | null {
+function getServerChapterContent(
+  chapter: ChapterMetadata,
+  edition: "en" | "zh" = "en"
+): string | null {
   try {
-    const novelPath = path.join(process.cwd(), "public", "novel.txt");
+    const fileName = edition === "zh" ? "novel-zh.txt" : "novel.txt";
+    const novelPath = path.join(process.cwd(), "public", fileName);
     if (!fs.existsSync(novelPath)) return null;
     const fd = fs.openSync(novelPath, "r");
     const len = chapter.length;
@@ -55,8 +71,13 @@ interface ReadPageProps {
 }
 
 export default async function ReadPage({ searchParams }: ReadPageProps) {
-  const manifest = getServerManifest();
   const resolvedParams = await searchParams;
+  const cookieStore = await cookies();
+  const rawLangParam = resolvedParams.lang || resolvedParams.edition;
+  const cookieEdition = cookieStore.get("reverend_reader_edition")?.value;
+  const initialEdition: "en" | "zh" =
+    rawLangParam === "zh" || rawLangParam === "raw" || (!rawLangParam && cookieEdition === "zh") ? "zh" : "en";
+  const manifest = getServerManifest(initialEdition);
 
   const rawChapterParam = resolvedParams.c || resolvedParams.id;
   let initialChapterId = 1;
@@ -65,8 +86,6 @@ export default async function ReadPage({ searchParams }: ReadPageProps) {
   let initialUserId: string | undefined;
   let cloudChapterId: number | undefined;
   let cloudScroll: number | undefined;
-
-  const cookieStore = await cookies();
 
   if (typeof rawChapterParam === "string") {
     const parsed = parseInt(rawChapterParam, 10);
@@ -138,7 +157,7 @@ export default async function ReadPage({ searchParams }: ReadPageProps) {
   };
 
   // Pre-render chapter text directly on server (eliminates spinner, maximizes LCP, 100 SEO)
-  const initialContent = getServerChapterContent(chapterMeta);
+  const initialContent = getServerChapterContent(chapterMeta, initialEdition);
 
   // Read saved typography settings from server-side cookies
   const themeCookie = cookieStore.get("reverend_theme_settings")?.value;
@@ -184,6 +203,8 @@ export default async function ReadPage({ searchParams }: ReadPageProps) {
 
   return (
     <ReaderInterface
+      manifest={manifest}
+      initialEdition={initialEdition}
       initialChapter={initialChapter}
       totalChapters={manifest.totalChapters}
       initialContent={initialContent}

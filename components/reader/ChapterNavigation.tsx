@@ -2,7 +2,7 @@
 
 import React, { useEffect } from "react";
 import Link from "next/link";
-import { ChapterMetadata, ReaderSettings } from "@/types/novel";
+import { ChapterMetadata, ReaderSettings, NovelEdition } from "@/types/novel";
 import {
   ChevronLeft,
   ChevronRight,
@@ -25,6 +25,8 @@ interface ChapterNavigationProps {
   isBookmarked: boolean;
   onToggleBookmark: () => void;
   settings?: ReaderSettings;
+  edition?: NovelEdition;
+  onToggleEdition?: (newEdition?: NovelEdition) => void;
 }
 
 export function ChapterNavigation({
@@ -38,6 +40,8 @@ export function ChapterNavigation({
   onOpenSettings,
   isBookmarked,
   onToggleBookmark,
+  edition = "en",
+  onToggleEdition,
 }: ChapterNavigationProps) {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -146,6 +150,20 @@ export function ChapterNavigation({
               strokeWidth={1.75}
             />
           </button>
+
+          {onToggleEdition && (
+            <button
+              type="button"
+              onClick={() => onToggleEdition()}
+              title={edition === "zh" ? "Switch to English Translation" : "Switch to Chinese Raw (中文原版)"}
+              aria-label="Toggle language edition"
+              className="inline-flex items-center gap-1 rounded-xl border border-line bg-surface px-2 sm:px-2.5 py-1 sm:py-1.5 text-[11px] font-bold hover:border-line-strong hover:bg-sunken transition-colors"
+            >
+              <span className={edition === "en" ? "text-ink font-bold" : "text-muted font-normal"}>EN</span>
+              <span className="text-line-strong text-[10px]">/</span>
+              <span className={edition === "zh" ? "text-ink font-bold" : "text-muted font-normal"}>中文</span>
+            </button>
+          )}
 
           <button
             type="button"

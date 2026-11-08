@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useMemo, useEffect, useRef } from "react";
-import { ChapterMetadata, Bookmark } from "@/types/novel";
+import { ChapterMetadata, Bookmark, NovelEdition } from "@/types/novel";
 import { Search, X, ArrowUpDown, Bookmark as BookmarkIcon, Trash2 } from "lucide-react";
 
 interface ChapterSelectorModalProps {
@@ -13,6 +13,8 @@ interface ChapterSelectorModalProps {
   bookmarks: Bookmark[];
   onRemoveBookmark: (chapterId: number) => void;
   initialTab?: "chapters" | "bookmarks";
+  edition?: NovelEdition;
+  onToggleEdition?: (newEdition: NovelEdition) => void;
 }
 
 export function ChapterSelectorModal({
@@ -24,6 +26,8 @@ export function ChapterSelectorModal({
   bookmarks,
   onRemoveBookmark,
   initialTab = "chapters",
+  edition = "en",
+  onToggleEdition,
 }: ChapterSelectorModalProps) {
   const [activeTab, setActiveTab] = useState<"chapters" | "bookmarks">(initialTab);
   const [searchQuery, setSearchQuery] = useState("");
@@ -145,6 +149,33 @@ export function ChapterSelectorModal({
           >
             <span>[02: BOOKMARKS / 书签 ({bookmarks.length})]</span>
           </button>
+
+          {onToggleEdition && (
+            <div className="ml-auto hidden sm:flex items-center gap-1 self-center pb-2">
+              <button
+                type="button"
+                onClick={() => onToggleEdition("en")}
+                className={`px-2 py-0.5 rounded text-[10px] font-bold border transition-colors ${
+                  edition === "en"
+                    ? "border-accent bg-accent/20 text-accent"
+                    : "border-line bg-paper text-muted hover:text-ink"
+                }`}
+              >
+                EN
+              </button>
+              <button
+                type="button"
+                onClick={() => onToggleEdition("zh")}
+                className={`px-2 py-0.5 rounded text-[10px] font-bold border transition-colors ${
+                  edition === "zh"
+                    ? "border-accent bg-accent/20 text-accent"
+                    : "border-line bg-paper text-muted hover:text-ink"
+                }`}
+              >
+                中文原版
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Chapters Tab View */}
