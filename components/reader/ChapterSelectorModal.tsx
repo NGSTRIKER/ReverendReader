@@ -93,65 +93,67 @@ export function ChapterSelectorModal({
       aria-modal="true"
       aria-label="Chapter Index and Bookmarks"
       onClick={onClose}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 sm:p-6"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-2.5 sm:p-6"
     >
       <div
-        className="relative flex h-[85vh] w-full max-w-2xl flex-col rounded-2xl border border-line bg-surface text-ink shadow-2xl overflow-hidden font-mono"
+        className="relative flex h-[90vh] sm:h-[85vh] w-full max-w-2xl flex-col rounded-2xl border border-line bg-surface text-ink shadow-2xl overflow-hidden font-mono"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Terminal Header */}
-        <div className="flex items-center justify-between border-b border-line px-5 py-3.5 bg-paper">
-          <div className="flex items-center gap-2.5">
-            <div className="flex items-center gap-1.5" aria-hidden="true">
+        <div className="flex items-center justify-between border-b border-line px-3.5 sm:px-5 py-3 sm:py-3.5 bg-paper">
+          <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
+            <div className="flex items-center gap-1.5 flex-shrink-0" aria-hidden="true">
               <span className="h-2.5 w-2.5 rounded-full bg-accent" />
               <span className="h-2.5 w-2.5 rounded-full bg-line-strong" />
               <span className="h-2.5 w-2.5 rounded-full bg-line-strong" />
             </div>
-            <span className="text-xs font-semibold text-ink flex items-center gap-1.5">
+            <span className="text-xs font-semibold text-ink flex items-center gap-1.5 truncate">
               <span>&gt;_</span>
               <span>INDEX / 章节目录</span>
             </span>
-            <span className="chinese-seal text-[10px]">卷</span>
+            <span className="chinese-seal text-[10px] flex-shrink-0">卷</span>
           </div>
 
           <button
             type="button"
             onClick={onClose}
             aria-label="Close table of contents"
-            className="icon-btn rounded-lg h-7 w-7"
+            className="icon-btn rounded-lg h-7 w-7 flex-shrink-0"
           >
             <X className="h-4 w-4" />
           </button>
         </div>
 
         {/* Tab Switcher */}
-        <div className="flex border-b border-line bg-sunken px-5 gap-2 pt-2">
+        <div className="flex border-b border-line bg-sunken px-3 sm:px-5 gap-1.5 sm:gap-2 pt-2 overflow-x-auto items-center">
           <button
             type="button"
             onClick={() => setActiveTab("chapters")}
-            className={`flex items-center gap-1.5 rounded-t-xl px-4 py-2 text-xs font-semibold transition-all border-t border-x ${
+            className={`flex items-center gap-1.5 rounded-t-xl px-3 sm:px-4 py-2 text-xs font-semibold transition-all border-t border-x whitespace-nowrap flex-shrink-0 ${
               activeTab === "chapters"
                 ? "border-line bg-surface text-accent shadow-sm"
                 : "border-transparent text-muted hover:text-ink"
             }`}
           >
-            <span>[01: CHAPTERS / 章节 ({chapters.length.toLocaleString()})]</span>
+            <span className="hidden sm:inline">[01: CHAPTERS / 章节 ({chapters.length.toLocaleString()})]</span>
+            <span className="sm:hidden">Chapters ({chapters.length.toLocaleString()})</span>
           </button>
 
           <button
             type="button"
             onClick={() => setActiveTab("bookmarks")}
-            className={`flex items-center gap-1.5 rounded-t-xl px-4 py-2 text-xs font-semibold transition-all border-t border-x ${
+            className={`flex items-center gap-1.5 rounded-t-xl px-3 sm:px-4 py-2 text-xs font-semibold transition-all border-t border-x whitespace-nowrap flex-shrink-0 ${
               activeTab === "bookmarks"
                 ? "border-line bg-surface text-accent shadow-sm"
                 : "border-transparent text-muted hover:text-ink"
             }`}
           >
-            <span>[02: BOOKMARKS / 书签 ({bookmarks.length})]</span>
+            <span className="hidden sm:inline">[02: BOOKMARKS / 书签 ({bookmarks.length})]</span>
+            <span className="sm:hidden">Bookmarks ({bookmarks.length})</span>
           </button>
 
           {onToggleEdition && (
-            <div className="ml-auto hidden sm:flex items-center gap-1 self-center pb-2">
+            <div className="ml-auto flex items-center gap-1 self-center pb-2 flex-shrink-0">
               <button
                 type="button"
                 onClick={() => onToggleEdition("en")}
@@ -172,7 +174,7 @@ export function ChapterSelectorModal({
                     : "border-line bg-paper text-muted hover:text-ink"
                 }`}
               >
-                中文原版
+                中文
               </button>
             </div>
           )}

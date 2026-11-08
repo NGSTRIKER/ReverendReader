@@ -127,13 +127,13 @@ export function InteractionSidebar({
         aria-hidden={!visible}
         data-testid="interaction-sidebar"
         data-state={visible ? "visible" : "hidden"}
-        className={`mr-1.5 sm:mr-3 flex flex-col items-center rounded-2xl border border-line bg-surface/95 px-1.5 py-2.5 shadow-pop backdrop-blur-sm transition-all duration-200 ${
+        className={`mr-1 sm:mr-3 flex flex-col items-center rounded-2xl border border-line bg-surface/95 px-1 sm:px-1.5 py-2 sm:py-2.5 shadow-pop backdrop-blur-sm transition-all duration-200 ${
           visible
             ? "translate-x-0 opacity-100 pointer-events-auto"
             : "translate-x-[calc(100%+1.5rem)] opacity-0 pointer-events-none"
         }`}
       >
-        <div className="flex flex-col items-center space-y-2 sm:space-y-2.5">
+        <div className="flex flex-col items-center space-y-1.5 sm:space-y-2.5">
           {/* 1. Like current chapter */}
           <div className="flex flex-col items-center">
             <button
@@ -146,7 +146,7 @@ export function InteractionSidebar({
               aria-pressed={social.viewerLiked}
               title={social.viewerLiked ? "Unlike chapter" : "Like chapter"}
               data-testid="sidebar-like-btn"
-              className={`group flex h-9 w-9 items-center justify-center rounded-xl border transition-colors ${
+              className={`group flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-xl border transition-colors ${
                 social.viewerLiked
                   ? "border-accent bg-accent/15 text-accent shadow-sm"
                   : "border-transparent text-muted hover:bg-sunken hover:text-ink"
@@ -181,7 +181,7 @@ export function InteractionSidebar({
               aria-expanded={isCommentsOpen}
               title="Chapter comments"
               data-testid="sidebar-comments-btn"
-              className={`group flex h-9 w-9 items-center justify-center rounded-xl border transition-colors ${
+              className={`group flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-xl border transition-colors ${
                 isCommentsOpen
                   ? "border-accent bg-accent/15 text-accent shadow-sm"
                   : "border-transparent text-muted hover:bg-sunken hover:text-ink"
@@ -213,7 +213,7 @@ export function InteractionSidebar({
               aria-pressed={isBookmarked}
               title={isBookmarked ? "Remove bookmark" : "Bookmark chapter"}
               data-testid="sidebar-bookmark-btn"
-              className={`group flex h-9 w-9 items-center justify-center rounded-xl border transition-colors ${
+              className={`group flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-xl border transition-colors ${
                 isBookmarked
                   ? "border-accent bg-accent/15 text-accent shadow-sm"
                   : "border-transparent text-muted hover:bg-sunken hover:text-ink"
@@ -238,7 +238,7 @@ export function InteractionSidebar({
               aria-haspopup="true"
               title="React to chapter"
               data-testid="sidebar-reaction-btn"
-              className={`group relative flex h-9 w-9 items-center justify-center rounded-xl border transition-colors ${
+              className={`group relative flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-xl border transition-colors ${
                 activePopover === "reactions" || activeReactionDef
                   ? "border-accent bg-accent/15 text-accent shadow-sm"
                   : "border-transparent text-muted hover:bg-sunken hover:text-ink"
@@ -274,7 +274,7 @@ export function InteractionSidebar({
                 role="dialog"
                 aria-label="Chapter reactions"
                 data-testid="reaction-picker-popover"
-                className="absolute right-full mr-2.5 top-1/2 -translate-y-1/2 z-50 flex items-center gap-1 rounded-2xl border border-line bg-surface p-1.5 shadow-pop"
+                className="absolute right-full mr-1.5 sm:mr-2.5 top-1/2 -translate-y-1/2 z-50 flex items-center gap-0.5 sm:gap-1 rounded-2xl border border-line bg-surface p-1 sm:p-1.5 shadow-pop max-w-[calc(100vw-3rem)] overflow-x-auto"
               >
                 {REACTION_DEFINITIONS.map((item) => {
                   const selected = social.viewerReaction === item.type;
@@ -292,7 +292,7 @@ export function InteractionSidebar({
                       aria-pressed={selected}
                       title={`${item.label}${itemCount ? ` (${itemCount})` : ""}`}
                       data-testid={`reaction-option-${item.type}`}
-                      className={`flex flex-col items-center rounded-xl px-2.5 py-1.5 transition-colors ${
+                      className={`flex flex-col items-center rounded-xl px-2 sm:px-2.5 py-1 sm:py-1.5 transition-colors ${
                         selected
                           ? "bg-accent/15 text-accent border border-accent shadow-sm"
                           : "border border-transparent text-muted hover:bg-sunken hover:text-ink"
@@ -316,7 +316,7 @@ export function InteractionSidebar({
         </div>
 
         {/* Separator before bottom Account button */}
-        <div className="my-2.5 h-px w-6 border-t border-line" />
+        <div className="my-2 sm:my-2.5 h-px w-6 border-t border-line" />
 
         {/* 5. Open account menu */}
         <div className="relative flex flex-col items-center">
@@ -330,7 +330,7 @@ export function InteractionSidebar({
             aria-haspopup="true"
             title={userIdentity ? `Account: ${userIdentity.displayName}` : "Account menu"}
             data-testid="sidebar-account-btn"
-            className={`group relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl border transition-colors ${
+            className={`group relative flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center overflow-hidden rounded-xl border transition-colors ${
               activePopover === "account"
                 ? "border-accent bg-accent/15 text-accent shadow-sm"
                 : "border-transparent text-muted hover:bg-sunken hover:text-ink"
@@ -362,7 +362,7 @@ export function InteractionSidebar({
               role="menu"
               aria-label="Account menu"
               data-testid="sidebar-account-popover"
-              className="absolute right-full mr-2.5 bottom-0 z-50 w-56 rounded-2xl border border-line bg-surface p-1.5 shadow-pop overflow-hidden"
+              className="absolute right-full mr-1.5 sm:mr-2.5 bottom-0 z-50 w-52 sm:w-56 max-w-[calc(100vw-3rem)] rounded-2xl border border-line bg-surface p-1.5 shadow-pop overflow-hidden"
             >
               <AccountMenuContent
                 user={user}

@@ -1215,7 +1215,7 @@ export function ReaderInterface({
         {/* Reading Canvas (reserves right padding only when sidebar is visible so text is never covered) */}
         <main
           className={`flex-1 transition-[padding] duration-200 ${
-            sidebarVisible ? "pl-4 pr-14 sm:pl-6 sm:pr-16" : "px-4 sm:px-6"
+            sidebarVisible ? "pl-3 pr-11 sm:pl-6 sm:pr-16" : "px-3 sm:px-6"
           }`}
         >
           <ChapterContent

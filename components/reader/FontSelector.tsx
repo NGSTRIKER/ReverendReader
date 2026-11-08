@@ -111,7 +111,7 @@ export function FontSelector({ settings, onChangeSettings }: FontSelectorProps) 
           </label>
           <span className="text-[11px] text-faint">Light (Red) · Dark (Matte Black)</span>
         </div>
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
           {[
             { id: "light" as const, label: "Day Book", sub: "White & Red", swatch: "bg-[#ffffff] border-[#c5162a]" },
             { id: "dark" as const, label: "Matte Terminal", sub: "Black & Grey", swatch: "bg-[#0e0f12] border-[#4d8aff]" },
@@ -123,16 +123,16 @@ export function FontSelector({ settings, onChangeSettings }: FontSelectorProps) 
                 key={item.id}
                 type="button"
                 onClick={() => handleSelectTheme(item.id)}
-                className={`flex items-center gap-2 rounded-xl border p-2.5 text-left transition-all ${
+                className={`flex items-center gap-1.5 sm:gap-2 rounded-xl border p-2 sm:p-2.5 text-left transition-all ${
                   active
                     ? "border-accent bg-accent/10 text-ink shadow-sm"
                     : "border-line bg-sunken text-muted hover:border-line-strong hover:text-ink"
                 }`}
               >
-                <span className={`h-4 w-4 rounded-full border-2 flex-shrink-0 ${item.swatch}`} />
+                <span className={`h-3.5 w-3.5 sm:h-4 sm:w-4 rounded-full border-2 flex-shrink-0 ${item.swatch}`} />
                 <div className="min-w-0">
-                  <div className="text-xs font-semibold text-ink truncate">{item.label}</div>
-                  <div className="text-[10px] text-muted truncate">{item.sub}</div>
+                  <div className="text-[11px] sm:text-xs font-semibold text-ink truncate">{item.label}</div>
+                  <div className="text-[9px] sm:text-[10px] text-muted truncate">{item.sub}</div>
                 </div>
               </button>
             );
@@ -434,20 +434,20 @@ export function FontSelector({ settings, onChangeSettings }: FontSelectorProps) 
           </span>
           <span className="text-[10px] text-faint">Responsive Columns</span>
         </label>
-        <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+        <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5 sm:gap-2">
           {WIDTH_OPTIONS.map((item) => (
             <button
               key={item.label}
               type="button"
               onClick={() => onChangeSettings({ maxWidth: item.value })}
-              className={`flex flex-col items-center justify-center rounded-xl border py-2 px-1 text-xs transition-all ${
+              className={`flex flex-col items-center justify-center rounded-xl border py-1.5 sm:py-2 px-1 text-xs transition-all ${
                 settings.maxWidth === item.value
                   ? "border-accent bg-accent/15 text-ink font-semibold shadow-sm ring-1 ring-accent/30"
                   : "border-line bg-sunken text-muted hover:text-ink hover:border-line-strong"
               }`}
             >
-              <span className="font-medium truncate text-ink">{item.label}</span>
-              <span className="text-[10px] text-muted mt-0.5">{item.desc}</span>
+              <span className="font-medium truncate text-ink text-[11px] sm:text-xs">{item.label}</span>
+              <span className="text-[9px] sm:text-[10px] text-muted mt-0.5">{item.desc}</span>
             </button>
           ))}
         </div>

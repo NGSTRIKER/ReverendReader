@@ -79,7 +79,7 @@ export function ChapterContent({
   }, [content]);
 
   const isFullWidth = settings.maxWidth >= 9999;
-  const maxWidthStyle = isFullWidth ? "100%" : `${settings.maxWidth}px`;
+  const maxWidthStyle = isFullWidth ? "100%" : `min(100%, ${settings.maxWidth}px)`;
   const { kicker, headline } = splitChapterHeading(chapter.number, chapter.title);
 
   const themeClass = settings.surfaceTheme
@@ -108,14 +108,12 @@ export function ChapterContent({
   return (
     <article
       style={surfaceStyle}
-      className={`relative mx-auto my-6 sm:my-10 px-4 sm:px-10 md:px-14 py-8 sm:py-12 rounded-2xl transition-all duration-200 ${themeClass} ${
-        isFullWidth ? "w-full max-w-full" : ""
-      }`}
+      className={`relative mx-auto my-4 sm:my-10 px-3.5 sm:px-10 md:px-14 py-6 sm:py-12 rounded-xl sm:rounded-2xl transition-all duration-200 w-full max-w-full ${themeClass}`}
     >
       {/* Modern Terminal Header with Chinese Touch */}
-      <header className="mb-8 sm:mb-12 border-b border-line pb-6">
+      <header className="mb-6 sm:mb-12 border-b border-line pb-5 sm:pb-6">
         {/* Terminal Titlebar Row */}
-        <div className="flex flex-wrap items-center justify-between gap-3 mb-4 font-mono text-[11px]">
+        <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-3 mb-4 font-mono text-[10px] sm:text-[11px]">
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1.5" aria-hidden="true">
               <span className="h-2 w-2 rounded-full bg-accent" />
@@ -145,7 +143,7 @@ export function ChapterContent({
           <p className="text-xs font-mono font-semibold uppercase tracking-wider text-accent mb-1.5">
             {kicker}
           </p>
-          <h1 className="text-2xl sm:text-3xl md:text-[2.2rem] font-bold tracking-tight leading-[1.25] text-ink font-mono sm:font-sans">
+          <h1 className="text-2xl sm:text-3xl md:text-[2.2rem] font-bold tracking-tight leading-[1.25] text-ink font-mono sm:font-sans break-words">
             「 {headline} 」
           </h1>
         </div>
@@ -187,7 +185,7 @@ export function ChapterContent({
       {/* Chapter Prose */}
       {!loading && !error && (
         <div
-          className={`reader-content ${fontClass} ${alignmentClass}`}
+          className={`reader-content ${fontClass} ${alignmentClass} break-words`}
           style={{
             color: settings.fontColor || undefined,
             fontSize: `${settings.fontSize}px`,
