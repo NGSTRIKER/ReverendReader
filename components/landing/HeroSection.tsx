@@ -2,7 +2,8 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { ArrowUpRight, Download, BookOpen, Layers } from "lucide-react";
+import { Download, Layers } from "lucide-react";
+import { SpinningOrbsSphere } from "@/components/landing/SpinningOrbsSphere";
 
 interface HeroSectionProps {
   continueChapter?: number | null;
@@ -70,13 +71,15 @@ const VOLUMES: VolumeOption[] = [
 
 export function HeroSection({ continueChapter = null }: HeroSectionProps) {
   const [selectedEdition, setSelectedEdition] = useState<"complete" | string>("complete");
+  const [isArtHovered, setIsArtHovered] = useState(false);
+  const [isCardHovered, setIsCardHovered] = useState(false);
+  const [pointerTilt, setPointerTilt] = useState({ x: 0, y: 0 });
 
   const activeVolume =
     selectedEdition === "complete"
       ? null
       : VOLUMES.find((v) => v.id === selectedEdition) || null;
 
-  // Determine target chapter and primary label
   let primaryHref = "/read";
   let primaryLabel = "Chapters";
 
@@ -91,18 +94,48 @@ export function HeroSection({ continueChapter = null }: HeroSectionProps) {
     primaryLabel = "Begin Chapter 1";
   }
 
-  return (
-    <section className="relative overflow-hidden py-12 sm:py-20 lg:py-24 font-dmsans">
-      <div className="mx-auto max-w-[1250px] px-4 sm:px-8 lg:px-12">
-        {/* 2-Column Grid matching TWATF Reader */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.18fr] items-center gap-12 lg:gap-16">
-          {/* Left Column: 3D Art & Orbit Presentation */}
-          <div className="twatf-art-glow flex flex-col items-center text-center">
-            <div className="relative w-full max-w-[360px] sm:max-w-[420px] flex justify-center py-4">
-              {/* Planetary Orbit Ring */}
-              <div className="twatf-orbit" aria-hidden="true" />
+  const handlePointerMove = (e: React.MouseEvent<HTMLElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    const ny = ((e.clientY - rect.top) / rect.height) * 2 - 1;
+    setPointerTilt({ x: nx, y: ny });
+  };
 
-              {/* 3D Tilted Official Book Cover */}
+  const handlePointerLeave = () => {
+    setIsArtHovered(false);
+    setIsCardHovered(false);
+    setPointerTilt({ x: 0, y: 0 });
+  };
+
+  const sphereActive = isArtHovered || isCardHovered;
+
+  return (
+    <section
+      className="relative overflow-hidden py-7 sm:py-16 lg:py-24 font-times"
+      onMouseMove={handlePointerMove}
+      onMouseLeave={handlePointerLeave}
+    >
+      <div className="mx-auto max-w-[1250px] px-3.5 sm:px-8 lg:px-12">
+        {/* 2-Column Grid — Phone-Optimized & Desktop Balanced */}
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.18fr] items-center gap-8 sm:gap-12 lg:gap-16">
+          {/* Left Column: Book Cover with Interactive Spinning Orbs Sphere Behind It */}
+          <div
+            className="relative flex flex-col items-center text-center"
+            onMouseEnter={() => setIsArtHovered(true)}
+            onMouseLeave={() => setIsArtHovered(false)}
+            onTouchStart={() => setIsArtHovered(true)}
+            onTouchEnd={() => setIsArtHovered(false)}
+          >
+            <div className="relative w-full max-w-[290px] sm:max-w-[420px] aspect-square flex items-center justify-center">
+              {/* Interactive Spinning Orbs Sphere (Replaces Glow & Static Orbit) */}
+              <SpinningOrbsSphere
+                isHovered={sphereActive}
+                tiltX={pointerTilt.x}
+                tiltY={pointerTilt.y}
+                className="absolute inset-0 w-full h-full z-0"
+              />
+
+              {/* 3D Tilted Official Book Cover — Zero Glow */}
               <picture className="relative z-10 block">
                 <source type="image/webp" srcSet="/images/book-cover.webp" />
                 <img
@@ -113,146 +146,156 @@ export function HeroSection({ continueChapter = null }: HeroSectionProps) {
                   height={1170}
                   loading="eager"
                   fetchPriority="high"
-                  className="twatf-book-cover w-[78%] max-w-[300px] sm:max-w-[340px] max-h-[480px] object-cover mx-auto"
+                  className="twatf-book-cover w-[168px] sm:w-[255px] md:w-[290px] max-h-[420px] object-cover mx-auto"
                 />
               </picture>
             </div>
 
             {/* Art Caption */}
-            <span className="art-caption mt-7 inline-block rounded-md border border-line bg-surface/85 px-4 py-1.5 text-[10px] font-mono tracking-[0.24em] uppercase text-muted backdrop-blur-md shadow-sm">
+            <span className="art-caption mt-3 sm:mt-6 inline-block rounded border border-line bg-surface px-3 sm:px-4 py-1 sm:py-1.5 text-[10px] sm:text-xs tracking-[0.18em] sm:tracking-[0.22em] uppercase text-muted">
               A WORLD GOVERNED BY GU &amp; HEAVENLY DAO
             </span>
           </div>
 
-          {/* Right Column: Frosted Intro Card */}
-          <div className="intro rounded-2xl border border-line bg-surface/85 p-6 sm:p-9 lg:p-10 shadow-2xl backdrop-blur-md">
-            {/* Eyebrow */}
-            <p className="eyebrow text-[10px] sm:text-[11px] font-mono font-semibold tracking-[0.24em] uppercase text-accent mb-3">
-              GU ZHEN REN · 蛊真人 · FANTASY EPIC
-            </p>
+          {/* Right Column: Main Intro Card (Also triggers Spinning Sphere on Hover) */}
+          <div
+            className="relative"
+            onMouseEnter={() => setIsCardHovered(true)}
+            onMouseLeave={() => setIsCardHovered(false)}
+            onTouchStart={() => setIsCardHovered(true)}
+            onTouchEnd={() => setIsCardHovered(false)}
+          >
+            <div className="intro relative z-10 rounded-xl sm:rounded-2xl border border-line bg-surface/95 p-5 sm:p-9 lg:p-10">
+              {/* Eyebrow */}
+              <p className="eyebrow text-[11px] sm:text-xs font-semibold tracking-[0.18em] sm:tracking-[0.22em] uppercase text-muted mb-2.5 sm:mb-3">
+                GU ZHEN REN · 蛊真人 · FANTASY EPIC
+              </p>
 
-            {/* Main Title */}
-            <h1 className="font-playfair text-4xl sm:text-6xl lg:text-[4.4rem] font-medium tracking-tight text-ink leading-[1.06] mb-4">
-              Reverend<br />
-              <em className="italic text-accent font-semibold">Insanity.</em>
-            </h1>
+              {/* Main Title in Times New Roman */}
+              <h1 className="font-times text-4xl sm:text-6xl lg:text-[4.4rem] font-bold tracking-tight text-ink leading-[1.04] mb-3.5 sm:mb-4">
+                Reverend<br />
+                <em className="italic text-accent font-normal">Insanity.</em>
+              </h1>
 
-            {/* Summary */}
-            <p className="summary text-muted text-sm sm:text-[15px] leading-relaxed mb-6 font-normal">
-              The tower of destiny collapses before the demonic path. Reborn five hundred years
-              into his youth with the supreme Spring Autumn Cicada, Fang Yuan walks an uncompromising
-              road through the five regions and nine heavens—indifferent to worldly morality,
-              relentlessly pursuing eternal life.
-            </p>
+              {/* Summary */}
+              <p className="summary text-muted text-sm sm:text-base leading-relaxed mb-5 sm:mb-6">
+                The tower of destiny collapses before the demonic path. Reborn five hundred years
+                into his youth with the supreme Spring Autumn Cicada, Fang Yuan walks an uncompromising
+                road through the five regions and nine heavens—indifferent to worldly morality,
+                relentlessly pursuing eternal life.
+              </p>
 
-            {/* Choose Your Volume / Edition Selector */}
-            <fieldset className="editions mb-6 border-0 p-0">
-              <legend className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted mb-2.5 font-medium flex items-center gap-1.5">
-                <Layers className="h-3 w-3 text-accent" />
-                CHOOSE YOUR EDITION OR VOLUME
-              </legend>
+              {/* Choose Your Volume / Edition Selector — Symmetrical on Phone */}
+              <fieldset className="editions mb-5 sm:mb-6 border-0 p-0">
+                <legend className="text-[11px] tracking-[0.16em] uppercase text-muted mb-2.5 font-semibold flex items-center gap-1.5">
+                  <Layers className="h-3.5 w-3.5 text-ink" />
+                  CHOOSE YOUR EDITION OR VOLUME
+                </legend>
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                {/* Complete Canon Button */}
-                <button
-                  type="button"
-                  onClick={() => setSelectedEdition("complete")}
-                  className={`text-left rounded-lg p-3 transition-all border ${
-                    selectedEdition === "complete"
-                      ? "border-accent bg-accent/10 shadow-sm"
-                      : "border-line bg-paper/60 hover:border-line-strong hover:bg-paper"
-                  }`}
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {/* Complete Canon Button — Full Width Row on Phone */}
+                  <button
+                    type="button"
+                    onClick={() => setSelectedEdition("complete")}
+                    className={`col-span-2 sm:col-span-1 text-left rounded-lg p-2.5 sm:p-3 transition-colors border ${
+                      selectedEdition === "complete"
+                        ? "border-accent bg-sunken text-ink"
+                        : "border-line bg-paper hover:border-line-strong"
+                    }`}
+                  >
+                    <span className="block text-xs sm:text-sm font-bold text-ink">
+                      Complete Canon
+                    </span>
+                    <span className="block text-[11px] text-muted mt-0.5">
+                      2,334 chapters
+                    </span>
+                  </button>
+
+                  {/* Volumes 1 to 6 */}
+                  {VOLUMES.map((vol) => {
+                    const isSelected = selectedEdition === vol.id;
+                    return (
+                      <button
+                        key={vol.id}
+                        type="button"
+                        onClick={() => setSelectedEdition(vol.id)}
+                        className={`text-left rounded-lg p-2.5 sm:p-3 transition-colors border ${
+                          isSelected
+                            ? "border-accent bg-sunken text-ink"
+                            : "border-line bg-paper hover:border-line-strong"
+                        }`}
+                      >
+                        <span className="block text-xs sm:text-sm font-bold text-ink truncate">
+                          Book {vol.number}
+                        </span>
+                        <span className="block text-[11px] text-muted mt-0.5">
+                          {vol.chapterCount} chapters
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </fieldset>
+
+              {/* Primary Action Row — Full-Width CTA on Phone */}
+              <div className="actions flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-3 sm:gap-6 pt-1">
+                <Link
+                  id="start"
+                  href={primaryHref}
+                  className="primary group inline-flex w-full sm:w-auto sm:min-w-[200px] items-center justify-between gap-4 rounded-lg bg-accent px-5 sm:px-6 py-3.5 text-sm sm:text-base font-bold text-on-accent transition-colors hover:bg-accent-hover"
                 >
-                  <span className="block text-xs font-semibold text-ink">
-                    Complete Canon
+                  <span>{primaryLabel}</span>
+                  <span className="text-base transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5">
+                    ↗
                   </span>
-                  <span className="block text-[10px] text-muted font-mono mt-1">
-                    2,334 chapters
-                  </span>
-                </button>
+                </Link>
 
-                {/* Volumes 1 to 6 */}
-                {VOLUMES.map((vol) => {
-                  const isSelected = selectedEdition === vol.id;
-                  return (
-                    <button
-                      key={vol.id}
-                      type="button"
-                      onClick={() => setSelectedEdition(vol.id)}
-                      className={`text-left rounded-lg p-3 transition-all border ${
-                        isSelected
-                          ? "border-accent bg-accent/10 shadow-sm"
-                          : "border-line bg-paper/60 hover:border-line-strong hover:bg-paper"
-                      }`}
+                <div className="flex items-center justify-between sm:justify-start gap-4 px-1 sm:px-0">
+                  {/* Download EPUB Link */}
+                  <a
+                    id="download"
+                    href="/downloads/Reverend_Insanity.epub"
+                    download="Reverend_Insanity.epub"
+                    className="inline-flex items-center gap-1.5 text-xs uppercase tracking-wider text-muted hover:text-ink border-b border-line hover:border-ink py-1.5 transition-colors whitespace-nowrap"
+                    title="Download complete 2,334 chapters EPUB (25 MB)"
+                  >
+                    <Download className="h-3.5 w-3.5" />
+                    <span>Download EPUB ↓</span>
+                  </a>
+
+                  {/* Read from Ch 1 if continuing */}
+                  {continueChapter && continueChapter > 1 && (
+                    <Link
+                      href="/read?c=1"
+                      className="text-xs uppercase tracking-wider text-muted hover:text-ink border-b border-line hover:border-ink py-1.5 transition-colors whitespace-nowrap"
                     >
-                      <span className="block text-xs font-semibold text-ink truncate">
-                        Book {vol.number}
-                      </span>
-                      <span className="block text-[10px] text-muted font-mono mt-1">
-                        {vol.chapterCount} chs
-                      </span>
-                    </button>
-                  );
-                })}
+                      Read Chapter 1
+                    </Link>
+                  )}
+                </div>
               </div>
-            </fieldset>
 
-            {/* Primary Action Row */}
-            <div className="actions flex flex-wrap items-center gap-4 sm:gap-6 pt-1">
-              <Link
-                id="start"
-                href={primaryHref}
-                className="primary group inline-flex min-w-[200px] items-center justify-between gap-4 rounded-lg bg-accent px-6 py-3.5 text-sm font-semibold text-on-accent shadow-lg transition-all hover:brightness-110 active:scale-[0.99]"
+              {/* Resume Note */}
+              <p id="resume-note" className="text-xs text-muted mt-4 sm:mt-5">
+                Your place is saved automatically on this device.
+              </p>
+
+              {/* Quick Volume Links — Clean 3-Col Grid on Phone */}
+              <nav
+                className="browse-editions mt-3 grid grid-cols-3 sm:flex sm:flex-wrap gap-2 sm:gap-x-4 sm:gap-y-2 text-xs"
+                aria-label="Resume reading by volume"
               >
-                <span>{primaryLabel}</span>
-                <span className="text-base transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5">
-                  ↗
-                </span>
-              </Link>
-
-              {/* Download EPUB Link */}
-              <a
-                id="download"
-                href="/downloads/Reverend_Insanity.epub"
-                download="Reverend_Insanity.epub"
-                className="inline-flex items-center gap-1.5 text-xs uppercase tracking-wider font-mono text-muted hover:text-accent border-b border-line hover:border-accent py-2 transition-colors whitespace-nowrap"
-                title="Download complete 2,334 chapters EPUB (25 MB)"
-              >
-                <Download className="h-3.5 w-3.5" />
-                <span>Download EPUB ↓</span>
-              </a>
-
-              {/* Read from Ch 1 if continuing */}
-              {continueChapter && continueChapter > 1 && (
-                <Link
-                  href="/read?c=1"
-                  className="text-xs uppercase tracking-wider font-mono text-muted hover:text-accent border-b border-line hover:border-accent py-2 transition-colors whitespace-nowrap"
-                >
-                  Read from Chapter 1
-                </Link>
-              )}
+                {VOLUMES.map((vol) => (
+                  <Link
+                    key={vol.id}
+                    href={`/read?c=${vol.startChapter}`}
+                    className="text-muted hover:text-ink border-b border-dashed border-line hover:border-ink pb-0.5 transition-colors truncate"
+                  >
+                    Book {vol.number} (Ch {vol.startChapter})
+                  </Link>
+                ))}
+              </nav>
             </div>
-
-            {/* Resume Note */}
-            <p id="resume-note" className="text-xs font-mono text-muted/80 mt-5">
-              Your place is saved automatically on this device.
-            </p>
-
-            {/* Quick Volume Links (browse-editions) */}
-            <nav
-              className="browse-editions mt-3 flex flex-wrap gap-x-4 gap-y-2 text-xs font-mono"
-              aria-label="Resume reading by volume"
-            >
-              {VOLUMES.map((vol) => (
-                <Link
-                  key={vol.id}
-                  href={`/read?c=${vol.startChapter}`}
-                  className="text-muted hover:text-accent border-b border-dashed border-line hover:border-accent pb-0.5 transition-colors"
-                >
-                  Book {vol.number} (Ch {vol.startChapter})
-                </Link>
-              ))}
-            </nav>
           </div>
         </div>
       </div>

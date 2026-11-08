@@ -52,16 +52,16 @@ export default async function HomePage() {
   };
 
   return (
-    <div className="relative flex min-h-screen flex-col bg-paper text-ink font-dmsans selection:bg-accent/20">
+    <div className="relative flex min-h-screen flex-col bg-paper text-ink font-times selection:bg-accent/20">
       <script
         type="application/ld+json"
         nonce={nonce}
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      {/* Atmospheric Fixed Wallpaper Background */}
+      {/* Atmospheric Fixed Wallpaper Background — Greyscale Monochrome */}
       <div
-        className="fixed inset-0 -z-20 pointer-events-none select-none bg-cover bg-center bg-no-repeat opacity-20 dark:opacity-15 filter contrast-110"
+        className="fixed inset-0 -z-20 pointer-events-none select-none bg-cover bg-center bg-no-repeat opacity-15 dark:opacity-12 filter grayscale contrast-110"
         style={{ backgroundImage: `url('/images/fang-yuan-creation.webp')` }}
         aria-hidden="true"
       />

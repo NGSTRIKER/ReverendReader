@@ -52,38 +52,38 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --paper: 14 15 18;
-    --surface: 22 24 29;
-    --sunken: 10 11 13;
-    --ink: 228 232 240;
-    --muted: 140 148 160;
-    --faint: 88 95 106;
-    --line: 34 38 46;
-    --line-strong: 50 56 68;
-    --accent: 77 138 255;
-    --accent-hover: 110 160 255;
-    --on-accent: 10 11 13;
-    --danger: 248 113 113;
-    --success: 74 222 128;
+    --paper: 10 10 10;
+    --surface: 20 20 20;
+    --sunken: 5 5 5;
+    --ink: 240 240 240;
+    --muted: 156 156 156;
+    --faint: 104 104 104;
+    --line: 42 42 42;
+    --line-strong: 68 68 68;
+    --accent: 224 224 224;
+    --accent-hover: 248 248 248;
+    --on-accent: 10 10 10;
+    --danger: 210 85 85;
+    --success: 170 170 170;
     --shadow: 0 0 0;
     color-scheme: dark;
   }
 }
 
 :root[data-theme="dark"] {
-  --paper: 14 15 18;
-  --surface: 22 24 29;
-  --sunken: 10 11 13;
-  --ink: 228 232 240;
-  --muted: 140 148 160;
-  --faint: 88 95 106;
-  --line: 34 38 46;
-  --line-strong: 50 56 68;
-  --accent: 77 138 255;
-  --accent-hover: 110 160 255;
-  --on-accent: 10 11 13;
-  --danger: 248 113 113;
-  --success: 74 222 128;
+  --paper: 10 10 10;
+  --surface: 20 20 20;
+  --sunken: 5 5 5;
+  --ink: 240 240 240;
+  --muted: 156 156 156;
+  --faint: 104 104 104;
+  --line: 42 42 42;
+  --line-strong: 68 68 68;
+  --accent: 224 224 224;
+  --accent-hover: 248 248 248;
+  --on-accent: 10 10 10;
+  --danger: 210 85 85;
+  --success: 170 170 170;
   --shadow: 0 0 0;
   color-scheme: dark;
 }
@@ -226,50 +226,22 @@
   font-weight: 500;
 }
 
-/* TWATF Reader Signature Aesthetics */
-.twatf-orbit {
-  position: absolute;
-  width: 112%;
-  height: 75%;
-  border: 1px solid rgb(var(--accent) / 0.28);
-  border-radius: 50%;
-  transform: rotate(-28deg);
-  left: -6%;
-  top: 12%;
-  z-index: -1;
-  pointer-events: none;
-}
-
-.twatf-art-glow {
-  position: relative;
-  isolation: isolate;
-}
-
-.twatf-art-glow::before {
-  content: "";
-  position: absolute;
-  inset: -60px;
-  background: radial-gradient(ellipse, rgb(var(--accent) / 0.18), transparent 65%);
-  z-index: -2;
-  pointer-events: none;
-}
-
+/* TWATF Reader Signature Aesthetics — Strictly Zero Glow */
 .twatf-book-cover {
-  box-shadow: 15px 25px 60px rgb(0 0 0 / 0.65);
   transform: rotate(-3.5deg);
-  border: 1px solid rgb(var(--accent) / 0.35);
+  border: 1px solid rgb(var(--line-strong));
   border-radius: 4px;
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
 }
 
 .twatf-book-cover:hover {
   transform: rotate(0deg) scale(1.02);
-  box-shadow: 18px 30px 70px rgb(0 0 0 / 0.75);
+  border-color: rgb(var(--accent));
 }
 
 .twatf-circle-btn {
-  width: 38px;
-  height: 38px;
+  width: 34px;
+  height: 34px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -279,10 +251,17 @@
   transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
 }
 
+@media (min-width: 640px) {
+  .twatf-circle-btn {
+    width: 38px;
+    height: 38px;
+  }
+}
+
 .twatf-circle-btn:hover {
-  color: rgb(var(--accent));
-  border-color: rgb(var(--accent));
-  background-color: rgb(var(--accent) / 0.08);
+  color: rgb(var(--ink));
+  border-color: rgb(var(--line-strong));
+  background-color: rgb(var(--sunken));
 }
 
 @media (prefers-reduced-motion: reduce) {

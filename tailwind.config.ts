@@ -25,6 +25,7 @@ const config: Config = {
         success: token("success"),
       },
       fontFamily: {
+        times: ['"Times New Roman"', "Times", "Georgia", "serif"],
         playfair: ["'Playfair Display'", "Georgia", "serif"],
         dmsans: ["'DM Sans'", "system-ui", "-apple-system", "sans-serif"],
         serif: ["var(--font-serif)", "EB Garamond", "Garamond", "Georgia", "serif"],
