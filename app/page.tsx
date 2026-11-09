@@ -14,6 +14,8 @@ export const metadata: Metadata = {
 export default async function HomePage() {
   const nonce = (await headers()).get("x-nonce") ?? undefined;
   const cookieStore = await cookies();
+  const rawCookieEdition = cookieStore.get("reverend_reader_edition")?.value;
+  const initialEdition: "en" | "zh" = rawCookieEdition === "zh" ? "zh" : "en";
   const lastReadRaw = cookieStore.get("reverend_last_read")?.value;
   const parsedLast = lastReadRaw ? parseInt(lastReadRaw, 10) : NaN;
   const continueChapter =
@@ -69,7 +71,7 @@ export default async function HomePage() {
       <Navigation />
 
       <main className="flex-1">
-        <HeroSection continueChapter={continueChapter} />
+        <HeroSection continueChapter={continueChapter} initialEdition={initialEdition} />
         <SynopsisSection />
       </main>
 

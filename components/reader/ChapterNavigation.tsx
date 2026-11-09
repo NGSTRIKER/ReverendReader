@@ -2,14 +2,13 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { ChapterMetadata, ReaderSettings, NovelEdition } from "@/types/novel";
+import { ChapterMetadata, ReaderSettings } from "@/types/novel";
 import {
   ChevronLeft,
   ChevronRight,
   List,
   SlidersHorizontal,
   Bookmark,
-  Languages,
   MoreVertical,
   Palette,
 } from "lucide-react";
@@ -28,8 +27,6 @@ interface ChapterNavigationProps {
   isBookmarked: boolean;
   onToggleBookmark: () => void;
   settings?: ReaderSettings;
-  edition?: NovelEdition;
-  onToggleEdition?: (newEdition?: NovelEdition) => void;
 }
 
 export function ChapterNavigation({
@@ -43,8 +40,6 @@ export function ChapterNavigation({
   onOpenSettings,
   isBookmarked,
   onToggleBookmark,
-  edition = "en",
-  onToggleEdition,
 }: ChapterNavigationProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
@@ -200,21 +195,6 @@ export function ChapterNavigation({
             />
           </button>
 
-          {/* Language Edition Toggle (Desktop inline) */}
-          {onToggleEdition && (
-            <button
-              type="button"
-              onClick={() => onToggleEdition()}
-              title={edition === "zh" ? "Switch to English Translation" : "Switch to Chinese Raw (中文原版)"}
-              aria-label="Toggle language edition"
-              className="hidden sm:inline-flex items-center gap-1 rounded-xl border border-line bg-surface px-2 sm:px-2.5 py-1 sm:py-1.5 text-[11px] font-bold hover:border-line-strong hover:bg-sunken transition-colors"
-            >
-              <span className={edition === "en" ? "text-ink font-bold" : "text-muted font-normal"}>EN</span>
-              <span className="text-line-strong text-[10px]">/</span>
-              <span className={edition === "zh" ? "text-ink font-bold" : "text-muted font-normal"}>中文</span>
-            </button>
-          )}
-
           {/* Theme Toggle (Desktop inline) */}
           <ThemeToggle className="hidden sm:inline-flex rounded-xl" />
 
@@ -246,25 +226,6 @@ export function ChapterNavigation({
                 aria-label="Reader mobile options"
                 className="absolute right-0 top-full mt-2 w-52 rounded-2xl border border-line bg-surface p-1.5 shadow-pop z-50 font-mono text-xs animate-in fade-in zoom-in-95 duration-150"
               >
-                {onToggleEdition && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      onToggleEdition();
-                      setMobileMenuOpen(false);
-                    }}
-                    className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-ink hover:bg-sunken transition-colors text-left"
-                  >
-                    <span className="flex items-center gap-2">
-                      <Languages className="h-3.5 w-3.5 text-accent" />
-                      <span>Language</span>
-                    </span>
-                    <span className="chinese-seal text-[10px]">
-                      {edition === "zh" ? "中文原版" : "English"}
-                    </span>
-                  </button>
-                )}
-
                 <button
                   type="button"
                   onClick={() => {

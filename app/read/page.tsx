@@ -76,7 +76,13 @@ export default async function ReadPage({ searchParams }: ReadPageProps) {
   const rawLangParam = resolvedParams.lang || resolvedParams.edition;
   const cookieEdition = cookieStore.get("reverend_reader_edition")?.value;
   const initialEdition: "en" | "zh" =
-    rawLangParam === "zh" || rawLangParam === "raw" || (!rawLangParam && cookieEdition === "zh") ? "zh" : "en";
+    rawLangParam === "zh" || rawLangParam === "raw"
+      ? "zh"
+      : rawLangParam === "en"
+      ? "en"
+      : cookieEdition === "zh"
+      ? "zh"
+      : "en";
   const manifest = getServerManifest(initialEdition);
 
   const rawChapterParam = resolvedParams.c || resolvedParams.id;

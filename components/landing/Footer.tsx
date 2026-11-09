@@ -64,6 +64,23 @@ export function Footer() {
             </Link>
           </nav>
         </div>
+
+        {/* Attribution / Inspiration */}
+        <div className="mt-3 sm:mt-4 pt-3 border-t border-line/60 flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-muted">
+          <span>
+            UI inspiration is taken from{" "}
+            <a
+              href="https://twatf.pages.dev/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-ink hover:text-accent underline underline-offset-2 transition-colors font-medium inline-flex items-center gap-0.5"
+            >
+              <span>https://twatf.pages.dev/</span>
+              <ArrowUpRight className="h-2.5 w-2.5" />
+            </a>
+          </span>
+          <span className="text-faint">Fan-made reader for Reverend Insanity.</span>
+        </div>
       </div>
     </footer>
   );

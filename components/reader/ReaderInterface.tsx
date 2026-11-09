@@ -122,11 +122,19 @@ export function ReaderInterface({
   const initialId = initialChapter?.id ?? initialChapterId ?? 1;
 
   // Language & Edition State (English translation vs Chinese raw)
-  const [edition, setEdition] = useState<NovelEdition>(initialEdition);
+  const [edition] = useState<NovelEdition>(initialEdition);
   const manifestsRef = useRef<Record<NovelEdition, ChapterMetadata[] | null>>({
     en: manifest && manifest.edition !== "zh" ? manifest.chapters : null,
     zh: manifest && manifest.edition === "zh" ? manifest.chapters : null,
   });
+
+  // Ensure the chosen edition is persisted to localStorage and cookie
+  useEffect(() => {
+    try {
+      localStorage.setItem("reverend_reader_edition", edition);
+      setCookie("reverend_reader_edition", edition);
+    } catch {}
+  }, [edition]);
 
   // Current Chapter State
   const [currentChapterId, setCurrentChapterId] = useState<number>(initialId);
@@ -888,51 +896,6 @@ export function ReaderInterface({
     [totalChaptersCount, edition]
   );
 
-  // Switch between English translation and Chinese raw
-  const handleToggleEdition = useCallback(
-    async (newEdition?: NovelEdition) => {
-      const targetEdition = newEdition || (edition === "en" ? "zh" : "en");
-      if (targetEdition === edition) return;
-      setEdition(targetEdition);
-      try {
-        localStorage.setItem("reverend_reader_edition", targetEdition);
-        setCookie("reverend_reader_edition", targetEdition);
-      } catch {}
-
-      const url = new URL(window.location.href);
-      url.searchParams.set("c", String(currentChapterId));
-      url.searchParams.set("edition", targetEdition);
-      window.history.replaceState({}, "", url.toString());
-
-      if (manifestsRef.current[targetEdition] && manifestsRef.current[targetEdition]!.length > 0) {
-        setChapters(manifestsRef.current[targetEdition]!);
-      } else {
-        const manifestUrl = targetEdition === "zh" ? "/chapters-zh.json" : "/chapters.json";
-        fetch(manifestUrl)
-          .then((res) => res.json())
-          .then((data: ManifestData) => {
-            if (data?.chapters) {
-              manifestsRef.current[targetEdition] = data.chapters;
-              setChapters(data.chapters);
-            }
-          })
-          .catch(() => {});
-      }
-
-      setLoading(true);
-      setError(null);
-      try {
-        const text = await fetchChapterContent({ id: currentChapterId }, targetEdition);
-        setContent(text);
-      } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : "Failed to load chapter content.");
-      } finally {
-        setLoading(false);
-      }
-    },
-    [edition, currentChapterId]
-  );
-
   const isInitialMount = useRef(true);
 
   useEffect(() => {
@@ -1208,8 +1171,6 @@ export function ReaderInterface({
           isBookmarked={isCurrentBookmarked}
           onToggleBookmark={handleToggleBookmark}
           settings={settings}
-          edition={edition}
-          onToggleEdition={handleToggleEdition}
         />
 
         {/* Reading Canvas (reserves right padding only when sidebar is visible so text is never covered) */}
@@ -1276,8 +1237,6 @@ export function ReaderInterface({
         bookmarks={bookmarks}
         onRemoveBookmark={handleRemoveBookmark}
         initialTab={tocInitialTab}
-        edition={edition}
-        onToggleEdition={handleToggleEdition}
       />
 
       {/* Settings Modal (Lazy Loaded) */}

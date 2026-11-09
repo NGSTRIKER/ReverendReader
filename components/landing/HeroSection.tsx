@@ -1,12 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Download, Layers } from "lucide-react";
 import { SpinningOrbsSphere } from "@/components/landing/SpinningOrbsSphere";
+import { setCookie } from "@/lib/storage";
 
 interface HeroSectionProps {
   continueChapter?: number | null;
+  initialEdition?: "en" | "zh";
 }
 
 interface VolumeOption {
@@ -83,12 +85,32 @@ const VOLUMES: VolumeOption[] = [
   },
 ];
 
-export function HeroSection({ continueChapter = null }: HeroSectionProps) {
-  const [languageEdition, setLanguageEdition] = useState<"en" | "zh">("en");
+export function HeroSection({
+  continueChapter = null,
+  initialEdition = "en",
+}: HeroSectionProps) {
+  const [languageEdition, setLanguageEdition] = useState<"en" | "zh">(initialEdition);
   const [selectedEdition, setSelectedEdition] = useState<"complete" | string>("complete");
   const [isArtHovered, setIsArtHovered] = useState(false);
   const [isCardHovered, setIsCardHovered] = useState(false);
   const [pointerTilt, setPointerTilt] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("reverend_reader_edition");
+      if (stored === "en" || stored === "zh") {
+        setLanguageEdition(stored);
+      }
+    } catch {}
+  }, []);
+
+  const handleLanguageEditionChange = (ed: "en" | "zh") => {
+    setLanguageEdition(ed);
+    try {
+      localStorage.setItem("reverend_reader_edition", ed);
+      setCookie("reverend_reader_edition", ed);
+    } catch {}
+  };
 
   const isZh = languageEdition === "zh";
 
@@ -97,21 +119,21 @@ export function HeroSection({ continueChapter = null }: HeroSectionProps) {
       ? null
       : VOLUMES.find((v) => v.id === selectedEdition) || null;
 
-  let primaryHref = isZh ? "/read?edition=zh" : "/read";
+  let primaryHref = `/read?c=1&edition=${languageEdition}`;
   let primaryLabel = isZh ? "章节目录" : "Chapters";
 
   if (activeVolume) {
-    primaryHref = `/read?c=${activeVolume.startChapter}${isZh ? "&edition=zh" : ""}`;
+    primaryHref = `/read?c=${activeVolume.startChapter}&edition=${languageEdition}`;
     primaryLabel = isZh
       ? `阅读${activeVolume.numberZh} (${activeVolume.titleZh})`
       : `Read Book ${activeVolume.number}`;
   } else if (continueChapter && continueChapter >= 1) {
-    primaryHref = `/read?c=${continueChapter}${isZh ? "&edition=zh" : ""}`;
+    primaryHref = `/read?c=${continueChapter}&edition=${languageEdition}`;
     primaryLabel = isZh
       ? `继续阅读第 ${continueChapter} 节`
       : `Continue Chapter ${continueChapter}`;
   } else {
-    primaryHref = `/read?c=1${isZh ? "&edition=zh" : ""}`;
+    primaryHref = `/read?c=1&edition=${languageEdition}`;
     primaryLabel = isZh ? "开始阅读第一节 (中文原版)" : "Begin Chapter 1";
   }
 
@@ -210,7 +232,7 @@ export function HeroSection({ continueChapter = null }: HeroSectionProps) {
               <div className="flex items-center gap-1.5 p-1 rounded-lg border border-line bg-paper w-fit mb-5">
                 <button
                   type="button"
-                  onClick={() => setLanguageEdition("en")}
+                  onClick={() => handleLanguageEditionChange("en")}
                   className={`px-3 py-1 rounded text-xs font-semibold transition-colors ${
                     !isZh
                       ? "bg-surface text-ink border border-line shadow-sm"
@@ -221,7 +243,7 @@ export function HeroSection({ continueChapter = null }: HeroSectionProps) {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setLanguageEdition("zh")}
+                  onClick={() => handleLanguageEditionChange("zh")}
                   className={`px-3 py-1 rounded text-xs font-semibold transition-colors flex items-center gap-1.5 ${
                     isZh
                       ? "bg-surface text-ink border border-line shadow-sm"
@@ -318,7 +340,7 @@ export function HeroSection({ continueChapter = null }: HeroSectionProps) {
                   {/* Read from Ch 1 if continuing */}
                   {continueChapter && continueChapter > 1 && (
                     <Link
-                      href={isZh ? "/read?c=1&edition=zh" : "/read?c=1"}
+                      href={`/read?c=1&edition=${languageEdition}`}
                       className="text-xs uppercase tracking-wider text-muted hover:text-ink border-b border-line hover:border-ink py-1.5 transition-colors whitespace-nowrap"
                     >
                       {isZh ? "从第一节重读" : "Read Chapter 1"}
@@ -340,7 +362,7 @@ export function HeroSection({ continueChapter = null }: HeroSectionProps) {
                 {VOLUMES.map((vol) => (
                   <Link
                     key={vol.id}
-                    href={`/read?c=${vol.startChapter}${isZh ? "&edition=zh" : ""}`}
+                    href={`/read?c=${vol.startChapter}&edition=${languageEdition}`}
                     className="text-muted hover:text-ink border-b border-dashed border-line hover:border-ink pb-0.5 transition-colors truncate"
                   >
                     {isZh ? `${vol.numberZh} (${vol.startChapter}节)` : `Book ${vol.number} (Ch ${vol.startChapter})`}
