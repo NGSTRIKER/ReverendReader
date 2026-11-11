@@ -12,6 +12,7 @@ import { ManifestData, ReaderSettings, Bookmark, ChapterMetadata, NovelEdition }
 import { ChapterNavigation } from "./ChapterNavigation";
 import { ChapterContent } from "./ChapterContent";
 import { InteractionSidebar } from "./InteractionSidebar";
+import { useFluidScroll } from "./useFluidScroll";
 import { fetchChapterContent, preloadChapter } from "@/lib/chapterFetcher";
 import {
   loadThemeSettings,
@@ -176,6 +177,9 @@ export function ReaderInterface({
     }
     return initialSettings;
   });
+
+  // Desktop fluid momentum scrolling hook
+  useFluidScroll(settings.scrollFluidity ?? 0);
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
   const [customBgUrl, setCustomBgUrl] = useState<string | null>(null);
   const prevCustomBgRef = useRef<string | null>(null);

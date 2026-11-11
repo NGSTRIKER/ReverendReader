@@ -54,6 +54,7 @@ export interface ReaderSettings {
   fontColor?: string; // custom hex color string, e.g. "#e4e8f0"
   letterSpacing?: number; // letter spacing in pixels (e.g. 0, 0.5, 1.0)
   textAlign?: "left" | "justify";
+  scrollFluidity?: number; // 0 = off (native), 1-100 = momentum fluidity level
 }
 
 export interface Bookmark {

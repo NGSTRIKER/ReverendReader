@@ -10,6 +10,7 @@ export const DEFAULT_SETTINGS: ReaderSettings = {
   fontColor: "#e4e8f0",
   letterSpacing: 0.2,
   textAlign: "left",
+  scrollFluidity: 0,
 };
 
 const VALID_FONTS: ReaderFont[] = ["serif", "sans", "mono", "literary"];
@@ -63,6 +64,7 @@ function sanitizeSettings(raw: Record<string, unknown>): ReaderSettings {
     fontColor,
     letterSpacing: clamp(raw.letterSpacing ?? DEFAULT_SETTINGS.letterSpacing, 0.2, -0.5, 2.5),
     textAlign,
+    scrollFluidity: clamp(raw.scrollFluidity ?? DEFAULT_SETTINGS.scrollFluidity ?? 0, 0, 0, 100),
   };
 }
 
@@ -151,6 +153,9 @@ export function saveThemeSettings(settings: ReaderSettings): void {
   if (clean.textAlign) {
     setCookie("reverend_text_align", clean.textAlign);
   }
+  if (typeof clean.scrollFluidity === "number") {
+    setCookie("reverend_scroll_fluidity", String(clean.scrollFluidity));
+  }
 
   try {
     if (typeof localStorage !== "undefined") {
@@ -170,6 +175,9 @@ export function saveThemeSettings(settings: ReaderSettings): void {
       }
       if (clean.textAlign) {
         localStorage.setItem("reverend_text_align", clean.textAlign);
+      }
+      if (typeof clean.scrollFluidity === "number") {
+        localStorage.setItem("reverend_scroll_fluidity", String(clean.scrollFluidity));
       }
     }
   } catch {
@@ -200,6 +208,7 @@ export function loadThemeSettings(): ReaderSettings {
     const fontColorCookie = getCookie("reverend_font_color");
     const letterSpacingCookie = getCookie("reverend_letter_spacing");
     const textAlignCookie = getCookie("reverend_text_align");
+    const scrollFluidityCookie = getCookie("reverend_scroll_fluidity");
 
     if (fontCookie) {
       currentSettings.font = fontCookie as ReaderSettings["font"];
@@ -235,6 +244,10 @@ export function loadThemeSettings(): ReaderSettings {
     }
     if (textAlignCookie === "left" || textAlignCookie === "justify") {
       currentSettings.textAlign = textAlignCookie;
+      hasLoaded = true;
+    }
+    if (scrollFluidityCookie && !isNaN(parseInt(scrollFluidityCookie, 10))) {
+      currentSettings.scrollFluidity = parseInt(scrollFluidityCookie, 10);
       hasLoaded = true;
     }
 

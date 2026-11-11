@@ -94,7 +94,9 @@ All user interface elements are organized into modular, reusable React component
 | **`ChapterNavigation.tsx`** | The top header bar during reading. Features an auto-hiding navigation bar optimized for narrow mobile portrait screens and desktops, chapter prev/next buttons, table-of-contents quick-jump, reader settings trigger, and user account status. |
 | **`ChapterContent.tsx`** | Renders the actual novel text. Displays the chapter heading, paragraphs with customizable font sizing, line height, margins, and bottom navigation controls. |
 | **`ChapterSelectorModal.tsx`** | The popup Table of Contents (Index). Allows instant searching across all 2,334 chapters, volume-based filtering, quick jumping, and bookmark viewing. |
-| **`SettingsModal.tsx`** | The customization modal dialog. Allows readers to adjust font sizes, margins, line spacing, reading themes (light, dark, sepia, midnight, terminal), and typography. |
+| **`SettingsModal.tsx`** | The customization modal dialog. Allows readers to adjust font sizes, margins, line spacing, reading themes (light, dark, sepia, midnight, terminal), typography, and desktop scroll fluidity. |
+| **`ScrollFluiditySelector.tsx`** | A dedicated control panel in settings for desktop users to adjust mouse wheel scroll momentum, choose inertia presets (Off, Gentle, Smooth, Fluid, Ultra), fine-tune damping, and test scrolling in an interactive sandbox. |
+| **`useFluidScroll.ts`** | A high-performance physics-based custom React hook using `requestAnimationFrame` that gives desktop mouse wheel scrolling smooth inertial momentum based on scrolling speed. |
 | **`FontSelector.tsx`** | A dedicated font switcher widget embedded in the settings modal. Previews and applies book-friendly fonts like Bookerly, Literata, Libre Baskerville, Roboto, and OpenDyslexic. |
 | **`CommentsDrawer.tsx`** | An interactive drawer that lets readers view, post, and reply to community comments and paragraph thoughts. |
 | **`InteractionSidebar.tsx`** | A subtle side widget on the right edge of the screen for quick one-click access to comments, bookmarks, and reader tools while scrolling. |

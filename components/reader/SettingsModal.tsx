@@ -4,7 +4,8 @@ import React, { useState, useEffect } from "react";
 import { ReaderSettings } from "@/types/novel";
 import { FontSelector } from "./FontSelector";
 import { BackgroundManager } from "./BackgroundManager";
-import { X, Type, Image as ImageIcon } from "lucide-react";
+import { ScrollFluiditySelector } from "./ScrollFluiditySelector";
+import { X, Type, Image as ImageIcon, Wind } from "lucide-react";
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -23,7 +24,7 @@ export function SettingsModal({
   customBgUrl,
   onSetCustomBg,
 }: SettingsModalProps) {
-  const [activeTab, setActiveTab] = useState<"typography" | "background">("typography");
+  const [activeTab, setActiveTab] = useState<"typography" | "background" | "scroll">("typography");
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -106,19 +107,35 @@ export function SettingsModal({
             <span className="hidden sm:inline">[02: THEMES & BG / 壁纸]</span>
             <span className="sm:hidden">Themes & BG</span>
           </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab("scroll")}
+            className={`flex items-center gap-1.5 rounded-t-xl px-3 sm:px-4 py-2 text-xs font-semibold transition-all border-t border-x whitespace-nowrap flex-shrink-0 ${
+              activeTab === "scroll"
+                ? "border-line bg-surface text-accent shadow-sm"
+                : "border-transparent text-muted hover:text-ink"
+            }`}
+          >
+            <Wind className="h-3.5 w-3.5 flex-shrink-0" />
+            <span className="hidden sm:inline">[03: FLUID SCROLL / 滚动惯性]</span>
+            <span className="sm:hidden">Scroll</span>
+          </button>
         </div>
 
         {/* Content */}
         <div className="p-3.5 sm:p-5 flex-1 overflow-y-auto">
           {activeTab === "typography" ? (
             <FontSelector settings={settings} onChangeSettings={onChangeSettings} />
-          ) : (
+          ) : activeTab === "background" ? (
             <BackgroundManager
               customBgUrl={customBgUrl}
               onSetCustomBg={onSetCustomBg}
               settings={settings}
               onChangeSettings={onChangeSettings}
             />
+          ) : (
+            <ScrollFluiditySelector settings={settings} onChangeSettings={onChangeSettings} />
           )}
         </div>
 
