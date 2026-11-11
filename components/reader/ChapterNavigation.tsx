@@ -129,77 +129,53 @@ export function ChapterNavigation({
       }`}
     >
       <div className="mx-auto flex h-12 sm:h-14 max-w-[1240px] items-center justify-between gap-1 sm:gap-2 px-1.5 sm:px-6">
-        {/* Left: Brand return & Contents */}
-        <div className="flex items-center gap-1 sm:gap-2.5 min-w-0">
+        {/* Left: Brand return */}
+        <div className="flex items-center min-w-0">
           <Link
             href="/"
-            title="Return to Index"
-            aria-label="Return to Index"
-            className="inline-flex h-9 items-center gap-1.5 sm:gap-2 rounded-xl px-2 sm:px-2.5 text-xs font-bold text-ink hover:bg-sunken transition-colors flex-shrink-0"
+            title="Return to Home"
+            aria-label="Reverend Insanity - Return to Home"
+            className="inline-flex h-9 items-center gap-1.5 sm:gap-2 rounded-xl px-1.5 sm:px-2.5 text-xs font-bold text-ink hover:bg-sunken transition-colors flex-shrink-0"
           >
-            <span className="hidden min-[360px]:block h-2 w-2 rounded-full bg-accent" aria-hidden="true" />
-            <span className="hidden sm:inline">Reverend Insanity</span>
-            <span className="chinese-seal text-[10px]">蛊</span>
+            <span className="h-2 w-2 rounded-full bg-accent flex-shrink-0" aria-hidden="true" />
+            <span className="truncate">Reverend Insanity</span>
+            <span className="chinese-seal text-[10px] flex-shrink-0">蛊</span>
           </Link>
+        </div>
 
-          <span className="hidden sm:block h-4 w-px bg-line flex-shrink-0" aria-hidden="true" />
-
+        {/* Right: Controls (Icons / logos only) */}
+        <div className="flex items-center gap-0.5 sm:gap-1.5 flex-shrink-0">
+          {/* Table of contents / Index */}
           <button
             type="button"
             onClick={onOpenToc}
-            title="Table of contents and bookmarks"
-            className="hidden sm:inline-flex items-center gap-1.5 rounded-xl border border-line bg-surface px-2.5 py-1.5 text-xs text-ink hover:border-accent hover:bg-sunken transition-colors shadow-sm flex-shrink-0"
+            title={`Table of contents (Chapter ${currentChapter.number}/${totalChapters})`}
+            aria-label="Table of contents"
+            className="icon-btn rounded-xl h-9 w-9"
           >
-            <List className="h-3.5 w-3.5 text-accent flex-shrink-0" strokeWidth={1.75} />
-            <span className="font-semibold">&gt;_ Index</span>
-            <span className="hidden md:inline text-muted tabular-nums">
-              · {currentChapter.number}/{totalChapters}
-            </span>
+            <List className="h-4 w-4 text-accent flex-shrink-0" strokeWidth={1.75} />
           </button>
-        </div>
 
-        {/* Center: Running header */}
-        <div className="hidden sm:flex items-center gap-2 min-w-0 max-w-md md:max-w-lg truncate text-center px-2">
-          <span className="text-[11px] text-muted tabular-nums flex-shrink-0">
-            [CH.{currentChapter.number.toString().padStart(4, "0")}]
-          </span>
-          <span className="truncate text-xs font-medium text-ink">
-            {currentChapter.title}
-          </span>
-        </div>
-
-        {/* Right: Controls */}
-        <div className="flex items-center gap-0.5 sm:gap-1.5 flex-shrink-0">
+          {/* Previous chapter */}
           <button
             type="button"
             onClick={onPrev}
             disabled={!hasPrev}
             aria-label="Previous chapter"
             title="Previous chapter (Left Arrow)"
-            className="icon-btn rounded-xl max-sm:h-9 max-sm:w-9"
+            className="icon-btn rounded-xl h-9 w-9"
           >
             <ChevronLeft className="h-4 w-4" strokeWidth={1.75} />
           </button>
 
-          {/* Mobile: chapter number doubles as the Index button */}
-          <button
-            type="button"
-            onClick={onOpenToc}
-            title="Current chapter - Click to open chapter index"
-            aria-label={`Chapter ${currentChapter.number}. Click to open index`}
-            className="sm:hidden inline-flex h-9 items-center gap-1 rounded-xl border border-line bg-surface px-2 text-xs font-semibold text-ink tabular-nums active:bg-sunken"
-          >
-            <List className="h-3.5 w-3.5 text-accent flex-shrink-0" strokeWidth={1.75} />
-            {currentChapter.number}
-          </button>
-
+          {/* Next chapter */}
           <button
             type="button"
             onClick={onNext}
             disabled={!hasNext}
             aria-label="Next chapter"
             title="Next chapter (Right Arrow)"
-            className="icon-btn rounded-xl max-sm:h-9 max-sm:w-9"
+            className="icon-btn rounded-xl h-9 w-9"
           >
             <ChevronRight className="h-4 w-4" strokeWidth={1.75} />
           </button>
@@ -211,19 +187,19 @@ export function ChapterNavigation({
             aria-label="Customize reader dimensions and typography"
             title="Customize reader (Typography, font size, theme, dimensions)"
             data-testid="reader-customization-btn"
-            className="icon-btn rounded-xl max-sm:h-9 max-sm:w-9 text-accent bg-accent/10 border border-accent/25 hover:border-accent hover:bg-accent/20 transition-colors"
+            className="icon-btn rounded-xl h-9 w-9 text-accent bg-accent/10 border border-accent/25 hover:border-accent hover:bg-accent/20 transition-colors"
           >
             <SlidersHorizontal className="h-4 w-4" strokeWidth={1.75} />
           </button>
 
-          {/* Bookmark Button (Desktop and wide mobile screens) */}
+          {/* Bookmark Button (Desktop) */}
           <button
             type="button"
             onClick={onToggleBookmark}
             title={isBookmarked ? "Remove bookmark" : "Bookmark this chapter"}
             aria-label={isBookmarked ? "Remove bookmark" : "Bookmark this chapter"}
             aria-pressed={isBookmarked}
-            className={`hidden sm:inline-flex icon-btn rounded-xl ${
+            className={`hidden sm:inline-flex icon-btn rounded-xl h-9 w-9 ${
               isBookmarked ? "text-accent bg-accent/15 border border-accent/30" : ""
             }`}
           >
@@ -234,7 +210,7 @@ export function ChapterNavigation({
           </button>
 
           {/* Theme Toggle (Desktop inline) */}
-          <ThemeToggle className="hidden sm:inline-flex rounded-xl" />
+          <ThemeToggle className="hidden sm:inline-flex rounded-xl h-9 w-9" />
 
           <span className="hidden sm:inline-block mx-0.5 h-4 w-px bg-line" aria-hidden="true" />
 

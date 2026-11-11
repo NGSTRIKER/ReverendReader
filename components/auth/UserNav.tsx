@@ -286,13 +286,16 @@ export function UserNav({ compact = false }: UserNavProps) {
     return (
       <Link
         href={loginUrl}
-        className={`btn-quiet ${
-          compact ? "px-2.5 py-1 text-xs" : "px-3 py-1.5 text-xs"
-        }`}
-        title="Sign in with Discord"
+        className={
+          compact
+            ? "icon-btn rounded-xl h-9 w-9 text-ink"
+            : "btn-quiet px-3 py-1.5 text-xs"
+        }
+        title="Sign in"
+        aria-label="Sign in"
       >
-        <LogIn className="h-3.5 w-3.5 text-accent" />
-        <span className={compact ? "hidden sm:inline" : ""}>Sign in</span>
+        <LogIn className="h-4 w-4 text-accent" />
+        <span className={compact ? "sr-only" : ""}>Sign in</span>
       </Link>
     );
   }
