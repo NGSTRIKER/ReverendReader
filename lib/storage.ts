@@ -13,7 +13,19 @@ export const DEFAULT_SETTINGS: ReaderSettings = {
   scrollFluidity: 0,
 };
 
-const VALID_FONTS: ReaderFont[] = ["serif", "sans", "mono", "literary"];
+const VALID_FONTS: ReaderFont[] = ["serif", "sans", "mono", "literary", "bellota"];
+
+const FONT_CLASS_MAP: Record<ReaderFont, string> = {
+  mono: "font-mono",
+  sans: "font-sans",
+  literary: "font-literary",
+  bellota: "font-bellota",
+  serif: "font-serif",
+};
+
+export function getReaderFontClass(font: ReaderFont | undefined): string {
+  return (font && FONT_CLASS_MAP[font]) || "font-serif";
+}
 const VALID_THEMES: ReaderSurfaceTheme[] = [
   "matte-terminal",
   "terminal-grey",
@@ -32,7 +44,7 @@ const VALID_THEMES: ReaderSurfaceTheme[] = [
   "transparent",
 ];
 
-function sanitizeSettings(raw: Record<string, unknown>): ReaderSettings {
+export function sanitizeSettings(raw: Record<string, unknown>): ReaderSettings {
   const clamp = (val: unknown, fallback: number, min: number, max: number) => {
     const n = typeof val === "number" ? val : Number(val);
     return Number.isFinite(n) ? Math.min(max, Math.max(min, n)) : fallback;
@@ -186,73 +198,86 @@ export function saveThemeSettings(settings: ReaderSettings): void {
 }
 
 /**
+ * Resolves and sanitizes ReaderSettings from a cookie getter (shared by SSR and client).
+ */
+export function resolveSettingsFromCookies(
+  readCookie: (name: string) => string | null | undefined
+): { settings: ReaderSettings; hasLoaded: boolean } {
+  let currentSettings: ReaderSettings = { ...DEFAULT_SETTINGS };
+  let hasLoaded = false;
+
+  const fromCookie = readCookie("reverend_theme_settings");
+  if (fromCookie) {
+    currentSettings = parseSettingsFromRaw(fromCookie);
+    hasLoaded = true;
+  }
+
+  const fontCookie = readCookie("reverend_font");
+  const fontSizeCookie = readCookie("reverend_font_size");
+  const lineHeightCookie = readCookie("reverend_line_height");
+  const opacityCookie = readCookie("reverend_surface_opacity");
+  const surfaceThemeCookie = readCookie("reverend_surface_theme");
+  const maxWidthCookie = readCookie("reverend_max_width");
+  const fontColorCookie = readCookie("reverend_font_color");
+  const letterSpacingCookie = readCookie("reverend_letter_spacing");
+  const textAlignCookie = readCookie("reverend_text_align");
+  const scrollFluidityCookie = readCookie("reverend_scroll_fluidity");
+
+  if (fontCookie) {
+    currentSettings.font = fontCookie as ReaderSettings["font"];
+    hasLoaded = true;
+  }
+  if (fontSizeCookie && !isNaN(parseInt(fontSizeCookie, 10))) {
+    currentSettings.fontSize = parseInt(fontSizeCookie, 10);
+    hasLoaded = true;
+  }
+  if (lineHeightCookie && !isNaN(parseFloat(lineHeightCookie))) {
+    currentSettings.lineHeight = parseFloat(lineHeightCookie);
+    hasLoaded = true;
+  }
+  if (opacityCookie && !isNaN(parseFloat(opacityCookie))) {
+    currentSettings.surfaceOpacity = parseFloat(opacityCookie);
+    hasLoaded = true;
+  }
+  if (surfaceThemeCookie) {
+    currentSettings.surfaceTheme = surfaceThemeCookie as ReaderSettings["surfaceTheme"];
+    hasLoaded = true;
+  }
+  if (maxWidthCookie && !isNaN(parseInt(maxWidthCookie, 10))) {
+    currentSettings.maxWidth = parseInt(maxWidthCookie, 10);
+    hasLoaded = true;
+  }
+  if (fontColorCookie) {
+    currentSettings.fontColor = fontColorCookie;
+    hasLoaded = true;
+  }
+  if (letterSpacingCookie && !isNaN(parseFloat(letterSpacingCookie))) {
+    currentSettings.letterSpacing = parseFloat(letterSpacingCookie);
+    hasLoaded = true;
+  }
+  if (textAlignCookie === "left" || textAlignCookie === "justify") {
+    currentSettings.textAlign = textAlignCookie;
+    hasLoaded = true;
+  }
+  if (scrollFluidityCookie && !isNaN(parseInt(scrollFluidityCookie, 10))) {
+    currentSettings.scrollFluidity = parseInt(scrollFluidityCookie, 10);
+    hasLoaded = true;
+  }
+
+  return {
+    settings: sanitizeSettings(currentSettings as unknown as Record<string, unknown>),
+    hasLoaded,
+  };
+}
+
+/**
  * Load typography settings from cookies with localStorage fallback.
  */
 export function loadThemeSettings(): ReaderSettings {
   try {
-    let currentSettings: ReaderSettings = { ...DEFAULT_SETTINGS };
-    let hasLoaded = false;
-
-    const fromCookie = getCookie("reverend_theme_settings");
-    if (fromCookie) {
-      currentSettings = parseSettingsFromRaw(fromCookie);
-      hasLoaded = true;
-    }
-
-    const fontCookie = getCookie("reverend_font");
-    const fontSizeCookie = getCookie("reverend_font_size");
-    const lineHeightCookie = getCookie("reverend_line_height");
-    const opacityCookie = getCookie("reverend_surface_opacity");
-    const surfaceThemeCookie = getCookie("reverend_surface_theme");
-    const maxWidthCookie = getCookie("reverend_max_width");
-    const fontColorCookie = getCookie("reverend_font_color");
-    const letterSpacingCookie = getCookie("reverend_letter_spacing");
-    const textAlignCookie = getCookie("reverend_text_align");
-    const scrollFluidityCookie = getCookie("reverend_scroll_fluidity");
-
-    if (fontCookie) {
-      currentSettings.font = fontCookie as ReaderSettings["font"];
-      hasLoaded = true;
-    }
-    if (fontSizeCookie && !isNaN(parseInt(fontSizeCookie, 10))) {
-      currentSettings.fontSize = parseInt(fontSizeCookie, 10);
-      hasLoaded = true;
-    }
-    if (lineHeightCookie && !isNaN(parseFloat(lineHeightCookie))) {
-      currentSettings.lineHeight = parseFloat(lineHeightCookie);
-      hasLoaded = true;
-    }
-    if (opacityCookie && !isNaN(parseFloat(opacityCookie))) {
-      currentSettings.surfaceOpacity = parseFloat(opacityCookie);
-      hasLoaded = true;
-    }
-    if (surfaceThemeCookie) {
-      currentSettings.surfaceTheme = surfaceThemeCookie as ReaderSettings["surfaceTheme"];
-      hasLoaded = true;
-    }
-    if (maxWidthCookie && !isNaN(parseInt(maxWidthCookie, 10))) {
-      currentSettings.maxWidth = parseInt(maxWidthCookie, 10);
-      hasLoaded = true;
-    }
-    if (fontColorCookie) {
-      currentSettings.fontColor = fontColorCookie;
-      hasLoaded = true;
-    }
-    if (letterSpacingCookie && !isNaN(parseFloat(letterSpacingCookie))) {
-      currentSettings.letterSpacing = parseFloat(letterSpacingCookie);
-      hasLoaded = true;
-    }
-    if (textAlignCookie === "left" || textAlignCookie === "justify") {
-      currentSettings.textAlign = textAlignCookie;
-      hasLoaded = true;
-    }
-    if (scrollFluidityCookie && !isNaN(parseInt(scrollFluidityCookie, 10))) {
-      currentSettings.scrollFluidity = parseInt(scrollFluidityCookie, 10);
-      hasLoaded = true;
-    }
+    const { settings: clean, hasLoaded } = resolveSettingsFromCookies(getCookie);
 
     if (hasLoaded) {
-      const clean = sanitizeSettings(currentSettings as unknown as Record<string, unknown>);
       try {
         if (typeof localStorage !== "undefined") {
           localStorage.setItem("reverend_theme_settings", JSON.stringify(clean));

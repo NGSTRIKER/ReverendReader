@@ -7,6 +7,35 @@ let cachedManifestEn: ManifestData | null = null;
 let cachedManifestEnTime = 0;
 let cachedManifestZh: ManifestData | null = null;
 let cachedManifestZhTime = 0;
+let cachedNovelSizeEn: number | null = null;
+let cachedNovelSizeEnTime = 0;
+let cachedNovelSizeZh: number | null = null;
+let cachedNovelSizeZhTime = 0;
+const NOVEL_SIZE_TTL_MS = 60_000;
+
+async function getNovelSize(novelPath: string, edition: string): Promise<number | null> {
+  const now = Date.now();
+  const cachedSize = edition === "zh" ? cachedNovelSizeZh : cachedNovelSizeEn;
+  const cachedTime = edition === "zh" ? cachedNovelSizeZhTime : cachedNovelSizeEnTime;
+
+  if (cachedSize !== null && now - cachedTime < NOVEL_SIZE_TTL_MS) {
+    return cachedSize;
+  }
+
+  try {
+    const stats = await fs.promises.stat(novelPath);
+    if (edition === "zh") {
+      cachedNovelSizeZh = stats.size;
+      cachedNovelSizeZhTime = now;
+    } else {
+      cachedNovelSizeEn = stats.size;
+      cachedNovelSizeEnTime = now;
+    }
+    return stats.size;
+  } catch {
+    return null;
+  }
+}
 
 // Best-effort per-instance rate limiter. Serverless instances do not share this
 // map, so this is a local abuse throttle, not a deployment-wide quota.
@@ -137,15 +166,21 @@ export async function GET(request: NextRequest) {
 
   const novelFileName = edition === "zh" ? "novel-zh.txt" : "novel.txt";
   const novelPath = path.join(process.cwd(), "public", novelFileName);
-  if (!fs.existsSync(novelPath)) {
+  const novelSize = await getNovelSize(novelPath, edition);
+  if (novelSize === null) {
     return NextResponse.json({ error: "Novel asset not found" }, { status: 500 });
   }
 
-  const stats = fs.statSync(novelPath);
   const start = chapter.startByte;
-  const end = Math.min(chapter.endByte - 1, stats.size - 1);
+  const end = Math.min(chapter.endByte - 1, novelSize - 1);
 
-  if (start > end || start >= stats.size) {
+  if (
+    !Number.isInteger(start) ||
+    !Number.isInteger(end) ||
+    start < 0 ||
+    start > end ||
+    start >= novelSize
+  ) {
     return NextResponse.json({ error: "Invalid chapter byte range" }, { status: 416 });
   }
 
@@ -163,11 +198,11 @@ export async function GET(request: NextRequest) {
   });
 
   return new Response(webStream, {
-    status: 206,
+    status: 200,
     headers: {
       "Content-Type": "text/plain; charset=utf-8",
-      "Content-Range": `bytes ${start}-${end}/${stats.size}`,
       "Content-Length": String(end - start + 1),
+      "X-Content-Type-Options": "nosniff",
       "Cache-Control": "public, max-age=86400, stale-while-revalidate=604800",
     },
   });

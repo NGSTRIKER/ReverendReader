@@ -11,7 +11,11 @@ import {
   rebasePendingProgress,
 } from "../lib/supabase/progressQueue.ts";
 import { syncReadingProgress, addCloudBookmark } from "../lib/supabase/sync.ts";
-import { loadSidebarVisibility, saveSidebarVisibility } from "../lib/storage.ts";
+import {
+  loadSidebarVisibility,
+  resolveSettingsFromCookies,
+  saveSidebarVisibility,
+} from "../lib/storage.ts";
 import {
   isValidChapterId,
   isValidUuid,
@@ -341,6 +345,59 @@ await check("UI author formatting suppresses emails while showing usernames clea
   const case4 = formatAuthorNames(null, null);
   assert.equal(case4.authorLabel, "Cultivator");
   assert.equal(case4.displayUsername, null);
+});
+
+await check("resolveSettingsFromCookies sanitizes font, color, theme, and numeric bounds", () => {
+  const safeCookies: Record<string, string> = {
+    reverend_font: "bellota",
+    reverend_font_color: "#1a2b3c",
+    reverend_surface_theme: "catppuccin-mocha",
+    reverend_font_size: "20",
+    reverend_line_height: "1.8",
+    reverend_letter_spacing: "0.02",
+    reverend_max_width: "820",
+    reverend_text_align: "justify",
+    reverend_scroll_fluidity: "65",
+  };
+  const safeResult = resolveSettingsFromCookies((name) => safeCookies[name]);
+  assert.equal(safeResult.hasLoaded, true);
+  assert.equal(safeResult.settings.font, "bellota");
+  assert.equal(safeResult.settings.fontColor, "#1a2b3c");
+  assert.equal(safeResult.settings.surfaceTheme, "catppuccin-mocha");
+  assert.equal(safeResult.settings.fontSize, 20);
+  assert.equal(safeResult.settings.lineHeight, 1.8);
+  assert.equal(safeResult.settings.letterSpacing, 0.02);
+  assert.equal(safeResult.settings.maxWidth, 820);
+  assert.equal(safeResult.settings.textAlign, "justify");
+  assert.equal(safeResult.settings.scrollFluidity, 65);
+
+  const maliciousCookies: Record<string, string> = {
+    reverend_font: "javascript:alert(1)",
+    reverend_font_color: "red; background-image: url(https://evil.test)",
+    reverend_surface_theme: "invalid-theme",
+    reverend_font_size: "999",
+    reverend_line_height: "0.1",
+    reverend_letter_spacing: "5",
+    reverend_max_width: "100",
+    reverend_text_align: "justify-all",
+    reverend_scroll_fluidity: "999",
+  };
+  const maliciousResult = resolveSettingsFromCookies((name) => maliciousCookies[name]);
+  assert.equal(maliciousResult.settings.font, "mono");
+  assert.equal(maliciousResult.settings.fontColor, "#e4e8f0");
+  assert.equal(maliciousResult.settings.surfaceTheme, "matte-terminal");
+  assert.equal(maliciousResult.settings.fontSize, 32);
+  assert.equal(maliciousResult.settings.lineHeight, 1.3);
+  assert.equal(maliciousResult.settings.letterSpacing, 2.5);
+  assert.equal(maliciousResult.settings.maxWidth, 560);
+  assert.equal(maliciousResult.settings.textAlign, "left");
+  assert.equal(maliciousResult.settings.scrollFluidity, 100);
+});
+
+await check("createContentSecurityPolicy falls back cleanly on malformed supabaseUrl", () => {
+  const csp = createContentSecurityPolicy("nonce-123", "not a valid url", false);
+  assert.match(csp, /https:\/\/placeholder\.supabase\.co/);
+  assert.match(csp, /wss:\/\/placeholder\.supabase\.co/);
 });
 
 console.log(`\n${passed} offline security checks passed.`);

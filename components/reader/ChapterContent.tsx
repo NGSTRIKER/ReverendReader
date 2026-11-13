@@ -7,6 +7,7 @@
 
 import React from "react";
 import { ChapterMetadata, ReaderSettings } from "@/types/novel";
+import { getReaderFontClass } from "@/lib/storage";
 import { ChevronLeft, ChevronRight, AlertCircle, RefreshCw } from "lucide-react";
 
 interface ChapterContentProps {
@@ -57,7 +58,7 @@ function splitChapterHeading(number: number, rawTitle: string): {
   };
 }
 
-export function ChapterContent({
+export const ChapterContent = React.memo(function ChapterContent({
   chapter,
   content,
   loading,
@@ -94,14 +95,7 @@ export function ChapterContent({
     surfaceStyle.backgroundColor = `rgb(var(--surface) / ${settings.surfaceOpacity})`;
   }
 
-  const fontClass =
-    settings.font === "mono"
-      ? "font-mono"
-      : settings.font === "sans"
-      ? "font-sans"
-      : settings.font === "literary"
-      ? "font-literary"
-      : "font-serif";
+  const fontClass = getReaderFontClass(settings.font);
 
   const alignmentClass = settings.textAlign === "justify" ? "text-justify" : "text-left";
 
@@ -197,9 +191,7 @@ export function ChapterContent({
           }}
         >
           {paragraphs.map((para, index) => (
-            <p key={index} style={{ lineHeight: settings.lineHeight }}>
-              {para}
-            </p>
+            <p key={index}>{para}</p>
           ))}
         </div>
       )}
@@ -233,4 +225,4 @@ export function ChapterContent({
       </footer>
     </article>
   );
-}
+});

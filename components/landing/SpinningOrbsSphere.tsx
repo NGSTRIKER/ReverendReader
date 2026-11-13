@@ -129,16 +129,27 @@ export function SpinningOrbsSphere({
       return { x: x3, y: y3, z: z2 };
     };
 
+    let inkRaw = "240 240 240";
+    let mutedRaw = "156 156 156";
+    let lineStrongRaw = "68 68 68";
+
+    const refreshPalette = () => {
+      const style = getComputedStyle(document.documentElement);
+      inkRaw = style.getPropertyValue("--ink").trim() || "240 240 240";
+      mutedRaw = style.getPropertyValue("--muted").trim() || "156 156 156";
+      lineStrongRaw = style.getPropertyValue("--line-strong").trim() || "68 68 68";
+    };
+
+    refreshPalette();
+    const colorSchemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    window.addEventListener("reverend:theme", refreshPalette);
+    colorSchemeQuery.addEventListener("change", refreshPalette);
+
     const render = () => {
       const rect = canvas.getBoundingClientRect();
       const width = rect.width;
       const height = rect.height;
       ctx.clearRect(0, 0, width, height);
-
-      const style = getComputedStyle(document.documentElement);
-      const inkRaw = style.getPropertyValue("--ink").trim() || "240 240 240";
-      const mutedRaw = style.getPropertyValue("--muted").trim() || "156 156 156";
-      const lineStrongRaw = style.getPropertyValue("--line-strong").trim() || "68 68 68";
 
       const hovered = hoverRef.current;
       const targetSpeed = hovered ? 0.026 : 0.0065;
@@ -289,6 +300,8 @@ export function SpinningOrbsSphere({
 
     return () => {
       window.removeEventListener("resize", resize);
+      window.removeEventListener("reverend:theme", refreshPalette);
+      colorSchemeQuery.removeEventListener("change", refreshPalette);
       window.cancelAnimationFrame(animationFrameId);
     };
   }, []);

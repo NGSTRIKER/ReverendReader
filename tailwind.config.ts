@@ -26,12 +26,12 @@ const config: Config = {
       },
       fontFamily: {
         times: ['"Times New Roman"', "Times", "Georgia", "serif"],
-        playfair: ["'Playfair Display'", "Georgia", "serif"],
-        dmsans: ["'DM Sans'", "system-ui", "-apple-system", "sans-serif"],
+        dmsans: ["var(--font-sans)", "system-ui", "-apple-system", "sans-serif"],
         serif: ["var(--font-serif)", "EB Garamond", "Garamond", "Georgia", "serif"],
         mono: ["var(--font-mono)", "JetBrains Mono", "SFMono-Regular", "Menlo", "monospace"],
-        sans: ["'DM Sans'", "system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "sans-serif"],
+        sans: ["var(--font-sans)", "system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "sans-serif"],
         literary: ["var(--font-serif)", "Palatino", "Georgia", "serif"],
+        bellota: ["var(--font-bellota)", '"Bellota"', "system-ui", "sans-serif"],
       },
       boxShadow: {
         pop: "0 1px 2px rgb(var(--shadow) / 0.05), 0 8px 24px -4px rgb(var(--shadow) / 0.14)",

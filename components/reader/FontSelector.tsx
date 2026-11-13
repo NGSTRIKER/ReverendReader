@@ -13,7 +13,7 @@ import {
   AlignJustify,
   Maximize2,
 } from "lucide-react";
-import { DEFAULT_SETTINGS } from "@/lib/storage";
+import { DEFAULT_SETTINGS, getReaderFontClass } from "@/lib/storage";
 import {
   ThemeChoice,
   applyThemeChoice,
@@ -44,6 +44,7 @@ const FONT_OPTIONS: { id: ReaderFont; label: string; preview: string; className:
   { id: "mono", label: "JetBrains Mono", preview: "Terminal Engine", className: "font-mono", tag: "Terminal" },
   { id: "serif", label: "EB Garamond", preview: "Imperial Classic", className: "font-serif", tag: "Classic" },
   { id: "literary", label: "Palatino Book", preview: "Parchment Antiqua", className: "font-literary", tag: "Literary" },
+  { id: "bellota", label: "Bellota", preview: "Flowing Calligraphic", className: "font-bellota", tag: "Artisan" },
   { id: "sans", label: "Modern Clean", preview: "Screen Sans", className: "font-sans", tag: "System" },
 ];
 
@@ -150,14 +151,18 @@ export function FontSelector({ settings, onChangeSettings }: FontSelectorProps) 
           <span className="chinese-seal text-[10px]">字</span>
         </label>
         <div className="grid grid-cols-2 gap-2">
-          {FONT_OPTIONS.map((f) => {
+          {FONT_OPTIONS.map((f, index) => {
             const active = (settings.font || DEFAULT_SETTINGS.font) === f.id;
+            const spanLastOdd =
+              FONT_OPTIONS.length % 2 === 1 && index === FONT_OPTIONS.length - 1
+                ? "col-span-2"
+                : "";
             return (
               <button
                 key={f.id}
                 type="button"
                 onClick={() => onChangeSettings({ font: f.id })}
-                className={`flex flex-col items-start rounded-xl border p-3 text-left transition-all ${
+                className={`flex flex-col items-start rounded-xl border p-3 text-left transition-all ${spanLastOdd} ${
                   active
                     ? "border-accent bg-accent/10 text-ink shadow-sm ring-1 ring-accent/30"
                     : "border-line bg-sunken text-muted hover:border-line-strong hover:text-ink"
@@ -401,15 +406,9 @@ export function FontSelector({ settings, onChangeSettings }: FontSelectorProps) 
             <span className="chinese-seal text-[9px]">方源 · 诗</span>
           </div>
           <p
-            className={`transition-colors duration-150 ${
-              settings.font === "mono"
-                ? "font-mono"
-                : settings.font === "sans"
-                ? "font-sans"
-                : settings.font === "literary"
-                ? "font-literary"
-                : "font-serif"
-            } ${settings.textAlign === "justify" ? "text-justify" : "text-center"}`}
+            className={`transition-colors duration-150 ${getReaderFontClass(settings.font)} ${
+              settings.textAlign === "justify" ? "text-justify" : "text-center"
+            }`}
             style={{
               color: currentFontColor,
               fontSize: `${Math.min(18, Math.max(14, settings.fontSize - 2))}px`,

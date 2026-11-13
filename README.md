@@ -48,17 +48,17 @@ Here is a human-friendly breakdown of every tracked file in this repository, gro
 
 | File | What it does in simple terms |
 | :--- | :--- |
-| **`package.json`** | The project's manifest. Lists all installed JavaScript libraries (Next.js, Supabase, Tailwind, Lucide icons, etc.) and npm scripts (`dev`, `build`, `start`, `lint`). |
+| **`package.json`** | The project's manifest. Lists all installed JavaScript libraries (Next.js, Supabase, Tailwind, Lucide icons, etc.) and npm scripts (`dev`, `build`, `start`, `lint`, `test:security`, `verify:supabase`). |
 | **`package-lock.json`** | Records exact dependency versions installed in `node_modules` so builds are 100% reproducible across machines. |
 | **`tsconfig.json`** | Configures TypeScript rules and path shortcuts (such as allowing `@/*` to point straight to the root folder). |
-| **`next.config.ts`** | Settings for Next.js. Manages image optimization rules, security headers, compiler preferences, and server behaviors. |
+| **`next.config.ts`** | Settings for Next.js. Manages image optimization rules, security headers, static asset `Cache-Control` policies (`/fonts/:path*`, `/chapters.json`, `/chapters-zh.json`), compiler preferences, and server behaviors. |
 | **`next-env.d.ts`** | An auto-generated TypeScript declaration file that ensures the compiler understands Next.js global types. |
-| **`tailwind.config.ts`** | The design blueprint for Tailwind CSS. Defines custom colors (paper, ink, accent, sunken), custom typography fonts, and dark mode tokens. |
+| **`tailwind.config.ts`** | The design blueprint for Tailwind CSS. Defines custom colors (paper, ink, accent, sunken), custom typography font families (`sans` / DM Sans, `bellota`, `literary`, `mono`, `serif`), and dark mode tokens. |
 | **`postcss.config.mjs`** | Tells the build pipeline to process CSS through Tailwind CSS and Autoprefixer (for cross-browser CSS compatibility). |
 | **`eslint.config.mjs`** | Linting rules for clean, bug-free TypeScript and React code. |
 | **`.env.example`** | An example environment variables template showing which Supabase keys (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`) are needed to run the app. |
 | **`.gitignore`** | Tells Git which files to never commit (e.g., `node_modules`, secret `.env` files, `.next` build caches). |
-| **`middleware.ts`** | Gatekeeper code that runs before any page or API request loads. Refreshes user auth tokens, sets security headers (CSP), and handles cookie sessions. |
+| **`middleware.ts`** | Gatekeeper code that runs before dynamic page or API requests. Refreshes user auth tokens, sets security headers (CSP), handles cookie sessions, and excludes static images, fonts, manifests, and `.epub` downloads. |
 | **`googleddd765da26430ef2.html`** | A static verification file required by Google Search Console to prove domain ownership for SEO indexing. |
 
 ---
@@ -69,17 +69,17 @@ The `app/` directory uses the Next.js App Router to define pages, layouts, and b
 
 | File | What it does in simple terms |
 | :--- | :--- |
-| **`app/layout.tsx`** | The master wrapper around every page. Sets HTML tags, default metadata (title, description, social cards), loads custom font variables, and injects theme restoration scripts so screens don't flicker on load. |
-| **`app/globals.css`** | The core stylesheet. Contains CSS reset rules, theme variable definitions (light, dark, sepia, terminal), font faces, and reusable utility classes (`.icon-btn`, `.field`). |
+| **`app/layout.tsx`** | The master wrapper around every page. Sets HTML tags, default metadata (title, description, social cards), self-hosts Google Fonts (`DM Sans` and `Bellota` via `next/font/google`), and injects theme restoration scripts so screens don't flicker on load. |
+| **`app/globals.css`** | The core stylesheet. Contains CSS reset rules, theme variable definitions (light, dark, sepia, terminal), `.reader-content` typography rules, and reusable utility classes (`.icon-btn`, `.field`). |
 | **`app/page.tsx`** | The landing / home page (`/`). Welcomes visitors with the interactive 3D orb sphere, novel overview, synopsis, quick chapter jump links, and feature showcases. |
-| **`app/read/page.tsx`** | The reading page (`/read`). Loads chapter manifests on the server, figures out which chapter the user is reading (or resumes their progress), and renders the full reading interface. |
+| **`app/read/page.tsx`** | The reading page (`/read`). Reads the active chapter slice directly on the server, resolves authenticated progress and sanitized reader settings from cookies (`resolveSettingsFromCookies`), and leaves full manifest loading to the client to keep SSR payloads lean. |
 | **`app/login/page.tsx`** | The sign-in page (`/login`). Lets users log in with OAuth providers (Google, Discord) or magic links to sync their bookmarks and reading progress across multiple devices. |
 | **`app/account/page.tsx`** | The user profile dashboard (`/account`). Shows reading statistics, cloud-saved bookmarks, current chapter progress, and account management options. |
 | **`app/robots.ts`** | Automatically generates `robots.txt` so search engine crawlers know which pages to index and which to ignore. |
 | **`app/sitemap.ts`** | Automatically generates XML sitemaps to help search engines discover novel pages, the landing page, and reader routes. |
 | **`app/icon.svg`** | The primary vector favicon and application icon (the Chinese character 蛊 "Gu"). |
 | **`app/auth/callback/route.ts`** | An API route that Supabase redirects users to after they log in. It exchanges the temporary auth code for a permanent session cookie and redirects them back to where they were reading. |
-| **`app/api/chapter/route.ts`** | A lightweight backend API endpoint that delivers chapter text and metadata on demand, complete with HTTP caching to keep chapter switching instant. |
+| **`app/api/chapter/route.ts`** | A lightweight backend API endpoint that streams validated chapter byte ranges with `HTTP 200`, async file-size caching, `X-Content-Type-Options: nosniff`, and CDN/browser `Cache-Control` headers. |
 
 ---
 
@@ -90,14 +90,14 @@ All user interface elements are organized into modular, reusable React component
 #### Reader Experience (`components/reader/`)
 | File | What it does in simple terms |
 | :--- | :--- |
-| **`ReaderInterface.tsx`** | The brain of the reader. Coordinates chapter fetching, auto-scrolling to saved positions, bookmark toggling, opening dialogs, and listening for keyboard shortcuts (arrow keys). |
+| **`ReaderInterface.tsx`** | The brain of the reader. Coordinates lazy manifest fetching (`force-cache`), chapter prefetching, debounced settings persistence, validated custom backgrounds, bookmark toggling, and keyboard shortcuts. |
 | **`ChapterNavigation.tsx`** | The top header bar during reading. Features an auto-hiding navigation bar optimized for narrow mobile portrait screens and desktops, chapter prev/next buttons, table-of-contents quick-jump, reader settings trigger, and user account status. |
-| **`ChapterContent.tsx`** | Renders the actual novel text. Displays the chapter heading, paragraphs with customizable font sizing, line height, margins, and bottom navigation controls. |
-| **`ChapterSelectorModal.tsx`** | The popup Table of Contents (Index). Allows instant searching across all 2,334 chapters, volume-based filtering, quick jumping, and bookmark viewing. |
+| **`ChapterContent.tsx`** | Memoized (`React.memo`) chapter renderer. Displays the chapter heading and paragraphs with customizable font family (`getReaderFontClass`), sizing, line height, and bottom navigation controls. |
+| **`ChapterSelectorModal.tsx`** | The popup Table of Contents (Index). Uses deferred search filtering (`useDeferredValue`) across all 2,334 chapters, shows loading state while the manifest initializes, and supports volume jumping and bookmarks. |
 | **`SettingsModal.tsx`** | The customization modal dialog. Allows readers to adjust font sizes, margins, line spacing, reading themes (light, dark, sepia, midnight, terminal), typography, and desktop scroll fluidity. |
 | **`ScrollFluiditySelector.tsx`** | A dedicated control panel in settings for desktop users to adjust mouse wheel scroll momentum, choose inertia presets (Off, Gentle, Smooth, Fluid, Ultra), fine-tune damping, and test scrolling in an interactive sandbox. |
 | **`useFluidScroll.ts`** | A high-performance physics-based custom React hook using `requestAnimationFrame` that gives desktop mouse wheel scrolling smooth inertial momentum based on scrolling speed. |
-| **`FontSelector.tsx`** | A dedicated font switcher widget embedded in the settings modal. Previews and applies book-friendly fonts like Bookerly, Literata, Libre Baskerville, Roboto, and OpenDyslexic. |
+| **`FontSelector.tsx`** | A dedicated font switcher widget embedded in the settings modal. Previews and applies reader fonts including **Bellota** (Calligraphic / Artisan), **DM Sans**, **Literata**, **Mono**, and **Serif**. |
 | **`CommentsDrawer.tsx`** | An interactive drawer that lets readers view, post, and reply to community comments and paragraph thoughts. |
 | **`InteractionSidebar.tsx`** | A subtle side widget on the right edge of the screen for quick one-click access to comments, bookmarks, and reader tools while scrolling. |
 | **`BackgroundManager.tsx`** | Manages custom paper textures, subtle noise grain, and atmospheric reading wallpapers. |
@@ -130,9 +130,9 @@ Houses reusable helper functions, offline synchronization queues, and database c
 | File | What it does in simple terms |
 | :--- | :--- |
 | **`lib/theme.ts`** | Theme management logic. Handles storing selected themes in cookies and `localStorage`, and toggling theme attributes on the `<html>` root. |
-| **`lib/storage.ts`** | Browser storage abstraction. Reads and writes reader preferences, local bookmarks, and offline reading state to `localStorage` safely with fallback defaults. |
+| **`lib/storage.ts`** | Browser storage and SSR cookie abstraction. Exposes `sanitizeSettings()`, `resolveSettingsFromCookies()`, and `getReaderFontClass()` to validate, clamp, and persist reader preferences, local bookmarks, and sidebar state safely. |
 | **`lib/chapterFetcher.ts`** | Handles loading chapter text from the server or static JSON files, cleaning up raw text formatting, and prefetching upcoming chapters in the background for instant pagination. |
-| **`lib/security/csp.ts`** | Generates strict Content Security Policy (CSP) headers and nonces to protect readers from cross-site scripting (XSS) and injection attacks. |
+| **`lib/security/csp.ts`** | Generates strict Content Security Policy (CSP) headers and nonces (with safe URL fallback handling) to protect readers from cross-site scripting (XSS) and injection attacks. |
 | **`lib/auth/origin.ts`** | Validates incoming request hostnames and origins to prevent malicious phishing and host-header spoofing. |
 | **`lib/auth/redirect.ts`** | Sanitizes redirect URLs after login to protect against open-redirect vulnerabilities. |
 | **`lib/supabase/client.ts`** | Creates the browser-side Supabase client using cookies so client components can read and write authenticated data. |
@@ -179,7 +179,7 @@ Command-line utilities for converting source novel files, validating data integr
 | **`scripts/convert_chinese_epub.py`** | A Python script that parses the raw Chinese `蛊真人` EPUB, cleans chapter headers, and outputs Chinese edition manifests (`chapters-zh.json`). |
 | **`scripts/test_manifest.py`** | A validation script that checks the generated chapter JSON files to ensure no chapters are missing, indices are sequential, and word counts are accurate. |
 | **`scripts/verify-supabase.ts`** | A Node/TypeScript verification tool that tests whether Supabase tables, RLS policies, and credentials are functioning correctly. |
-| **`scripts/test-security.ts`** | Automated security test checking that CSP headers, auth redirection rules, and URL guards reject malicious input. |
+| **`scripts/test-security.ts`** | Automated offline security test suite (`npm run test:security`, 20 checks) verifying CSP headers, auth redirection rules, cookie/settings sanitization, social write sanitization, and offline progress queue invariants. |
 
 ---
 
@@ -222,6 +222,20 @@ npm run dev
 ```
 
 Visit [http://localhost:3000](http://localhost:3000) in your browser.
+
+### Verification & Security Checks
+
+```bash
+# Run offline security test suite (20 checks)
+npm run test:security
+
+# Run ESLint and TypeScript type-checking
+npm run lint
+npx tsc --noEmit
+
+# Build production bundle (fetches self-hosted fonts via next/font/google)
+npm run build
+```
 
 ---
 

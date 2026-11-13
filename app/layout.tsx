@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { EB_Garamond, JetBrains_Mono } from "next/font/google";
+import { Bellota, DM_Sans, EB_Garamond, JetBrains_Mono } from "next/font/google";
 import { cookies } from "next/headers";
 import { Analytics } from "@vercel/analytics/next";
 import { THEME_COOKIE, parseThemeCookie } from "@/lib/theme";
@@ -19,6 +19,21 @@ const jetbrainsMono = JetBrains_Mono({
   style: ["normal", "italic"],
   display: "swap",
   variable: "--font-mono",
+});
+
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+  display: "swap",
+  variable: "--font-sans",
+});
+
+const bellota = Bellota({
+  weight: ["400", "700"],
+  style: ["normal", "italic"],
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-bellota",
 });
 
 export const viewport: Viewport = {
@@ -94,7 +109,7 @@ export default async function RootLayout({
     <html
       lang="en"
       data-theme={theme}
-      className={`${ebGaramond.variable} ${jetbrainsMono.variable}`}
+      className={`${ebGaramond.variable} ${jetbrainsMono.variable} ${dmSans.variable} ${bellota.variable}`}
     >
       <body className="min-h-screen">
         {children}

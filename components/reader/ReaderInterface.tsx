@@ -149,6 +149,9 @@ export function ReaderInterface({
 
   // Lazy-loaded chapters manifest (avoids embedding 520KB in SSR HTML)
   const [chapters, setChapters] = useState<ChapterMetadata[]>(() => manifest?.chapters || []);
+  const [isManifestLoading, setIsManifestLoading] = useState<boolean>(
+    () => !(manifest?.chapters && manifest.chapters.length > 0)
+  );
 
   // Modals State
   const [isTocOpen, setIsTocOpen] = useState(false);
@@ -166,17 +169,10 @@ export function ReaderInterface({
   const [toastNotice, setToastNotice] = useState<ToastNotice | null>(null);
   const toastTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Preferences & Bookmarks State
-  const [settings, setSettings] = useState<ReaderSettings>(() => {
-    if (typeof window !== "undefined") {
-      try {
-        return loadThemeSettings();
-      } catch {
-        return initialSettings;
-      }
-    }
-    return initialSettings;
-  });
+  // Preferences & Bookmarks State (initialized from SSR props to prevent hydration mismatch)
+  const [settings, setSettings] = useState<ReaderSettings>(initialSettings);
+  const settingsSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const pendingSettingsRef = useRef<ReaderSettings | null>(null);
 
   // Desktop fluid momentum scrolling hook
   useFluidScroll(settings.scrollFluidity ?? 0);
@@ -293,23 +289,28 @@ export function ReaderInterface({
     }
   }, [initialId, totalChaptersCount, initialChapter]);
 
-  // Asynchronously fetch chapters manifest in the background (prevents 520KB SSR HTML payload)
+  // Asynchronously fetch chapters manifest in the background (prevents 488KB SSR HTML payload)
   useEffect(() => {
     if (manifestsRef.current[edition] && manifestsRef.current[edition]!.length > 0) {
       setChapters(manifestsRef.current[edition]!);
+      setIsManifestLoading(false);
       return;
     }
     let isMounted = true;
+    setIsManifestLoading(true);
     const manifestUrl = edition === "zh" ? "/chapters-zh.json" : "/chapters.json";
-    fetch(manifestUrl)
-      .then((res) => res.json())
-      .then((data: ManifestData) => {
+    fetch(manifestUrl, { cache: "force-cache" })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: ManifestData | null) => {
         if (isMounted && data?.chapters) {
           manifestsRef.current[edition] = data.chapters;
           setChapters(data.chapters);
         }
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => {
+        if (isMounted) setIsManifestLoading(false);
+      });
     return () => {
       isMounted = false;
     };
@@ -317,11 +318,13 @@ export function ReaderInterface({
 
   // Clean up object URLs when custom background changes or unmounts
   const handleSetCustomBg = useCallback((newUrl: string | null) => {
+    const safeUrl =
+      typeof newUrl === "string" && /^blob:[^\s"'()\\<>]+$/i.test(newUrl) ? newUrl : null;
     if (prevCustomBgRef.current && prevCustomBgRef.current.startsWith("blob:")) {
       URL.revokeObjectURL(prevCustomBgRef.current);
     }
-    prevCustomBgRef.current = newUrl;
-    setCustomBgUrl(newUrl);
+    prevCustomBgRef.current = safeUrl;
+    setCustomBgUrl(safeUrl);
   }, []);
 
   useEffect(() => {
@@ -329,43 +332,58 @@ export function ReaderInterface({
       if (prevCustomBgRef.current && prevCustomBgRef.current.startsWith("blob:")) {
         URL.revokeObjectURL(prevCustomBgRef.current);
       }
+      if (settingsSaveTimerRef.current) {
+        clearTimeout(settingsSaveTimerRef.current);
+      }
+      if (pendingSettingsRef.current) {
+        saveThemeSettings(pendingSettingsRef.current);
+        pendingSettingsRef.current = null;
+      }
     };
   }, []);
 
-  // Update Settings immediately and persist to cookies and localStorage
+  // Update Settings immediately in React state and debounce storage/cookie writes
   const handleUpdateSettings = useCallback((newPartial: Partial<ReaderSettings>) => {
     setSettings((prev) => {
       const updated = { ...prev, ...newPartial };
-      saveThemeSettings(updated);
+      pendingSettingsRef.current = updated;
+      if (settingsSaveTimerRef.current) {
+        clearTimeout(settingsSaveTimerRef.current);
+      }
+      settingsSaveTimerRef.current = setTimeout(() => {
+        if (pendingSettingsRef.current) {
+          saveThemeSettings(pendingSettingsRef.current);
+          pendingSettingsRef.current = null;
+        }
+      }, 120);
       return updated;
     });
   }, []);
 
-  useEffect(() => {
-    saveThemeSettings(settings);
-  }, [settings]);
-
-  const currentChapter: ChapterMetadata =
-    chapters.find((c) => c.id === currentChapterId) ||
-    (initialChapter && currentChapterId === initialChapter.id
-      ? {
-          id: initialChapter.id,
-          number: initialChapter.number,
-          title: initialChapter.title,
-          wordCount: initialChapter.wordCount,
-          startByte: 0,
-          endByte: 0,
-          length: 0,
-        }
-      : {
-          id: currentChapterId,
-          number: currentChapterId,
-          title: `Chapter ${currentChapterId}`,
-          startByte: 0,
-          endByte: 0,
-          length: 0,
-          wordCount: 0,
-        });
+  const currentChapter: ChapterMetadata = React.useMemo(
+    () =>
+      chapters.find((c) => c.id === currentChapterId) ||
+      (initialChapter && currentChapterId === initialChapter.id
+        ? {
+            id: initialChapter.id,
+            number: initialChapter.number,
+            title: initialChapter.title,
+            wordCount: initialChapter.wordCount,
+            startByte: 0,
+            endByte: 0,
+            length: 0,
+          }
+        : {
+            id: currentChapterId,
+            number: currentChapterId,
+            title: `Chapter ${currentChapterId}`,
+            startByte: 0,
+            endByte: 0,
+            length: 0,
+            wordCount: 0,
+          }),
+    [chapters, currentChapterId, initialChapter]
+  );
 
   const hasPrev = currentChapterId > 1;
   const hasNext = currentChapterId < totalChaptersCount;
@@ -919,19 +937,23 @@ export function ReaderInterface({
     loadChapter(currentChapterId);
   }, [currentChapterId, loadChapter, initialContent, initialId, totalChaptersCount, edition]);
 
-  const handlePrev = () => {
+  const handlePrev = useCallback(() => {
     if (hasPrev) {
       flushProgressNow();
       setCurrentChapterId((prev) => prev - 1);
     }
-  };
+  }, [hasPrev, flushProgressNow]);
 
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     if (hasNext) {
       flushProgressNow();
       setCurrentChapterId((prev) => prev + 1);
     }
-  };
+  }, [hasNext, flushProgressNow]);
+
+  const handleRetryChapter = useCallback(() => {
+    loadChapter(currentChapterId);
+  }, [loadChapter, currentChapterId]);
 
   const handleSelectChapterFromModal = (id: number) => {
     flushProgressNow();
@@ -1153,7 +1175,7 @@ export function ReaderInterface({
         <div
           aria-hidden="true"
           className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat pointer-events-none"
-          style={{ backgroundImage: `url(${customBgUrl})` }}
+          style={{ backgroundImage: `url("${customBgUrl}")` }}
         />
       )}
 
@@ -1188,7 +1210,7 @@ export function ReaderInterface({
             content={content}
             loading={loading}
             error={error}
-            onRetry={() => loadChapter(currentChapterId)}
+            onRetry={handleRetryChapter}
             hasPrev={hasPrev}
             hasNext={hasNext}
             onPrev={handlePrev}
@@ -1241,6 +1263,7 @@ export function ReaderInterface({
         bookmarks={bookmarks}
         onRemoveBookmark={handleRemoveBookmark}
         initialTab={tocInitialTab}
+        isLoading={isManifestLoading}
       />
 
       {/* Settings Modal (Lazy Loaded) */}

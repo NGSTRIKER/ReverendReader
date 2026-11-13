@@ -4,7 +4,7 @@ import { Metadata } from "next";
 import { cookies } from "next/headers";
 import { ManifestData, ChapterMetadata } from "@/types/novel";
 import { ReaderInterface, InitialChapterInfo } from "@/components/reader/ReaderInterface";
-import { parseSettingsFromRaw } from "@/lib/storage";
+import { resolveSettingsFromCookies } from "@/lib/storage";
 import { cleanChapterContent } from "@/lib/chapterFetcher";
 import { createClient } from "@/lib/supabase/server";
 
@@ -51,18 +51,26 @@ function getServerChapterContent(
   chapter: ChapterMetadata,
   edition: "en" | "zh" = "en"
 ): string | null {
+  if (!Number.isInteger(chapter.startByte) || chapter.startByte < 0 || !Number.isInteger(chapter.length) || chapter.length <= 0 || chapter.length > 2_000_000) {
+    return null;
+  }
+  const fileName = edition === "zh" ? "novel-zh.txt" : "novel.txt";
+  const novelPath = path.join(process.cwd(), "public", fileName);
+  let fd: number | null = null;
   try {
-    const fileName = edition === "zh" ? "novel-zh.txt" : "novel.txt";
-    const novelPath = path.join(process.cwd(), "public", fileName);
-    if (!fs.existsSync(novelPath)) return null;
-    const fd = fs.openSync(novelPath, "r");
+    fd = fs.openSync(novelPath, "r");
     const len = chapter.length;
     const buf = Buffer.alloc(len);
-    fs.readSync(fd, buf, 0, len, chapter.startByte);
-    fs.closeSync(fd);
-    return cleanChapterContent(buf.toString("utf-8"));
+    const bytesRead = fs.readSync(fd, buf, 0, len, chapter.startByte);
+    return cleanChapterContent(buf.subarray(0, bytesRead).toString("utf-8"));
   } catch {
     return null;
+  } finally {
+    if (fd !== null) {
+      try {
+        fs.closeSync(fd);
+      } catch {}
+    }
   }
 }
 
@@ -165,51 +173,13 @@ export default async function ReadPage({ searchParams }: ReadPageProps) {
   // Pre-render chapter text directly on server (eliminates spinner, maximizes LCP, 100 SEO)
   const initialContent = getServerChapterContent(chapterMeta, initialEdition);
 
-  // Read saved typography settings from server-side cookies
-  const themeCookie = cookieStore.get("reverend_theme_settings")?.value;
-  const initialSettings = parseSettingsFromRaw(themeCookie);
-
-  const fontSizeCookie = cookieStore.get("reverend_font_size")?.value;
-  const lineHeightCookie = cookieStore.get("reverend_line_height")?.value;
-  const opacityCookie = cookieStore.get("reverend_surface_opacity")?.value;
-  const surfaceThemeCookie = cookieStore.get("reverend_surface_theme")?.value;
-  const fontCookie = cookieStore.get("reverend_font")?.value;
-  const fontColorCookie = cookieStore.get("reverend_font_color")?.value;
-  const maxWidthCookie = cookieStore.get("reverend_max_width")?.value;
-  const letterSpacingCookie = cookieStore.get("reverend_letter_spacing")?.value;
-  const textAlignCookie = cookieStore.get("reverend_text_align")?.value;
-
-  if (fontCookie) {
-    initialSettings.font = fontCookie as typeof initialSettings.font;
-  }
-  if (surfaceThemeCookie) {
-    initialSettings.surfaceTheme = surfaceThemeCookie as typeof initialSettings.surfaceTheme;
-  }
-  if (fontColorCookie) {
-    initialSettings.fontColor = fontColorCookie;
-  }
-  if (textAlignCookie === "left" || textAlignCookie === "justify") {
-    initialSettings.textAlign = textAlignCookie;
-  }
-  if (fontSizeCookie && !isNaN(parseInt(fontSizeCookie, 10))) {
-    initialSettings.fontSize = parseInt(fontSizeCookie, 10);
-  }
-  if (lineHeightCookie && !isNaN(parseFloat(lineHeightCookie))) {
-    initialSettings.lineHeight = parseFloat(lineHeightCookie);
-  }
-  if (opacityCookie && !isNaN(parseFloat(opacityCookie))) {
-    initialSettings.surfaceOpacity = parseFloat(opacityCookie);
-  }
-  if (maxWidthCookie && !isNaN(parseInt(maxWidthCookie, 10))) {
-    initialSettings.maxWidth = parseInt(maxWidthCookie, 10);
-  }
-  if (letterSpacingCookie && !isNaN(parseFloat(letterSpacingCookie))) {
-    initialSettings.letterSpacing = parseFloat(letterSpacingCookie);
-  }
+  // Read and sanitize saved typography settings from server-side cookies
+  const { settings: initialSettings } = resolveSettingsFromCookies(
+    (name) => cookieStore.get(name)?.value
+  );
 
   return (
     <ReaderInterface
-      manifest={manifest}
       initialEdition={initialEdition}
       initialChapter={initialChapter}
       totalChapters={manifest.totalChapters}

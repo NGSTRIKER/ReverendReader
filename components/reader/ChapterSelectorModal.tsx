@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useEffect, useRef } from "react";
+import React, { useState, useMemo, useEffect, useRef, useDeferredValue } from "react";
 import { ChapterMetadata, Bookmark } from "@/types/novel";
 import { Search, X, ArrowUpDown, Bookmark as BookmarkIcon, Trash2 } from "lucide-react";
 
@@ -8,6 +8,7 @@ interface ChapterSelectorModalProps {
   isOpen: boolean;
   onClose: () => void;
   chapters: ChapterMetadata[];
+  isLoading?: boolean;
   currentChapterId: number;
   onSelectChapter: (id: number) => void;
   bookmarks: Bookmark[];
@@ -19,6 +20,7 @@ export function ChapterSelectorModal({
   isOpen,
   onClose,
   chapters,
+  isLoading = false,
   currentChapterId,
   onSelectChapter,
   bookmarks,
@@ -27,6 +29,7 @@ export function ChapterSelectorModal({
 }: ChapterSelectorModalProps) {
   const [activeTab, setActiveTab] = useState<"chapters" | "bookmarks">(initialTab);
   const [searchQuery, setSearchQuery] = useState("");
+  const deferredSearchQuery = useDeferredValue(searchQuery);
   const [jumpInput, setJumpInput] = useState("");
   const [sortAsc, setSortAsc] = useState(true);
   const activeItemRef = useRef<HTMLButtonElement | null>(null);
@@ -57,8 +60,8 @@ export function ChapterSelectorModal({
 
   const filteredChapters = useMemo(() => {
     let result = chapters;
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase().trim();
+    if (deferredSearchQuery.trim()) {
+      const q = deferredSearchQuery.toLowerCase().trim();
       result = chapters.filter(
         (c) =>
           c.title.toLowerCase().includes(q) ||
@@ -70,7 +73,7 @@ export function ChapterSelectorModal({
       return [...result].reverse();
     }
     return result;
-  }, [chapters, searchQuery, sortAsc]);
+  }, [chapters, deferredSearchQuery, sortAsc]);
 
   const handleJump = (e: React.FormEvent) => {
     e.preventDefault();
@@ -195,7 +198,11 @@ export function ChapterSelectorModal({
 
             {/* Chapter List */}
             <div className="flex-1 overflow-y-auto divide-y divide-line">
-              {filteredChapters.length === 0 ? (
+              {isLoading && chapters.length === 0 ? (
+                <div className="py-12 text-center text-xs text-muted">
+                  Loading chapter index...
+                </div>
+              ) : filteredChapters.length === 0 ? (
                 <div className="py-12 text-center text-xs text-muted">
                   No matching chapters found.
                 </div>

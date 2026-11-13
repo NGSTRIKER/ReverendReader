@@ -3,7 +3,12 @@ export function createContentSecurityPolicy(
   supabaseUrl: string,
   isDevelopment: boolean
 ): string {
-  const supabaseOrigin = new URL(supabaseUrl).origin;
+  let supabaseOrigin = "https://placeholder.supabase.co";
+  try {
+    supabaseOrigin = new URL(supabaseUrl).origin;
+  } catch {
+    supabaseOrigin = "https://placeholder.supabase.co";
+  }
   const supabaseSocketOrigin = supabaseOrigin.replace(/^https:/, "wss:").replace(/^http:/, "ws:");
   const developmentEval = isDevelopment ? " 'unsafe-eval'" : "";
 

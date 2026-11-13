@@ -22,7 +22,7 @@ export interface ManifestData {
   chapters: ChapterMetadata[];
 }
 
-export type ReaderFont = "serif" | "sans" | "mono" | "literary";
+export type ReaderFont = "serif" | "sans" | "mono" | "literary" | "bellota";
 
 export type ReaderSurfaceTheme =
   | "matte-terminal"
