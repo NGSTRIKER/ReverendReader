@@ -9,7 +9,7 @@ export function Footer() {
       <div className="mx-auto max-w-[1250px] px-4 sm:px-8 lg:px-12 py-6 sm:py-8">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-xs">
           <div className="flex flex-wrap items-center justify-center md:justify-start gap-x-2.5 gap-y-1 text-center md:text-left">
-            <span className="font-serif font-semibold text-ink text-sm">
+            <span className="font-times font-semibold text-ink text-sm">
               Reverend Insanity
             </span>
             <span>by Gu Zhenren (蛊真人)</span>
@@ -70,7 +70,7 @@ export function Footer() {
               <ArrowUpRight className="h-2.5 w-2.5" aria-hidden="true" />
             </a>
           </span>
-          <span className="text-faint">Fan-made reader for Reverend Insanity.</span>
+          <span className="text-faint">Fan-made reader for <span className="font-times">Reverend Insanity</span>.</span>
         </div>
       </div>
     </footer>

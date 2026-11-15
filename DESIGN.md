@@ -26,7 +26,7 @@ colors:
   success-jade: "#166534"
 typography:
   display:
-    fontFamily: "Bookerly, var(--font-serif), EB Garamond, Georgia, serif"
+    fontFamily: "\"Times New Roman\", Times, Georgia, serif"
     fontSize: "clamp(2rem, 5vw, 4rem)"
     fontWeight: 400
     lineHeight: 1.06
@@ -197,14 +197,14 @@ The palette pairs neutral parchment and mineral ink tones with a single restrain
 
 ## Typography
 
-**Display Font:** Bookerly (backed by EB Garamond, Georgia, serif)
+**Display & Title Wordmark Font:** `"Times New Roman"`, Times, Georgia, serif (used uniformly without split styling for `"Reverend Insanity"` across navigation, hero display, footer, dialogs, login, and chapter headers)
 **Body Font:** Bookerly (backed by EB Garamond, Georgia, serif; Reader supports user switching across Serif, Editorial EB Garamond, Literata, DM Sans, Times, OpenDyslexic, Bellota, and JetBrains Mono)
 **UI / Label Font:** DM Sans (`--font-sans`), paired with JetBrains Mono (`--font-mono`) for tabular chapter indices and word counts
 
 **Character:** Classical editorial warmth for sustained prose paired with crisp geometric UI controls and lining tabular figures that prevent chapter counters (`1 / 2334`) or word counts from jittering horizontally.
 
 ### Hierarchy
-- **Display** (`400`, `clamp(2rem, 5vw, 4rem)`, `1.06` line-height, `-0.02em` tracking): Landing hero title (`Reverend Insanity`), pairing upright ink with italic accent emphasis.
+- **Display** (`400`, `clamp(2rem, 5vw, 4rem)`, `1.06` line-height, `-0.02em` tracking): Landing hero title (`Reverend Insanity`) rendered uniformly in upright Times New Roman ink.
 - **Headline** (`700`, `1.5rem–2.25rem`, `1.25` line-height, `-0.015em` tracking): Reader chapter titles (`h1`) and major section headings (`h2`).
 - **Title** (`500`, `1.125rem`, `1.35` line-height): Volume card headings and modal/drawer dialog headers (`h2`).
 - **Body Prose** (`400`, user-configurable `14px–32px` around `1.0625rem` base, `1.8` line-height, `"kern", "liga", "onum"`): Reader paragraphs and multi-paragraph editorial summaries.

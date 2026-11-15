@@ -52,7 +52,7 @@ function LoginForm() {
   return (
     <div className="w-full max-w-md rounded-2xl border border-line bg-surface p-7 sm:p-10 shadow-sheet">
       <div className="flex items-center justify-between border-b border-line pb-4 mb-6">
-        <Link href="/" className="font-serif text-base font-bold tracking-tight text-ink py-1.5">
+        <Link href="/" className="font-times text-base font-bold tracking-tight text-ink py-1.5">
           Reverend Insanity
         </Link>
         <ThemeToggle className="rounded-full h-11 w-11 sm:h-9 sm:w-9" />

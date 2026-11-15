@@ -104,7 +104,7 @@ export function InfoModal({ isOpen, onClose }: InfoModalProps) {
                 <span className="text-[10px] uppercase tracking-widest text-muted font-medium">
                   Premise &amp; World
                 </span>
-                <h3 className="font-serif text-lg sm:text-xl font-medium text-ink mt-1">
+                <h3 className="font-times text-lg sm:text-xl font-medium text-ink mt-1">
                   Reverend Insanity (蛊真人)
                 </h3>
                 <p className="mt-2 font-serif text-sm text-muted leading-relaxed">
@@ -152,7 +152,7 @@ export function InfoModal({ isOpen, onClose }: InfoModalProps) {
                 </h3>
                 <p className="mt-2 font-serif text-sm text-muted leading-relaxed">
                   Gu Zhenren (literally &ldquo;The Gu Master&rdquo; or &ldquo;The True Person&rdquo;) is a
-                  renowned Chinese web novelist born in Guizhou, China. He serialized <em>Reverend Insanity</em>
+                  renowned Chinese web novelist born in Guizhou, China. He serialized <span className="font-times">Reverend Insanity</span>
                   over seven years starting in December 2012.
                 </p>
               </div>
@@ -266,7 +266,7 @@ export function InfoModal({ isOpen, onClose }: InfoModalProps) {
               </div>
 
               <p className="text-[11px] text-faint pt-2">
-                Reverend Reader is a non-commercial fan project for the Reverend Insanity reading community.
+                Reverend Reader is a non-commercial fan project for the <span className="font-times">Reverend Insanity</span> reading community.
               </p>
             </div>
           )}

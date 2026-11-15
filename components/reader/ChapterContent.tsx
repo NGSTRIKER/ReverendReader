@@ -132,7 +132,7 @@ export const ChapterContent = React.memo(function ChapterContent({
       {/* Editorial Chapter Header */}
       <header className="mb-7 sm:mb-10 border-b border-line pb-5 sm:pb-6">
         <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-mono text-muted mb-2.5">
-          <span className="uppercase tracking-[0.14em] text-accent font-semibold">
+          <span className={`uppercase tracking-[0.14em] text-accent font-semibold ${kicker === "Reverend Insanity" ? "font-times" : ""}`}>
             {kicker}
           </span>
           <div className="flex items-center gap-2 tnum">

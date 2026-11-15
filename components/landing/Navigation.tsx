@@ -24,7 +24,7 @@ export function Navigation() {
         <div className="mx-auto flex h-14 sm:h-16 w-full max-w-[1250px] items-center justify-between gap-2 px-3.5 sm:px-8 lg:px-12">
           {/* Brand Logo */}
           <Link href="/" className="group flex flex-col justify-center select-none min-w-0 pr-1">
-            <span className="font-serif text-[15px] sm:text-xl font-semibold tracking-[0.07em] sm:tracking-[0.12em] uppercase text-ink transition-colors group-hover:text-muted whitespace-nowrap">
+            <span className="font-times text-[15px] sm:text-xl font-semibold tracking-[0.07em] sm:tracking-[0.12em] uppercase text-ink transition-colors group-hover:text-muted whitespace-nowrap">
               REVEREND INSANITY
             </span>
             <span className="font-sans text-[9px] tracking-[0.18em] sm:tracking-[0.22em] uppercase text-muted mt-0.5 whitespace-nowrap">

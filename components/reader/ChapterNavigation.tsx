@@ -124,7 +124,7 @@ export function ChapterNavigation({
             href="/"
             title="Return to Home"
             aria-label="Reverend Insanity - Return to Home"
-            className="inline-flex h-11 min-w-[44px] sm:h-9 sm:min-w-0 items-center justify-center rounded-full px-2 sm:px-2.5 text-sm sm:text-base font-serif font-bold tracking-tight text-ink hover:bg-sunken transition-colors flex-shrink-0"
+            className="inline-flex h-11 min-w-[44px] sm:h-9 sm:min-w-0 items-center justify-center rounded-full px-2 sm:px-2.5 text-sm sm:text-base font-times font-bold tracking-tight text-ink hover:bg-sunken transition-colors flex-shrink-0"
           >
             <span className="sm:hidden">RI</span>
             <span className="hidden sm:inline">Reverend Insanity</span>

@@ -100,8 +100,8 @@ export function HeroSection({
                 </p>
               </div>
 
-              <h1 className="font-serif text-[2rem] sm:text-5xl lg:text-[4rem] font-normal tracking-[-0.02em] text-ink leading-[1.06] mb-3 sm:mb-4">
-                Reverend <em className="italic text-accent">Insanity</em>
+              <h1 className="font-times text-[2rem] sm:text-5xl lg:text-[4rem] font-normal tracking-[-0.02em] text-ink leading-[1.06] mb-3 sm:mb-4">
+                Reverend Insanity
               </h1>
 
               <p className="summary text-muted text-[13.5px] sm:text-[15px] leading-[1.68] sm:leading-[1.8] mb-4 sm:mb-6">
