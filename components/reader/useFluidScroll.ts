@@ -41,8 +41,12 @@ export function useFluidScroll(fluidity: number = 0) {
   const lastFrameTimeRef = useRef(0);
 
   useEffect(() => {
-    // 0 = Off / Native browser scrolling. Do not attach wheel listener.
-    if (!fluidity || fluidity <= 0) {
+    const prefersReducedMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    // 0 = Off / Native browser scrolling, or user prefers reduced motion.
+    if (!fluidity || fluidity <= 0 || prefersReducedMotion) {
       if (rafIdRef.current) {
         cancelAnimationFrame(rafIdRef.current);
         rafIdRef.current = null;

@@ -2,23 +2,94 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: "Bookerly";
+  src: url("/fonts/bookerly/bookerly-regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Bookerly";
+  src: url("/fonts/bookerly/bookerly-bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Bookerly";
+  src: url("/fonts/bookerly/bookerly-italic.ttf") format("truetype");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Literata";
+  src: url("/fonts/literata/literata-regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Literata";
+  src: url("/fonts/literata/literata-bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Literata";
+  src: url("/fonts/literata/literata-italic.ttf") format("truetype");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "OpenDyslexic";
+  src: url("/fonts/opendyslexic-0.92/opendyslexic-regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "OpenDyslexic";
+  src: url("/fonts/opendyslexic-0.92/opendyslexic-bold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "OpenDyslexic";
+  src: url("/fonts/opendyslexic-0.92/opendyslexic-italic.otf") format("opentype");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
 /*
- * Design Tokens — Reverend Reader (Hallmark Anti-AI-Slop Architecture)
- * Light Mode: Natural warm book paper, carbon ink, imperial Chinese seal vermilion.
- * Dark Mode: Deep night void, slate surface, precision electric sapphire.
- * Zero inline improvisation. All colors reference token channels.
+ * Design Tokens — Reverend Reader
+ * Light Mode: Warm book paper, carbon ink, restrained seal vermilion.
+ * Dark Mode: Quiet editorial OLED charcoal, warm parchment ink, muted antique gold accent.
  */
 :root {
-  --paper: 252 251 249;
-  --surface: 255 255 255;
-  --sunken: 245 243 238;
-  --ink: 18 19 22;
-  --muted: 86 85 82;
-  --faint: 142 140 134;
-  --line: 228 224 216;
-  --line-strong: 204 199 188;
-  --accent: 197 22 42;
-  --accent-hover: 165 14 32;
+  --paper: 250 248 243;
+  --surface: 255 254 251;
+  --sunken: 241 237 229;
+  --ink: 24 23 20;
+  --muted: 98 94 86;
+  --faint: 110 104 94;
+  --line: 224 218 207;
+  --line-strong: 198 190 176;
+  --accent: 175 29 39;
+  --accent-hover: 145 21 30;
   --on-accent: 255 255 255;
   --danger: 185 28 28;
   --success: 22 101 52;
@@ -28,44 +99,43 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --paper: 10 10 10;
-    --surface: 20 20 20;
-    --sunken: 5 5 5;
-    --ink: 240 240 240;
-    --muted: 156 156 156;
-    --faint: 104 104 104;
-    --line: 42 42 42;
-    --line-strong: 68 68 68;
-    --accent: 224 224 224;
-    --accent-hover: 248 248 248;
-    --on-accent: 10 10 10;
-    --danger: 210 85 85;
-    --success: 170 170 170;
+    --paper: 13 15 14;
+    --surface: 21 24 22;
+    --sunken: 17 19 18;
+    --ink: 234 231 223;
+    --muted: 152 149 140;
+    --faint: 138 135 127;
+    --line: 40 44 41;
+    --line-strong: 64 69 65;
+    --accent: 208 190 148;
+    --accent-hover: 224 208 168;
+    --on-accent: 14 16 15;
+    --danger: 228 100 100;
+    --success: 122 188 142;
     --shadow: 0 0 0;
     color-scheme: dark;
   }
 }
 
 :root[data-theme="dark"] {
-  --paper: 10 10 10;
-  --surface: 20 20 20;
-  --sunken: 5 5 5;
-  --ink: 240 240 240;
-  --muted: 156 156 156;
-  --faint: 104 104 104;
-  --line: 42 42 42;
-  --line-strong: 68 68 68;
-  --accent: 224 224 224;
-  --accent-hover: 248 248 248;
-  --on-accent: 10 10 10;
-  --danger: 210 85 85;
-  --success: 170 170 170;
+  --paper: 13 15 14;
+  --surface: 21 24 22;
+  --sunken: 17 19 18;
+  --ink: 234 231 223;
+  --muted: 152 149 140;
+  --faint: 138 135 127;
+  --line: 40 44 41;
+  --line-strong: 64 69 65;
+  --accent: 208 190 148;
+  --accent-hover: 224 208 168;
+  --on-accent: 14 16 15;
+  --danger: 228 100 100;
+  --success: 122 188 142;
   --shadow: 0 0 0;
   color-scheme: dark;
 }
 
 @layer base {
-  /* Hard floor: overflow-x: clip on both html and body (Gate 62) */
   html,
   body {
     overflow-x: clip;
@@ -75,8 +145,8 @@
 
   body {
     @apply bg-paper text-ink antialiased;
-    font-family: var(--font-serif), "EB Garamond", Garamond, Georgia, serif;
-    font-feature-settings: "kern", "liga", "onum";
+    font-family: var(--font-sans), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-feature-settings: "kern", "liga";
   }
 
   ::selection {
@@ -124,19 +194,26 @@
   }
 
   .field {
-    @apply w-full rounded-lg border border-line-strong bg-paper px-3 py-2 text-[0.9rem] text-ink placeholder:text-faint focus:border-accent focus:outline-none transition-colors;
+    @apply w-full rounded-lg border border-line-strong bg-paper px-3 py-2 text-base sm:text-sm text-ink placeholder:text-faint focus:border-accent transition-colors;
   }
 
-  .terminal-card {
-    @apply rounded-2xl border border-line bg-surface/95 backdrop-blur-md shadow-sheet;
+  .seal-badge {
+    @apply inline-flex items-center justify-center rounded-md border border-accent/40 bg-accent/10 px-2 py-0.5 text-xs font-mono font-semibold text-accent;
   }
 
-  .terminal-chip {
-    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[11px] font-mono font-medium border border-line bg-sunken text-muted;
+  .circle-icon-btn {
+    @apply inline-flex h-11 w-11 sm:h-9 sm:w-9 items-center justify-center rounded-full border border-line text-muted transition-colors duration-150 hover:border-line-strong hover:bg-sunken hover:text-ink active:scale-[0.97];
   }
 
-  .chinese-seal {
-    @apply inline-flex items-center justify-center rounded-md border border-accent/40 bg-accent/10 px-1.5 py-0.5 text-[11px] font-mono font-semibold text-accent;
+  .book-cover-frame {
+    border: 1px solid rgb(var(--line-strong));
+    border-radius: 6px;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease;
+  }
+
+  .book-cover-frame:hover {
+    transform: translateY(-2px);
+    border-color: rgb(var(--accent));
   }
 
   .link {
@@ -175,69 +252,78 @@
 
   .cv-row {
     content-visibility: auto;
-    contain-intrinsic-size: auto 44px;
+    contain-intrinsic-size: auto 52px;
+  }
+
+  @keyframes drawerSlideInRight {
+    from {
+      transform: translateX(100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+
+  .drawer-enter {
+    animation: drawerSlideInRight 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   }
 }
 
 /* Reader prose formatting */
 .reader-content p {
-  margin: 0 0 var(--reader-paragraph-spacing, 1.25em);
-  text-indent: 1.5em;
-  hyphens: auto;
-  -webkit-hyphens: auto;
+  margin: 0 0 var(--reader-paragraph-spacing, 1.15em);
+  text-indent: 0;
+  overflow-wrap: anywhere;
   font-feature-settings: "kern", "liga", "onum";
 }
 
-.reader-content p:first-of-type {
-  text-indent: 0;
+/* Scoped custom reading surface tokens so headings, links, and footer buttons stay AA-legible */
+[data-reader-surface="terminal-grey"],
+[data-reader-surface="black"],
+[data-reader-surface="slate"],
+[data-reader-surface="catppuccin"],
+[data-reader-surface="catppuccin-mocha"],
+[data-reader-surface="catppuccin-jade"],
+[data-reader-surface="catppuccin-pink"],
+[data-reader-surface="catppuccin-coffee"],
+[data-reader-surface="sepia"],
+[data-reader-surface="blur"] {
+  --ink: 234 231 223;
+  --muted: 162 159 150;
+  --faint: 145 142 134;
+  --line: 48 52 50;
+  --line-strong: 74 79 75;
+  --sunken: 28 31 30;
+  --accent: 208 190 148;
+  --accent-hover: 224 208 168;
+  --on-accent: 14 16 15;
+  color-scheme: dark;
 }
 
-.reader-content p:first-of-type::first-letter {
-  float: left;
-  font-size: 3.5em;
-  line-height: 0.8;
-  padding: 0.08em 0.1em 0 0;
-  color: rgb(var(--accent));
-  font-family: var(--font-serif), "EB Garamond", serif;
-  font-weight: 500;
-}
+[data-reader-surface="terminal-grey"] { --paper: 28 31 38; --surface: 28 31 38; }
+[data-reader-surface="black"] { --paper: 9 9 11; --surface: 9 9 11; --line: 39 39 42; --line-strong: 63 63 70; }
+[data-reader-surface="slate"] { --paper: 15 23 42; --surface: 15 23 42; --line: 51 65 85; --line-strong: 71 85 105; }
+[data-reader-surface="catppuccin"] { --paper: 30 30 46; --surface: 30 30 46; --ink: 205 214 244; --muted: 166 173 200; --line: 69 71 90; --accent: 137 180 250; }
+[data-reader-surface="catppuccin-mocha"] { --paper: 17 17 27; --surface: 17 17 27; --ink: 205 214 244; --muted: 166 173 200; --line: 49 50 68; --accent: 203 166 247; }
+[data-reader-surface="catppuccin-jade"] { --paper: 20 35 27; --surface: 20 35 27; --ink: 220 242 224; --muted: 166 206 174; --line: 45 78 58; --accent: 166 227 161; }
+[data-reader-surface="catppuccin-pink"] { --paper: 40 24 39; --surface: 40 24 39; --ink: 245 214 234; --muted: 210 168 196; --line: 78 46 74; --accent: 245 194 231; }
+[data-reader-surface="catppuccin-coffee"] { --paper: 36 26 22; --surface: 36 26 22; --ink: 244 219 214; --muted: 198 166 156; --line: 74 52 44; --accent: 250 179 135; }
+[data-reader-surface="sepia"] { --paper: 24 21 18; --surface: 24 21 18; --ink: 235 220 194; --muted: 184 166 138; --line: 64 52 40; --accent: 218 186 132; }
+[data-reader-surface="blur"] { --line: 54 58 64; --line-strong: 82 88 96; }
 
-/* TWATF Reader Signature Aesthetics — Strictly Zero Glow */
-.twatf-book-cover {
-  transform: rotate(-3.5deg);
-  border: 1px solid rgb(var(--line-strong));
-  border-radius: 4px;
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
-}
-
-.twatf-book-cover:hover {
-  transform: rotate(0deg) scale(1.02);
-  border-color: rgb(var(--accent));
-}
-
-.twatf-circle-btn {
-  width: 34px;
-  height: 34px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid rgb(var(--line));
-  border-radius: 50%;
-  color: rgb(var(--muted));
-  transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
-}
-
-@media (min-width: 640px) {
-  .twatf-circle-btn {
-    width: 38px;
-    height: 38px;
-  }
-}
-
-.twatf-circle-btn:hover {
-  color: rgb(var(--ink));
-  border-color: rgb(var(--line-strong));
-  background-color: rgb(var(--sunken));
+[data-reader-surface="catppuccin-latte"] {
+  --paper: 239 241 245;
+  --surface: 239 241 245;
+  --sunken: 230 233 239;
+  --ink: 44 47 64;
+  --muted: 76 79 105;
+  --faint: 98 102 126;
+  --line: 204 208 218;
+  --line-strong: 172 176 190;
+  --accent: 175 29 39;
+  --accent-hover: 145 21 30;
+  --on-accent: 255 255 255;
+  color-scheme: light;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -245,6 +331,7 @@
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }

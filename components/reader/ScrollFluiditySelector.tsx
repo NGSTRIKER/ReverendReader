@@ -90,42 +90,47 @@ export function ScrollFluiditySelector({
   }, []);
 
   return (
-    <div className="space-y-5 text-ink font-mono text-xs">
+    <div className="space-y-5 text-ink font-sans text-xs">
       {/* Overview Banner */}
-      <div className="rounded-xl border border-line bg-sunken/80 p-3 sm:p-4">
+      <div className="rounded-xl border border-line bg-sunken/80 p-3.5 sm:p-4">
         <div className="flex items-center justify-between mb-1.5">
           <span className="flex items-center gap-1.5 font-semibold text-xs text-accent">
             <Mouse className="h-4 w-4" />
-            <span>Desktop Scroll Momentum / 鼠标平滑惯性</span>
+            <span>Desktop Scroll Momentum</span>
           </span>
-          <span className="text-[10px] uppercase tracking-wider text-muted font-bold">
+          <span className="font-mono text-[11px] uppercase tracking-wider text-muted font-semibold tnum">
             {currentFluidity === 0 ? "Off (Native)" : `${currentFluidity}% Fluidity`}
           </span>
         </div>
-        <p className="text-[11px] text-muted leading-relaxed">
-          Gives mouse wheel scrolling smooth inertial gliding. When you spin the wheel and release,
-          the page glides forward based on your scrolling speed and smoothly comes to rest.
+        <p className="text-xs text-muted leading-relaxed">
+          Gives mouse wheel scrolling smooth inertial gliding on desktop. Native touch momentum is always preserved on mobile devices.
         </p>
       </div>
 
       {/* Preset Buttons */}
       <div>
-        <label className="text-[11px] font-semibold uppercase tracking-wider text-muted mb-2 flex items-center justify-between">
-          <span className="flex items-center gap-1.5">
-            <Wind className="h-3.5 w-3.5 text-accent" />
-            <span>Fluidity Presets / 惯性档位</span>
+        <div className="text-xs font-semibold uppercase tracking-wider text-muted mb-2 flex items-center justify-between">
+          <span id="fluidity-presets-label" className="flex items-center gap-1.5">
+            <Wind className="h-3.5 w-3.5 text-accent" aria-hidden="true" />
+            <span>Fluidity Presets</span>
           </span>
-          <span className="text-[10px] text-faint">Instant Setup</span>
-        </label>
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5 sm:gap-2">
+          <span className="text-xs text-muted font-normal normal-case">Instant setup</span>
+        </div>
+        <div
+          role="radiogroup"
+          aria-labelledby="fluidity-presets-label"
+          className="grid grid-cols-2 sm:grid-cols-5 gap-1.5 sm:gap-2"
+        >
           {PRESETS.map((preset) => {
             const isSelected = currentFluidity === preset.value;
             return (
               <button
                 key={preset.label}
                 type="button"
+                role="radio"
+                aria-checked={isSelected}
                 onClick={() => handlePresetSelect(preset.value)}
-                className={`flex flex-col items-center justify-center rounded-xl border p-2 text-xs transition-all text-center ${
+                className={`flex min-h-[48px] flex-col items-center justify-center rounded-xl border p-2.5 text-xs transition-all text-center ${
                   isSelected
                     ? "border-accent bg-accent/15 text-ink font-semibold shadow-sm ring-1 ring-accent/30"
                     : "border-line bg-sunken text-muted hover:text-ink hover:border-line-strong"
@@ -133,12 +138,12 @@ export function ScrollFluiditySelector({
               >
                 <div className="flex items-center gap-1">
                   <span className="font-semibold text-xs text-ink">{preset.label}</span>
-                  {isSelected && <Check className="h-3 w-3 text-accent" />}
+                  {isSelected && <Check className="h-3 w-3 text-accent" aria-hidden="true" />}
                 </div>
-                <span className="text-[9px] uppercase tracking-wider text-accent/80 font-bold mt-0.5">
+                <span className="text-[10px] uppercase tracking-wider text-accent font-medium mt-0.5">
                   {preset.tag}
                 </span>
-                <span className="text-[9px] text-muted/80 mt-1 line-clamp-1">
+                <span className="text-[10px] text-muted mt-1 line-clamp-1">
                   {preset.desc}
                 </span>
               </button>
@@ -150,16 +155,20 @@ export function ScrollFluiditySelector({
       {/* Fluidity Fine-Tuning Slider */}
       <div className="rounded-xl border border-line bg-paper p-3.5 space-y-3">
         <div className="flex items-center justify-between text-xs">
-          <span className="font-semibold flex items-center gap-1.5">
-            <Sparkles className="h-3.5 w-3.5 text-accent" />
-            <span>Fine-Tune Momentum / 细调阻尼</span>
-          </span>
-          <span className="tabular-nums font-bold text-accent px-2 py-0.5 rounded-md bg-accent/10 border border-accent/20">
+          <label
+            htmlFor="scroll-fluidity-range"
+            className="font-semibold flex items-center gap-1.5"
+          >
+            <Sparkles className="h-3.5 w-3.5 text-accent" aria-hidden="true" />
+            <span>Fine-Tune Momentum</span>
+          </label>
+          <span className="font-mono tnum font-bold text-accent px-2 py-0.5 rounded-md bg-accent/10 border border-accent/20">
             {currentFluidity}%
           </span>
         </div>
 
         <input
+          id="scroll-fluidity-range"
           type="range"
           min="0"
           max="100"
@@ -170,37 +179,37 @@ export function ScrollFluiditySelector({
           className="w-full accent-accent cursor-pointer h-2 bg-sunken rounded-lg"
         />
 
-        <div className="flex justify-between text-[10px] text-muted tabular-nums">
-          <span>0% (Disabled)</span>
-          <span>25% (Gentle)</span>
-          <span>50% (Smooth)</span>
-          <span>75% (Fluid)</span>
-          <span>100% (Cinematic)</span>
+        <div className="flex justify-between text-[10px] text-muted tnum">
+          <span>0%</span>
+          <span>25%</span>
+          <span>50%</span>
+          <span>75%</span>
+          <span>100%</span>
         </div>
       </div>
 
       {/* Interactive Live Sandbox Preview */}
       <div className="rounded-xl border border-line bg-sunken/90 p-3 sm:p-4">
         <div className="flex items-center justify-between text-[10px] uppercase tracking-wider text-muted mb-2">
-          <span className="flex items-center gap-1">
+          <span className="flex items-center gap-1.5 font-medium">
             <Activity className="h-3 w-3 text-accent" />
-            <span>&gt;_ Live Test Sandbox (Scroll Inside Here)</span>
+            <span>Scroll Preview (Scroll Inside Box)</span>
           </span>
-          <span className="text-[9px] text-accent tabular-nums">
-            {activeVelocity > 0 ? `Speed: ${activeVelocity} px/s` : `Pos: ${testScrollY}px`}
+          <span className="font-mono text-[10px] text-accent tnum">
+            {activeVelocity > 0 ? `${activeVelocity} px/s` : `${testScrollY}px`}
           </span>
         </div>
 
         <div
           ref={sandboxRef}
           onWheel={handleSandboxWheel}
-          className="h-28 overflow-y-auto rounded-lg border border-line bg-paper/90 p-3 font-serif text-[13px] leading-relaxed select-none relative shadow-inner scroll-smooth"
+          className="h-28 overflow-y-auto rounded-lg border border-line bg-paper/90 p-3 font-serif text-sm leading-relaxed select-none relative shadow-inner scroll-smooth"
         >
           <div className="space-y-2 text-ink/90">
-            <p className="font-mono text-[10px] text-accent uppercase tracking-wider">
+            <p className="font-sans text-[11px] text-accent font-medium">
               {currentFluidity > 0
-                ? "▶ [Momentum Active: Spin your mouse wheel fast to test glide]"
-                : "▷ [Native Scroll: Smooth momentum is currently turned off]"}
+                ? "Momentum active — spin your mouse wheel inside this box to preview."
+                : "Native scroll — smooth momentum is currently turned off."}
             </p>
             <p>
               “In this world, humans are the essence of heaven and earth, and Gu are the refined spirits of myriad things.”
@@ -227,9 +236,9 @@ export function ScrollFluiditySelector({
         <button
           type="button"
           onClick={() => onChangeSettings({ scrollFluidity: 0 })}
-          className="btn-quiet text-xs py-1.5 px-3 rounded-lg flex items-center gap-1.5"
+          className="btn-quiet min-h-[44px] sm:min-h-[36px] text-xs py-1.5 px-3 rounded-lg flex items-center gap-1.5"
         >
-          <RotateCcw className="h-3 w-3" />
+          <RotateCcw className="h-3 w-3" aria-hidden="true" />
           <span>Reset to Native</span>
         </button>
       </div>

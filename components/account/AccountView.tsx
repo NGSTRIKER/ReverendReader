@@ -33,6 +33,7 @@ export function AccountView({
 }: AccountViewProps) {
   const router = useRouter();
   const [bookmarks, setBookmarks] = useState<DatabaseBookmark[]>(initialBookmarks);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [deletingBookmarkId, setDeletingBookmarkId] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<{ type: "error" | "success"; message: string } | null>(
     null
@@ -82,6 +83,7 @@ export function AccountView({
   };
 
   const handleRemoveBookmark = async (bookmark: DatabaseBookmark) => {
+    setConfirmDeleteId(null);
     setDeletingBookmarkId(bookmark.id);
     setFeedback(null);
 
@@ -128,7 +130,7 @@ export function AccountView({
     <div className="mx-auto max-w-[1120px] px-4 sm:px-8">
       {feedback && (
         <div
-          className={`mb-6 flex items-start gap-3 border p-4 text-xs ${
+          className={`mb-6 flex items-start gap-3 rounded-xl border p-4 text-xs ${
             feedback.type === "error"
               ? "border-danger/50 bg-danger/5 text-danger"
               : "border-success/50 bg-success/5 text-ink"
@@ -143,7 +145,7 @@ export function AccountView({
           <button
             type="button"
             onClick={() => setFeedback(null)}
-            className="text-xs text-muted hover:text-ink"
+            className="inline-flex h-10 w-10 sm:h-8 sm:w-8 flex-shrink-0 items-center justify-center rounded-md text-sm text-muted hover:bg-sunken hover:text-ink"
             aria-label="Close notification"
           >
             &times;
@@ -154,11 +156,11 @@ export function AccountView({
       {/* Profile Header */}
       <div
         id="profile"
-        className="scroll-mt-20 border border-line bg-surface p-6 sm:p-8"
+        className="scroll-mt-20 rounded-xl border border-line bg-surface p-6 sm:p-8"
       >
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
           <div className="flex items-center gap-4 sm:gap-5">
-            <div className="relative h-16 w-16 sm:h-20 sm:w-20 flex-shrink-0 overflow-hidden rounded-[3px] border border-line-strong bg-sunken">
+            <div className="relative h-16 w-16 sm:h-20 sm:w-20 flex-shrink-0 overflow-hidden rounded-xl border border-line-strong bg-sunken">
               {avatarUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -177,7 +179,7 @@ export function AccountView({
 
             <div>
               <p className="label text-accent">Reader Profile · Discord</p>
-              <h1 className="mt-0.5 text-xl sm:text-2xl font-semibold text-ink">
+              <h1 className="mt-0.5 font-serif text-xl sm:text-2xl font-bold text-ink">
                 {displayName}
               </h1>
 
@@ -197,12 +199,12 @@ export function AccountView({
               type="button"
               onClick={handleSignOut}
               disabled={isLoggingOut}
-              className="btn-quiet text-xs text-danger border-danger/40 hover:bg-danger/10"
+              className="btn-quiet min-h-[44px] sm:min-h-[38px] rounded-xl text-xs text-danger border-danger/40 hover:bg-danger/10"
             >
               {isLoggingOut ? (
-                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
               ) : (
-                <LogOut className="h-3.5 w-3.5" />
+                <LogOut className="h-3.5 w-3.5" aria-hidden="true" />
               )}
               <span>Sign out</span>
             </button>
@@ -214,12 +216,12 @@ export function AccountView({
       <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div
           id="progress"
-          className="scroll-mt-20 lg:col-span-2 border border-line bg-surface p-6"
+          className="scroll-mt-20 lg:col-span-2 rounded-xl border border-line bg-surface p-6"
         >
           <div className="flex items-baseline justify-between border-b border-line pb-4">
             <div>
               <p className="label text-accent">Reading Position</p>
-              <h2 className="mt-0.5 text-lg font-semibold text-ink">
+              <h2 className="mt-0.5 font-serif text-lg font-bold text-ink">
                 Current Chapter
               </h2>
             </div>
@@ -234,17 +236,17 @@ export function AccountView({
             {initialProgress ? (
               <div>
                 <div className="flex items-baseline justify-between gap-4">
-                  <div className="text-base font-medium text-ink">
+                  <div className="font-serif text-base font-medium text-ink">
                     {initialProgress.chapter_title || `Chapter ${initialProgress.chapter_number}`}
                   </div>
-                  <span className="text-xs text-muted tnum flex-shrink-0">
+                  <span className="font-mono text-xs text-muted tnum flex-shrink-0">
                     Ch. {initialProgress.chapter_number || initialProgress.chapter_id} of 2,334
                   </span>
                 </div>
 
-                <div className="mt-3 h-1.5 w-full overflow-hidden bg-sunken">
+                <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-sunken">
                   <div
-                    className="h-full bg-accent transition-all duration-200"
+                    className="h-full rounded-full bg-accent transition-all duration-200"
                     style={{ width: `${progressPercent}%` }}
                   />
                 </div>
@@ -261,9 +263,9 @@ export function AccountView({
                 </div>
 
                 <div className="mt-6">
-                  <Link href={continueUrl} className="btn-primary text-xs font-medium px-4 py-2.5">
+                  <Link href={continueUrl} className="btn-primary min-h-[44px] rounded-xl text-xs font-medium px-4 py-2.5">
                     <span>Continue reading</span>
-                    <ArrowRight className="h-3.5 w-3.5" />
+                    <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
                   </Link>
                 </div>
               </div>
@@ -274,9 +276,9 @@ export function AccountView({
                   Open any chapter to start syncing your reading position.
                 </p>
                 <div className="mt-5">
-                  <Link href="/read?id=1" className="btn-primary text-xs font-medium px-4 py-2.5">
+                  <Link href="/read?id=1" className="btn-primary min-h-[44px] rounded-xl text-xs font-medium px-4 py-2.5">
                     <span>Begin Chapter 1</span>
-                    <ArrowRight className="h-3.5 w-3.5" />
+                    <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
                   </Link>
                 </div>
               </div>
@@ -284,11 +286,11 @@ export function AccountView({
           </div>
         </div>
 
-        <div className="border border-line bg-surface p-6 flex flex-col justify-between">
+        <div className="rounded-xl border border-line bg-surface p-6 flex flex-col justify-between">
           <div>
             <div className="border-b border-line pb-4">
               <p className="label text-accent">Library</p>
-              <h2 className="mt-0.5 text-lg font-semibold text-ink">
+              <h2 className="mt-0.5 font-serif text-lg font-bold text-ink">
                 Saved Bookmarks
               </h2>
             </div>
@@ -311,12 +313,12 @@ export function AccountView({
       {/* Bookmarked Chapters */}
       <div
         id="bookmarks"
-        className="mt-8 scroll-mt-20 border border-line bg-surface p-6"
+        className="mt-8 scroll-mt-20 rounded-xl border border-line bg-surface p-6"
       >
         <div className="flex items-center justify-between border-b border-line pb-4">
           <div>
             <p className="label text-accent">Saved Places</p>
-            <h2 className="mt-0.5 text-lg font-semibold text-ink tnum">
+            <h2 className="mt-0.5 font-serif text-lg font-bold text-ink tnum">
               Bookmarked Chapters ({bookmarks.length})
             </h2>
           </div>
@@ -328,12 +330,12 @@ export function AccountView({
               {bookmarks.map((b) => (
                 <div
                   key={b.id}
-                  className="flex items-center justify-between py-3.5 px-2 hover:bg-sunken transition-colors"
+                  className="flex items-center justify-between py-3.5 px-2 hover:bg-sunken transition-colors rounded-lg"
                 >
                   <div className="min-w-0 pr-4">
                     <Link
                       href={`/read?id=${b.chapter_id}`}
-                      className="block truncate text-sm font-medium text-ink hover:text-accent transition-colors"
+                      className="block truncate font-serif text-base font-medium text-ink hover:text-accent transition-colors"
                     >
                       {b.chapter_title || `Chapter ${b.chapter_number || b.chapter_id}`}
                     </Link>
@@ -347,38 +349,58 @@ export function AccountView({
                   <div className="flex items-center gap-2 flex-shrink-0">
                     <Link
                       href={`/read?id=${b.chapter_id}`}
-                      className="btn-quiet px-3 py-1 text-xs"
+                      className="btn-quiet min-h-[44px] sm:min-h-[36px] rounded-xl px-3.5 py-1.5 text-xs"
                     >
                       Read
                     </Link>
 
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveBookmark(b)}
-                      disabled={deletingBookmarkId === b.id}
-                      className="icon-btn hover:text-danger"
-                      title="Remove bookmark"
-                      aria-label={`Remove bookmark for Chapter ${b.chapter_number || b.chapter_id}`}
-                    >
-                      {deletingBookmarkId === b.id ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <Trash2 className="h-4 w-4" />
-                      )}
-                    </button>
+                    {confirmDeleteId === b.id ? (
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveBookmark(b)}
+                          disabled={deletingBookmarkId === b.id}
+                          className="inline-flex min-h-[44px] sm:min-h-[36px] items-center rounded-xl border border-danger/50 bg-danger/10 px-3 py-1.5 text-xs font-medium text-danger hover:bg-danger/20 transition-colors"
+                        >
+                          Remove
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setConfirmDeleteId(null)}
+                          className="inline-flex min-h-[44px] sm:min-h-[36px] items-center rounded-xl border border-line px-2.5 py-1.5 text-xs text-muted hover:text-ink transition-colors"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => setConfirmDeleteId(b.id)}
+                        disabled={deletingBookmarkId === b.id}
+                        className="inline-flex h-11 w-11 sm:h-9 sm:w-9 items-center justify-center rounded-full text-muted hover:bg-sunken hover:text-danger transition-colors"
+                        title="Remove bookmark"
+                        aria-label={`Remove bookmark for Chapter ${b.chapter_number || b.chapter_id}`}
+                      >
+                        {deletingBookmarkId === b.id ? (
+                          <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                        ) : (
+                          <Trash2 className="h-4 w-4" aria-hidden="true" />
+                        )}
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}
             </div>
           ) : (
             <div className="py-10 text-center">
-              <Bookmark className="mx-auto h-8 w-8 text-faint mb-2" strokeWidth={1.5} />
+              <Bookmark className="mx-auto h-8 w-8 text-faint mb-2" strokeWidth={1.5} aria-hidden="true" />
               <p className="text-sm font-medium text-ink">No bookmarks saved yet</p>
               <p className="mt-1 text-xs text-muted">
-                Use the bookmark button in the reader header to save any chapter.
+                Use the bookmark button in the reader bar to save any chapter.
               </p>
               <div className="mt-5">
-                <Link href="/read" className="btn-quiet text-xs px-4 py-2">
+                <Link href="/read" className="btn-quiet min-h-[44px] rounded-xl text-xs px-4 py-2">
                   Open Reader
                 </Link>
               </div>

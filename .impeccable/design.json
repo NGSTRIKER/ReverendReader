@@ -1,0 +1,526 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-15T12:34:26+05:30",
+  "title": "Design System: Reverend Reader",
+  "extensions": {
+    "colorMeta": {
+      "seal-vermilion": {
+        "role": "primary",
+        "displayName": "Seal Vermilion",
+        "canonical": "oklch(48.8% 0.180 24.3)",
+        "tonalRamp": [
+          "oklch(15% 0.099 24.3)",
+          "oklch(25% 0.180 24.3)",
+          "oklch(36% 0.180 24.3)",
+          "oklch(48% 0.180 24.3)",
+          "oklch(60% 0.180 24.3)",
+          "oklch(73% 0.180 24.3)",
+          "oklch(85% 0.126 24.3)",
+          "oklch(95% 0.081 24.3)"
+        ]
+      },
+      "seal-vermilion-deep": {
+        "role": "primary",
+        "displayName": "Seal Vermilion Deep",
+        "canonical": "oklch(42.4% 0.157 24.3)",
+        "tonalRamp": [
+          "oklch(15% 0.086 24.3)",
+          "oklch(25% 0.157 24.3)",
+          "oklch(36% 0.157 24.3)",
+          "oklch(48% 0.157 24.3)",
+          "oklch(60% 0.157 24.3)",
+          "oklch(73% 0.157 24.3)",
+          "oklch(85% 0.110 24.3)",
+          "oklch(95% 0.071 24.3)"
+        ]
+      },
+      "antique-gold": {
+        "role": "secondary",
+        "displayName": "Antique Gold",
+        "canonical": "oklch(80.6% 0.060 87.5)",
+        "tonalRamp": [
+          "oklch(15% 0.033 87.5)",
+          "oklch(25% 0.060 87.5)",
+          "oklch(36% 0.060 87.5)",
+          "oklch(48% 0.060 87.5)",
+          "oklch(60% 0.060 87.5)",
+          "oklch(73% 0.060 87.5)",
+          "oklch(85% 0.042 87.5)",
+          "oklch(95% 0.027 87.5)"
+        ]
+      },
+      "antique-gold-lifted": {
+        "role": "secondary",
+        "displayName": "Antique Gold Lifted",
+        "canonical": "oklch(86.1% 0.056 88.8)",
+        "tonalRamp": [
+          "oklch(15% 0.031 88.8)",
+          "oklch(25% 0.056 88.8)",
+          "oklch(36% 0.056 88.8)",
+          "oklch(48% 0.056 88.8)",
+          "oklch(60% 0.056 88.8)",
+          "oklch(73% 0.056 88.8)",
+          "oklch(85% 0.039 88.8)",
+          "oklch(95% 0.025 88.8)"
+        ]
+      },
+      "warm-paper": {
+        "role": "neutral",
+        "displayName": "Warm Paper",
+        "canonical": "oklch(97.9% 0.007 88.6)",
+        "tonalRamp": [
+          "oklch(15% 0.004 88.6)",
+          "oklch(25% 0.007 88.6)",
+          "oklch(36% 0.007 88.6)",
+          "oklch(48% 0.007 88.6)",
+          "oklch(60% 0.007 88.6)",
+          "oklch(73% 0.007 88.6)",
+          "oklch(85% 0.005 88.6)",
+          "oklch(95% 0.003 88.6)"
+        ]
+      },
+      "clean-surface": {
+        "role": "neutral",
+        "displayName": "Clean Surface",
+        "canonical": "oklch(99.7% 0.004 91.4)",
+        "tonalRamp": [
+          "oklch(15% 0.002 91.4)",
+          "oklch(25% 0.004 91.4)",
+          "oklch(36% 0.004 91.4)",
+          "oklch(48% 0.004 91.4)",
+          "oklch(60% 0.004 91.4)",
+          "oklch(73% 0.004 91.4)",
+          "oklch(85% 0.003 91.4)",
+          "oklch(95% 0.002 91.4)"
+        ]
+      },
+      "sunken-parchment": {
+        "role": "neutral",
+        "displayName": "Sunken Parchment",
+        "canonical": "oklch(94.7% 0.012 84.6)",
+        "tonalRamp": [
+          "oklch(15% 0.006 84.6)",
+          "oklch(25% 0.012 84.6)",
+          "oklch(36% 0.012 84.6)",
+          "oklch(48% 0.012 84.6)",
+          "oklch(60% 0.012 84.6)",
+          "oklch(73% 0.012 84.6)",
+          "oklch(85% 0.008 84.6)",
+          "oklch(95% 0.005 84.6)"
+        ]
+      },
+      "carbon-ink": {
+        "role": "neutral",
+        "displayName": "Carbon Ink",
+        "canonical": "oklch(20.5% 0.006 91.6)",
+        "tonalRamp": [
+          "oklch(15% 0.003 91.6)",
+          "oklch(25% 0.006 91.6)",
+          "oklch(36% 0.006 91.6)",
+          "oklch(48% 0.006 91.6)",
+          "oklch(60% 0.006 91.6)",
+          "oklch(73% 0.006 91.6)",
+          "oklch(85% 0.004 91.6)",
+          "oklch(95% 0.003 91.6)"
+        ]
+      },
+      "stone-muted": {
+        "role": "neutral",
+        "displayName": "Stone Muted",
+        "canonical": "oklch(48.3% 0.014 84.6)",
+        "tonalRamp": [
+          "oklch(15% 0.007 84.6)",
+          "oklch(25% 0.014 84.6)",
+          "oklch(36% 0.014 84.6)",
+          "oklch(48% 0.014 84.6)",
+          "oklch(60% 0.014 84.6)",
+          "oklch(73% 0.014 84.6)",
+          "oklch(85% 0.009 84.6)",
+          "oklch(95% 0.006 84.6)"
+        ]
+      },
+      "umber-faint": {
+        "role": "neutral",
+        "displayName": "Umber Faint",
+        "canonical": "oklch(52% 0.017 80.7)",
+        "tonalRamp": [
+          "oklch(15% 0.009 80.7)",
+          "oklch(25% 0.017 80.7)",
+          "oklch(36% 0.017 80.7)",
+          "oklch(48% 0.017 80.7)",
+          "oklch(60% 0.017 80.7)",
+          "oklch(73% 0.017 80.7)",
+          "oklch(85% 0.012 80.7)",
+          "oklch(95% 0.008 80.7)"
+        ]
+      },
+      "hairline": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "oklch(89% 0.016 82.8)",
+        "tonalRamp": [
+          "oklch(15% 0.009 82.8)",
+          "oklch(25% 0.016 82.8)",
+          "oklch(36% 0.016 82.8)",
+          "oklch(48% 0.016 82.8)",
+          "oklch(60% 0.016 82.8)",
+          "oklch(73% 0.016 82.8)",
+          "oklch(85% 0.011 82.8)",
+          "oklch(95% 0.007 82.8)"
+        ]
+      },
+      "hairline-strong": {
+        "role": "neutral",
+        "displayName": "Hairline Strong",
+        "canonical": "oklch(80.4% 0.021 81.8)",
+        "tonalRamp": [
+          "oklch(15% 0.012 81.8)",
+          "oklch(25% 0.021 81.8)",
+          "oklch(36% 0.021 81.8)",
+          "oklch(48% 0.021 81.8)",
+          "oklch(60% 0.021 81.8)",
+          "oklch(73% 0.021 81.8)",
+          "oklch(85% 0.015 81.8)",
+          "oklch(95% 0.010 81.8)"
+        ]
+      },
+      "on-seal": {
+        "role": "neutral",
+        "displayName": "On Seal White",
+        "canonical": "oklch(100% 0.000 0)",
+        "tonalRamp": [
+          "oklch(15% 0.000 0)",
+          "oklch(25% 0.000 0)",
+          "oklch(36% 0.000 0)",
+          "oklch(48% 0.000 0)",
+          "oklch(60% 0.000 0)",
+          "oklch(73% 0.000 0)",
+          "oklch(85% 0.000 0)",
+          "oklch(95% 0.000 0)"
+        ]
+      },
+      "night-paper": {
+        "role": "neutral",
+        "displayName": "Night Paper",
+        "canonical": "oklch(16.6% 0.004 164.5)",
+        "tonalRamp": [
+          "oklch(15% 0.002 164.5)",
+          "oklch(25% 0.004 164.5)",
+          "oklch(36% 0.004 164.5)",
+          "oklch(48% 0.004 164.5)",
+          "oklch(60% 0.004 164.5)",
+          "oklch(73% 0.004 164.5)",
+          "oklch(85% 0.003 164.5)",
+          "oklch(95% 0.002 164.5)"
+        ]
+      },
+      "night-surface": {
+        "role": "neutral",
+        "displayName": "Night Surface",
+        "canonical": "oklch(20.5% 0.006 156.7)",
+        "tonalRamp": [
+          "oklch(15% 0.003 156.7)",
+          "oklch(25% 0.006 156.7)",
+          "oklch(36% 0.006 156.7)",
+          "oklch(48% 0.006 156.7)",
+          "oklch(60% 0.006 156.7)",
+          "oklch(73% 0.006 156.7)",
+          "oklch(85% 0.004 156.7)",
+          "oklch(95% 0.003 156.7)"
+        ]
+      },
+      "night-sunken": {
+        "role": "neutral",
+        "displayName": "Night Sunken",
+        "canonical": "oklch(18.4% 0.004 164.6)",
+        "tonalRamp": [
+          "oklch(15% 0.002 164.6)",
+          "oklch(25% 0.004 164.6)",
+          "oklch(36% 0.004 164.6)",
+          "oklch(48% 0.004 164.6)",
+          "oklch(60% 0.004 164.6)",
+          "oklch(73% 0.004 164.6)",
+          "oklch(85% 0.003 164.6)",
+          "oklch(95% 0.002 164.6)"
+        ]
+      },
+      "night-ink": {
+        "role": "neutral",
+        "displayName": "Night Ink",
+        "canonical": "oklch(92.8% 0.011 89.7)",
+        "tonalRamp": [
+          "oklch(15% 0.006 89.7)",
+          "oklch(25% 0.011 89.7)",
+          "oklch(36% 0.011 89.7)",
+          "oklch(48% 0.011 89.7)",
+          "oklch(60% 0.011 89.7)",
+          "oklch(73% 0.011 89.7)",
+          "oklch(85% 0.008 89.7)",
+          "oklch(95% 0.005 89.7)"
+        ]
+      },
+      "night-muted": {
+        "role": "neutral",
+        "displayName": "Night Muted",
+        "canonical": "oklch(67% 0.013 91.6)",
+        "tonalRamp": [
+          "oklch(15% 0.007 91.6)",
+          "oklch(25% 0.013 91.6)",
+          "oklch(36% 0.013 91.6)",
+          "oklch(48% 0.013 91.6)",
+          "oklch(60% 0.013 91.6)",
+          "oklch(73% 0.013 91.6)",
+          "oklch(85% 0.009 91.6)",
+          "oklch(95% 0.006 91.6)"
+        ]
+      },
+      "night-line": {
+        "role": "neutral",
+        "displayName": "Night Line",
+        "canonical": "oklch(28.8% 0.008 153.4)",
+        "tonalRamp": [
+          "oklch(15% 0.004 153.4)",
+          "oklch(25% 0.008 153.4)",
+          "oklch(36% 0.008 153.4)",
+          "oklch(48% 0.008 153.4)",
+          "oklch(60% 0.008 153.4)",
+          "oklch(73% 0.008 153.4)",
+          "oklch(85% 0.005 153.4)",
+          "oklch(95% 0.004 153.4)"
+        ]
+      },
+      "on-gold": {
+        "role": "neutral",
+        "displayName": "On Gold Night Ink",
+        "canonical": "oklch(17% 0.004 164.5)",
+        "tonalRamp": [
+          "oklch(15% 0.002 164.5)",
+          "oklch(25% 0.004 164.5)",
+          "oklch(36% 0.004 164.5)",
+          "oklch(48% 0.004 164.5)",
+          "oklch(60% 0.004 164.5)",
+          "oklch(73% 0.004 164.5)",
+          "oklch(85% 0.003 164.5)",
+          "oklch(95% 0.002 164.5)"
+        ]
+      },
+      "danger-crimson": {
+        "role": "semantic",
+        "displayName": "Danger Crimson",
+        "canonical": "oklch(50.5% 0.190 27.5)",
+        "tonalRamp": [
+          "oklch(15% 0.105 27.5)",
+          "oklch(25% 0.190 27.5)",
+          "oklch(36% 0.190 27.5)",
+          "oklch(48% 0.190 27.5)",
+          "oklch(60% 0.190 27.5)",
+          "oklch(73% 0.190 27.5)",
+          "oklch(85% 0.133 27.5)",
+          "oklch(95% 0.086 27.5)"
+        ]
+      },
+      "success-jade": {
+        "role": "semantic",
+        "displayName": "Success Jade",
+        "canonical": "oklch(44.8% 0.108 151.3)",
+        "tonalRamp": [
+          "oklch(15% 0.060 151.3)",
+          "oklch(25% 0.108 151.3)",
+          "oklch(36% 0.108 151.3)",
+          "oklch(48% 0.108 151.3)",
+          "oklch(60% 0.108 151.3)",
+          "oklch(73% 0.108 151.3)",
+          "oklch(85% 0.076 151.3)",
+          "oklch(95% 0.049 151.3)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Landing hero title only, pairing Roman serif regularity with italic seal accent."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Chapter titles in /read and section headlines across Landing and Account."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Dialog/drawer headers and individual book volume cards."
+      },
+      "body": {
+        "displayName": "Body Prose",
+        "purpose": "Sustained multi-chapter novel reading and editorial synopsis blocks with kern, liga, and oldstyle figures."
+      },
+      "ui-body": {
+        "displayName": "UI Body",
+        "purpose": "Interactive chrome, buttons, comments, modals, and form fields (16px minimum on mobile inputs)."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Uppercase small-caps eyebrows, volume badges, and metadata captions."
+      },
+      "mono-telemetry": {
+        "displayName": "Mono Telemetry",
+        "purpose": "Tabular chapter counters, reaction tallies, and word count indicators that must never jitter."
+      },
+      "reader-literary": {
+        "displayName": "Literary Serif",
+        "purpose": "Optional Literata digital-edition serif preset in reader font selector."
+      },
+      "reader-dyslexic": {
+        "displayName": "Dyslexia-Friendly",
+        "purpose": "Optional OpenDyslexic reader typeface preset improving character distinction."
+      }
+    },
+    "shadows": [
+      {
+        "name": "pop",
+        "value": "0 1px 2px rgb(var(--shadow) / 0.05), 0 8px 24px -4px rgb(var(--shadow) / 0.14)",
+        "purpose": "Floating dropdown menus, mobile bottom thumb dock, desktop right rail, and toast notices."
+      },
+      {
+        "name": "sheet",
+        "value": "0 0 0 1px rgb(var(--line)), 0 20px 40px -10px rgb(var(--shadow) / 0.22)",
+        "purpose": "Modal sheets (Settings, Chapters TOC, Info) and slide-over Comments drawer."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out-expo",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Slide-over drawer entry (0.2s) and upright book-cover hover lift (0.35s)."
+      },
+      {
+        "name": "transition-micro",
+        "value": "150ms cubic-bezier(0.4, 0, 0.2, 1)",
+        "purpose": "Buttons, quiet outlines, circle icon controls, and interactive row state changes."
+      },
+      {
+        "name": "transition-surface",
+        "value": "200ms cubic-bezier(0.4, 0, 0.2, 1)",
+        "purpose": "Theme and reader surface backdrop transitions; collapsed to 0.01ms under prefers-reduced-motion."
+      }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Filled cinnabar seal (or gold in dark mode) CTA for primary reading and recovery actions.",
+      "html": "<a href=\"#read\" class=\"ds-btn-primary\"><span>Start reading</span><svg viewBox=\"0 0 24 24\" width=\"16\" height=\"16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/></svg></a>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 48px; padding: 12px 20px; border: none; border-radius: 8px; background: rgb(var(--accent, 175 29 39)); color: rgb(var(--on-accent, 255 255 255)); font-family: var(--font-sans), system-ui, sans-serif; font-size: 0.875rem; font-weight: 600; line-height: 1; white-space: nowrap; text-decoration: none; cursor: pointer; box-shadow: 0 1px 2px rgb(var(--shadow, 20 18 16) / 0.08); transition: background-color 150ms ease, transform 150ms ease; } .ds-btn-primary:hover { background: rgb(var(--accent-hover, 145 21 30)); } .ds-btn-primary:focus-visible { outline: 2px solid rgb(var(--accent, 175 29 39)); outline-offset: 2px; } .ds-btn-primary:active { transform: scale(0.98); }"
+    },
+    {
+      "name": "Quiet Button",
+      "kind": "button",
+      "refersTo": "button-quiet",
+      "description": "Hairline-bordered secondary action for navigation, cancel, and chapter stepping.",
+      "html": "<button type=\"button\" class=\"ds-btn-quiet\">Previous chapter</button>",
+      "css": ".ds-btn-quiet { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 8px 14px; border: 1px solid rgb(var(--line-strong, 198 190 176)); border-radius: 8px; background: transparent; color: rgb(var(--ink, 24 23 20)); font-family: var(--font-sans), system-ui, sans-serif; font-size: 0.88rem; font-weight: 500; line-height: 1; white-space: nowrap; cursor: pointer; transition: background-color 150ms ease, border-color 150ms ease; } .ds-btn-quiet:hover { background: rgb(var(--sunken, 241 237 229)); border-color: rgb(var(--ink, 24 23 20) / 0.4); } .ds-btn-quiet:focus-visible { outline: 2px solid rgb(var(--accent, 175 29 39)); outline-offset: 2px; } .ds-btn-quiet:active { transform: scale(0.98); }"
+    },
+    {
+      "name": "Circle Icon Control",
+      "kind": "button",
+      "refersTo": "button-circle-icon",
+      "description": "44px mobile / 36px desktop circular utility button for theme toggle, modal close, and reveal.",
+      "html": "<button type=\"button\" class=\"ds-circle-icon-btn\" aria-label=\"Toggle color theme\"><svg viewBox=\"0 0 24 24\" width=\"16\" height=\"16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z\"/></svg></button>",
+      "css": ".ds-circle-icon-btn { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 9999px; border: 1px solid rgb(var(--line, 224 218 207)); background: transparent; color: rgb(var(--muted, 98 94 86)); cursor: pointer; transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease, transform 150ms ease; } .ds-circle-icon-btn:hover { background: rgb(var(--sunken, 241 237 229)); border-color: rgb(var(--line-strong, 198 190 176)); color: rgb(var(--ink, 24 23 20)); } .ds-circle-icon-btn:focus-visible { outline: 2px solid rgb(var(--accent, 175 29 39)); outline-offset: 2px; } .ds-circle-icon-btn:active { transform: scale(0.97); }"
+    },
+    {
+      "name": "Seal Stamp Badge",
+      "kind": "chip",
+      "refersTo": "seal-badge",
+      "description": "Cinnabar vermilion chop emblem (蛊) marking canonical identity and volume metadata.",
+      "html": "<span class=\"ds-seal-badge\" lang=\"zh-Hans\">蛊</span>",
+      "css": ".ds-seal-badge { display: inline-flex; align-items: center; justify-content: center; padding: 2px 8px; border-radius: 6px; border: 1px solid rgb(var(--accent, 175 29 39) / 0.4); background: rgb(var(--accent, 175 29 39) / 0.1); color: rgb(var(--accent, 175 29 39)); font-family: var(--font-mono), ui-monospace, monospace; font-size: 0.75rem; font-weight: 600; line-height: 1.3; }"
+    },
+    {
+      "name": "Text Input Field",
+      "kind": "input",
+      "refersTo": "field-input",
+      "description": "Zoom-safe 16px mobile input for chapter jump, TOC search, and comment replies.",
+      "html": "<input type=\"search\" class=\"ds-field\" placeholder=\"Search 2,334 chapters...\" aria-label=\"Search chapters\" />",
+      "css": ".ds-field { width: 100%; min-height: 44px; padding: 8px 12px; border-radius: 8px; border: 1px solid rgb(var(--line-strong, 198 190 176)); background: rgb(var(--paper, 250 248 243)); color: rgb(var(--ink, 24 23 20)); font-family: var(--font-sans), system-ui, sans-serif; font-size: 1rem; line-height: 1.5; transition: border-color 150ms ease; } .ds-field::placeholder { color: rgb(var(--faint, 110 104 94)); } .ds-field:hover { border-color: rgb(var(--ink, 24 23 20) / 0.45); } .ds-field:focus-visible { border-color: rgb(var(--accent, 175 29 39)); outline: 2px solid rgb(var(--accent, 175 29 39)); outline-offset: 2px; }"
+    },
+    {
+      "name": "Manuscript Volume Card",
+      "kind": "card",
+      "refersTo": "card-surface",
+      "description": "Hairline-framed surface card used for Book I–VI index entries and reading containers.",
+      "html": "<a href=\"#book-1\" class=\"ds-card\"><div class=\"ds-card-meta\"><span class=\"ds-card-vol\">Book I</span><span class=\"ds-card-range\">Ch. 1–199</span></div><h3 class=\"ds-card-title\">The Demon's Nature Doesn't Change</h3><p class=\"ds-card-desc\">Five hundred years of memory folded back onto Qing Mao Mountain.</p></a>",
+      "css": ".ds-card { display: flex; flex-direction: column; padding: 20px; border-radius: 12px; border: 1px solid rgb(var(--line, 224 218 207)); background: rgb(var(--surface, 255 254 251)); text-decoration: none; color: inherit; transition: background-color 150ms ease, border-color 150ms ease; } .ds-card:hover { border-color: rgb(var(--line-strong, 198 190 176)); background: rgb(var(--sunken, 241 237 229)); } .ds-card:focus-visible { outline: 2px solid rgb(var(--accent, 175 29 39)); outline-offset: 2px; } .ds-card-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; } .ds-card-vol { font-family: var(--font-serif), Georgia, serif; font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase; color: rgb(var(--accent, 175 29 39)); } .ds-card-range { font-size: 0.6875rem; font-variant-numeric: tabular-nums; color: rgb(var(--muted, 98 94 86)); } .ds-card-title { margin: 0; font-family: var(--font-serif), Georgia, serif; font-size: 1.125rem; font-weight: 500; color: rgb(var(--ink, 24 23 20)); } .ds-card-desc { margin: 8px 0 0; font-size: 0.75rem; line-height: 1.6; color: rgb(var(--muted, 98 94 86)); }"
+    },
+    {
+      "name": "Edition Radio Switcher",
+      "kind": "chip",
+      "refersTo": "edition-option",
+      "description": "Two-column mobile-friendly edition radio pair switching English and Chinese text feeds.",
+      "html": "<div role=\"radiogroup\" aria-label=\"Reading edition\" class=\"ds-edition-grid\"><button type=\"button\" role=\"radio\" aria-checked=\"true\" class=\"ds-edition-btn ds-edition-active\"><span class=\"ds-edition-title\">English</span><span class=\"ds-edition-sub\">2,334 ch.</span></button><button type=\"button\" role=\"radio\" aria-checked=\"false\" class=\"ds-edition-btn\"><span class=\"ds-edition-title\" lang=\"zh-Hans\">中文原版</span><span class=\"ds-edition-sub\">2,334 ch.</span></button></div>",
+      "css": ".ds-edition-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; } .ds-edition-btn { display: flex; flex-direction: column; align-items: flex-start; min-height: 48px; padding: 10px 12px; border-radius: 8px; border: 1px solid rgb(var(--line, 224 218 207)); background: rgb(var(--paper, 250 248 243) / 0.6); color: rgb(var(--muted, 98 94 86)); text-align: left; cursor: pointer; transition: border-color 150ms ease, background-color 150ms ease; } .ds-edition-btn:hover { border-color: rgb(var(--line-strong, 198 190 176)); color: rgb(var(--ink, 24 23 20)); } .ds-edition-btn:focus-visible { outline: 2px solid rgb(var(--accent, 175 29 39)); outline-offset: 2px; } .ds-edition-active { border-color: rgb(var(--accent, 175 29 39)); background: rgb(var(--accent, 175 29 39) / 0.1); color: rgb(var(--ink, 24 23 20)); } .ds-edition-title { font-size: 0.875rem; font-weight: 500; color: rgb(var(--ink, 24 23 20)); } .ds-edition-sub { font-size: 0.6875rem; font-variant-numeric: tabular-nums; color: rgb(var(--muted, 98 94 86)); margin-top: 2px; }"
+    },
+    {
+      "name": "Mobile Reader Thumb Dock",
+      "kind": "nav",
+      "refersTo": "reader-thumb-dock",
+      "description": "Bottom navigation bar keeping Prev/TOC/Next, Comments, Engage popover, Settings, and Hide within single-thumb reach.",
+      "html": "<nav aria-label=\"Reader controls\" class=\"ds-dock\"><button type=\"button\" class=\"ds-dock-btn\" aria-label=\"Previous chapter\"><svg viewBox=\"0 0 24 24\" width=\"16\" height=\"16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"m15 18-6-6 6-6\"/></svg></button><button type=\"button\" class=\"ds-dock-ch\">Ch. 1</button><button type=\"button\" class=\"ds-dock-btn\" aria-label=\"Next chapter\"><svg viewBox=\"0 0 24 24\" width=\"16\" height=\"16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"m9 18 6-6-6-6\"/></svg></button><button type=\"button\" class=\"ds-dock-btn\" aria-label=\"Comments\"><svg viewBox=\"0 0 24 24\" width=\"16\" height=\"16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M7.9 20A9 9 0 1 0 4 16.1L2 22Z\"/></svg></button><button type=\"button\" class=\"ds-dock-btn\" aria-label=\"Reader settings\"><svg viewBox=\"0 0 24 24\" width=\"16\" height=\"16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z\"/><circle cx=\"12\" cy=\"12\" r=\"3\"/></svg></button></nav>",
+      "css": ".ds-dock { display: flex; align-items: center; justify-content: space-between; gap: 4px; padding: 6px 8px; border-radius: 12px; border: 1px solid rgb(var(--line, 224 218 207)); background: rgb(var(--surface, 255 254 251) / 0.95); backdrop-filter: blur(12px); box-shadow: 0 1px 2px rgb(var(--shadow, 20 18 16) / 0.05), 0 8px 24px -4px rgb(var(--shadow, 20 18 16) / 0.14); } .ds-dock-btn { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border: none; border-radius: 9999px; background: transparent; color: rgb(var(--muted, 98 94 86)); cursor: pointer; transition: background-color 150ms ease, color 150ms ease; } .ds-dock-btn:hover { background: rgb(var(--sunken, 241 237 229)); color: rgb(var(--ink, 24 23 20)); } .ds-dock-btn:focus-visible { outline: 2px solid rgb(var(--accent, 175 29 39)); outline-offset: 2px; } .ds-dock-ch { min-height: 44px; padding: 0 10px; border: none; border-radius: 8px; background: transparent; font-family: var(--font-mono), ui-monospace, monospace; font-size: 0.75rem; font-weight: 500; font-variant-numeric: tabular-nums; color: rgb(var(--ink, 24 23 20)); cursor: pointer; } .ds-dock-ch:hover { background: rgb(var(--sunken, 241 237 229)); } .ds-dock-ch:focus-visible { outline: 2px solid rgb(var(--accent, 175 29 39)); outline-offset: 2px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Editorial Seal & Warm Manuscript",
+    "overview": "Reverend Reader treats an unforgiving 2,334-chapter dark fantasy novel with the stillness and discipline of a stitched manuscript edition. Rather than wrapping reading in terminal neon gradients, orbital hero chrome, or sticky engagement badges, the interface steps backward until only warm paper, crisp carbon ink, and a sparse cinnabar chop remain. Reading prose is the primary surface; every navigation rail, bookmark control, and community drawer is designed to recede cleanly when prose begins.\n\nMobile phones are the first-priority environment. On viewports below `640px`, controls consolidate into a unified docked bottom thumb bar balanced against a compact header so thumbs never hunt upward across the glass and prose preserves generous horizontal breathing room. On tablet and desktop viewports, navigation expands into a symmetric header paired with a whisper-quiet right interaction rail, never breaking the centered reading measure.",
+    "keyCharacteristics": [
+      "Tactile manuscript warmth in daylight (`#faf8f3` paper and `#af1d27` vermilion chop) paired with restrained OLED charcoal (`#0d0f0e`) and muted antique gold (`#d0be94`) at night.",
+      "Literary serif hierarchy led by Bookerly and EB Garamond for titles and long-form prose, disciplined by DM Sans chrome and tabular JetBrains Mono numerals.",
+      "Crisp 1px hairline containment and tonal surface steps (`paper` -> `surface` -> `sunken`) instead of heavy elevation drop shadows.",
+      "Mobile-first thumb ergonomics (`44px–48px` primary targets, non-zooming `16px` mobile inputs, `env(safe-area-inset-bottom)` clearance) with instant zero-gate access to both English and Chinese editions."
+    ],
+    "rules": [
+      {
+        "name": "The One-Chop Rule",
+        "body": "Reserve the vermilion (or antique gold in dark mode) fill exclusively for the primary reading action, active selection indicator, and inline `蛊` seal mark; secondary actions stay neutral ink over hairline borders so accent never exceeds roughly 10% of the viewport.",
+        "section": "colors"
+      },
+      {
+        "name": "The AA Paper Contrast Rule",
+        "body": "Every scoped dark or tinted reader surface inside `[data-reader-surface]` rebinds `--paper`, `--surface`, `--ink`, `--muted`, `--line`, and `--accent` locally in CSS so headings, links, and footer buttons stay readable (`>= 4.5:1`) regardless of global light or dark theme; the `#e4e8f0` sentinel acts solely as Auto Ink and never forces pale gray ink onto daylight or translucent surfaces.",
+        "section": "colors"
+      },
+      {
+        "name": "The Tabular Counter Rule",
+        "body": "Apply `tabular-nums lining-nums` (`tnum`) to every chapter number, reaction count, percentage readout, and word count so live progress updates and adjacent columns never shift laterally.",
+        "section": "typography"
+      },
+      {
+        "name": "The Anti-Zoom Input Rule",
+        "body": "Render interactive `<input>`, `<textarea>`, and `<select>` elements at `16px` (`text-base`) on viewports below `640px`, stepping down to `14px` (`sm:text-sm`) only on desktop so mobile Safari and Chrome never pinch-zoom the reading viewport on focus.",
+        "section": "typography"
+      },
+      {
+        "name": "The Hairline-First Rule",
+        "body": "Resting cards, navigation bars, and list containers establish depth through a `1px` `--line` stroke and a single tonal paper step; apply `shadow-pop` or `shadow-sheet` only to floating popovers, sticky rails, toast notices, and modal sheets that occlude underlying prose.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do enforce minimum `44×44px` touch targets on `<640px` mobile buttons, tabs, icon switches, and bottom dock controls, honoring `env(safe-area-inset-bottom)` under fixed bars.",
+      "Do keep dark/tinted custom reader themes isolated inside `[data-reader-surface]` scopes so theme variables invert ink, muted copy, hairlines, and buttons together at WCAG AA contrast.",
+      "Do preserve `16px` (`text-base`) input font sizes on mobile viewports, explicit `tabular-nums lining-nums` on chapter numbers and counters, and inline two-step confirmations for destructive bookmark or comment deletions.",
+      "Do keep accent color disciplined via warm paper/ink hierarchy and 1px hairline separation before introducing shadows only on floating overlays."
+    ],
+    "donts": [
+      "Don't introduce glowing orbs, tilted rotational book cover frames, glassmorphic dark gradients, or decorative dots behind landing headlines.",
+      "Don't duplicate navigation controls across both mobile top header and bottom dock simultaneously or allow custom wallpaper images to upload to remote storage.",
+      "Don't use `#e4e8f0` (Auto Ink sentinel) directly as a literal dark-text override onto daylight surfaces or hide focus indicators without replacing them cleanly via `:focus-visible`.",
+      "Don't mutate cookie keys, `DEFAULT_SETTINGS` fallback literals (`\"mono\"`, `\"matte-terminal\"`, `\"#e4e8f0\"`), or CSP/security contracts maintained by `scripts/test-security.ts`."
+    ]
+  }
+}

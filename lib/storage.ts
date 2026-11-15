@@ -13,7 +13,7 @@ export const DEFAULT_SETTINGS: ReaderSettings = {
   scrollFluidity: 0,
 };
 
-const VALID_FONTS: ReaderFont[] = ["serif", "sans", "mono", "literary", "bellota"];
+const VALID_FONTS: ReaderFont[] = ["serif", "sans", "mono", "literary", "bellota", "dyslexic"];
 
 const FONT_CLASS_MAP: Record<ReaderFont, string> = {
   mono: "font-mono",
@@ -21,6 +21,7 @@ const FONT_CLASS_MAP: Record<ReaderFont, string> = {
   literary: "font-literary",
   bellota: "font-bellota",
   serif: "font-serif",
+  dyslexic: "font-dyslexic",
 };
 
 export function getReaderFontClass(font: ReaderFont | undefined): string {
@@ -299,7 +300,7 @@ export function loadThemeSettings(): ReaderSettings {
   } catch {
     // Parse error fallback
   }
-  return DEFAULT_SETTINGS;
+  return { ...DEFAULT_SETTINGS, font: "serif" };
 }
 
 /**
@@ -396,4 +397,47 @@ export function saveSidebarVisibility(visible: boolean): void {
   } catch {
     // Ignore storage quota / privacy mode errors
   }
+}
+
+const GUEST_CHAPTER_SCROLL_KEY = "reverend_last_read_scroll";
+
+/**
+ * Persist anonymous intra-chapter scroll ratio per chapter in localStorage.
+ */
+export function saveGuestChapterScroll(chapterId: number, scrollRatio: number): void {
+  if (typeof window === "undefined") return;
+  if (!Number.isInteger(chapterId) || chapterId < 1 || !Number.isFinite(scrollRatio)) return;
+  try {
+    const clamped = Math.min(1, Math.max(0, Number(scrollRatio.toFixed(4))));
+    localStorage.setItem(
+      GUEST_CHAPTER_SCROLL_KEY,
+      JSON.stringify({ chapterId, scrollRatio: clamped })
+    );
+  } catch {
+    // Ignore storage quota / privacy mode errors
+  }
+}
+
+/**
+ * Read saved anonymous intra-chapter scroll ratio for the given chapter.
+ */
+export function loadGuestChapterScroll(chapterId: number): number | undefined {
+  if (typeof window === "undefined") return undefined;
+  try {
+    const raw = localStorage.getItem(GUEST_CHAPTER_SCROLL_KEY);
+    if (!raw) return undefined;
+    const parsed = JSON.parse(raw) as { chapterId?: unknown; scrollRatio?: unknown };
+    if (
+      parsed.chapterId === chapterId &&
+      typeof parsed.scrollRatio === "number" &&
+      Number.isFinite(parsed.scrollRatio) &&
+      parsed.scrollRatio >= 0 &&
+      parsed.scrollRatio <= 1
+    ) {
+      return parsed.scrollRatio;
+    }
+  } catch {
+    // Ignore parse errors
+  }
+  return undefined;
 }

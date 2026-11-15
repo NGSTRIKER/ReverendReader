@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Info, BookOpen } from "lucide-react";
 import { UserNav } from "@/components/auth/UserNav";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
-import { DISCORD_INVITE_URL } from "@/components/ui/DiscordIcon";
+import { DiscordIcon, DISCORD_INVITE_URL } from "@/components/ui/DiscordIcon";
 import { InfoModal } from "@/components/landing/InfoModal";
 
 export function Navigation() {
@@ -13,58 +13,64 @@ export function Navigation() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 border-b border-line bg-paper/95 font-times transition-colors duration-200">
-        <div className="mx-auto flex h-14 sm:h-16 w-full max-w-[1250px] items-center justify-between px-3.5 sm:px-8 lg:px-12">
-          {/* Brand Logo in Times New Roman — Phone Optimized */}
-          <Link href="/" className="group flex flex-col justify-center select-none min-w-0">
-            <span className="font-times text-base sm:text-2xl font-bold tracking-[0.06em] sm:tracking-[0.08em] text-ink transition-colors group-hover:text-muted truncate">
-              REVEREND <span className="font-normal italic text-accent">INSANITY</span>
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-lg focus:bg-accent focus:px-3.5 focus:py-2 focus:text-xs focus:font-semibold focus:text-on-accent focus:shadow-sheet"
+      >
+        Skip to content
+      </a>
+
+      <header className="sticky top-0 z-40 border-b border-line bg-paper/90 backdrop-blur-md font-sans transition-colors duration-200">
+        <div className="mx-auto flex h-14 sm:h-16 w-full max-w-[1250px] items-center justify-between gap-2 px-3.5 sm:px-8 lg:px-12">
+          {/* Brand Logo */}
+          <Link href="/" className="group flex flex-col justify-center select-none min-w-0 pr-1">
+            <span className="font-serif text-[15px] sm:text-xl font-semibold tracking-[0.07em] sm:tracking-[0.12em] uppercase text-ink transition-colors group-hover:text-muted whitespace-nowrap">
+              REVEREND INSANITY
             </span>
-            <span className="text-[8px] sm:text-[9px] font-times tracking-[0.18em] sm:tracking-[0.26em] text-muted uppercase font-medium truncate">
-              MASTER OF GU · 蛊真人
+            <span className="font-sans text-[9px] tracking-[0.18em] sm:tracking-[0.22em] uppercase text-muted mt-0.5 whitespace-nowrap">
+              GU ZHENREN · 蛊真人
             </span>
           </Link>
 
-          {/* Navigation Controls — Compact & Touch-Friendly on Phone */}
-          <nav aria-label="Primary" className="flex items-center gap-1.5 sm:gap-2.5 flex-shrink-0">
+          {/* Navigation Controls — 44px+ Mobile Touch Targets */}
+          <nav aria-label="Primary" className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
             {/* About / Info Modal Button */}
             <button
+              type="button"
               onClick={() => setIsInfoOpen(true)}
               aria-label="About this reader"
               title="About this reader & novel"
-              className="twatf-circle-btn"
+              className="circle-icon-btn"
             >
-              <Info className="h-4 w-4" />
+              <Info className="h-4 w-4" aria-hidden="true" />
             </button>
 
-            {/* Discord Community Button */}
+            {/* Discord Community Button — Shown in tablet+ header; accessible via Info & Footer on mobile */}
             <a
               href={DISCORD_INVITE_URL}
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Discord Community"
               title="Join our Discord community"
-              className="twatf-circle-btn"
+              className="circle-icon-btn hidden sm:inline-flex"
             >
-              <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M20.317 4.37a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z" />
-              </svg>
+              <DiscordIcon className="h-4 w-4" />
             </a>
 
             {/* Read Link */}
             <Link
               href="/read"
-              className="hidden sm:inline-flex items-center gap-1.5 rounded-lg border border-line bg-surface px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-ink transition-colors hover:border-line-strong hover:bg-sunken"
+              className="hidden sm:inline-flex min-h-[36px] items-center gap-1.5 rounded-lg border border-line bg-surface px-3 py-1.5 text-xs font-medium tracking-wide text-ink transition-colors hover:border-line-strong hover:bg-sunken"
             >
-              <BookOpen className="h-3.5 w-3.5" />
+              <BookOpen className="h-3.5 w-3.5" aria-hidden="true" />
               <span>Read</span>
             </Link>
 
-            <span className="mx-0.5 sm:mx-1 h-4 w-px bg-line" aria-hidden="true" />
+            <span className="hidden sm:inline-block mx-1 h-4 w-px bg-line" aria-hidden="true" />
 
             {/* Theme Toggle & User Account */}
-            <ThemeToggle />
-            <UserNav />
+            <ThemeToggle className="h-11 w-11 sm:h-9 sm:w-9 rounded-full border border-line" />
+            <UserNav compactMobile />
           </nav>
         </div>
       </header>

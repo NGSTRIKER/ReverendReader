@@ -130,11 +130,16 @@ export async function fetchReadingProgress(
   }
 }
 
-/** Fetches user bookmarks from Supabase, ordered by most recently created. */
-export async function fetchCloudBookmarks(
+export interface CloudBookmarksResult {
+  success: boolean;
+  bookmarks: Bookmark[];
+}
+
+/** Fetches user bookmarks cleanly while distinguishing request errors from empty lists. */
+export async function fetchCloudBookmarksResult(
   supabase: SupabaseClient<any>,
   userId: string
-): Promise<Bookmark[]> {
+): Promise<CloudBookmarksResult> {
   try {
     const { data, error } = await supabase
       .from("bookmarks")
@@ -144,20 +149,32 @@ export async function fetchCloudBookmarks(
 
     if (error) {
       console.error("Error fetching bookmarks:", error.message);
-      return [];
+      return { success: false, bookmarks: [] };
     }
 
     const items = (data || []) as DatabaseBookmark[];
-    return items.map((bookmark) => ({
-      chapterId: parseInt(bookmark.chapter_id, 10),
-      chapterNumber: bookmark.chapter_number || parseInt(bookmark.chapter_id, 10),
-      chapterTitle: bookmark.chapter_title || `Chapter ${bookmark.chapter_id}`,
-      createdAt: bookmark.created_at,
-    }));
+    return {
+      success: true,
+      bookmarks: items.map((bookmark) => ({
+        chapterId: parseInt(bookmark.chapter_id, 10),
+        chapterNumber: bookmark.chapter_number || parseInt(bookmark.chapter_id, 10),
+        chapterTitle: bookmark.chapter_title || `Chapter ${bookmark.chapter_id}`,
+        createdAt: bookmark.created_at,
+      })),
+    };
   } catch (err) {
     console.error("Network error fetching bookmarks:", err);
-    return [];
+    return { success: false, bookmarks: [] };
   }
+}
+
+/** Fetches user bookmarks from Supabase, ordered by most recently created. */
+export async function fetchCloudBookmarks(
+  supabase: SupabaseClient<any>,
+  userId: string
+): Promise<Bookmark[]> {
+  const res = await fetchCloudBookmarksResult(supabase, userId);
+  return res.bookmarks;
 }
 
 /** Adds a bookmark to Supabase. */

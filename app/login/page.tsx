@@ -50,17 +50,16 @@ function LoginForm() {
   };
 
   return (
-    <div className="w-full max-w-md border border-line bg-surface p-8 sm:p-10 shadow-sheet">
-      <div className="flex items-baseline justify-between border-b border-line pb-4 mb-6">
-        <Link href="/" className="inline-flex items-baseline gap-2 text-ink">
-          <span className="h-2 w-2 bg-accent" aria-hidden="true" />
-          <span className="font-semibold">Reverend Insanity</span>
+    <div className="w-full max-w-md rounded-2xl border border-line bg-surface p-7 sm:p-10 shadow-sheet">
+      <div className="flex items-center justify-between border-b border-line pb-4 mb-6">
+        <Link href="/" className="font-serif text-base font-bold tracking-tight text-ink py-1.5">
+          Reverend Insanity
         </Link>
-        <span className="label">蛊真人</span>
+        <ThemeToggle className="rounded-full h-11 w-11 sm:h-9 sm:w-9" />
       </div>
 
       <p className="label text-accent">Reader Account</p>
-      <h1 className="mt-1 text-2xl sm:text-3xl font-semibold tracking-[-0.015em] text-ink">
+      <h1 className="mt-1 font-serif text-2xl sm:text-3xl font-bold tracking-[-0.015em] text-ink">
         Sign in with Discord
       </h1>
       <p className="mt-2 text-sm leading-relaxed text-muted">
@@ -69,7 +68,7 @@ function LoginForm() {
       </p>
 
       {errorMessage && (
-        <div className="mt-6 flex items-start gap-2.5 border border-danger/50 bg-danger/5 p-3.5 text-left text-xs text-danger">
+        <div className="mt-6 flex items-start gap-2.5 rounded-xl border border-danger/50 bg-danger/5 p-3.5 text-left text-xs text-danger">
           <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
           <div className="flex-1">
             <span className="font-semibold">Authentication notice: </span>
@@ -78,7 +77,7 @@ function LoginForm() {
           <button
             type="button"
             onClick={() => setErrorMessage(null)}
-            className="text-xs text-danger/70 hover:text-danger"
+            className="inline-flex h-9 w-9 sm:h-7 sm:w-7 flex-shrink-0 items-center justify-center rounded-md text-sm text-danger hover:bg-danger/10"
             aria-label="Dismiss error"
           >
             &times;
@@ -91,7 +90,7 @@ function LoginForm() {
           onClick={handleDiscordSignIn}
           disabled={isLoading}
           type="button"
-          className="btn-primary w-full py-3 text-sm font-medium"
+          className="btn-primary w-full min-h-[48px] py-3 rounded-xl text-sm font-medium"
         >
           {isLoading ? (
             <>
@@ -111,15 +110,14 @@ function LoginForm() {
         </p>
       </div>
 
-      <div className="mt-8 border-t border-line pt-5 flex items-center justify-between text-xs">
+      <div className="mt-8 border-t border-line pt-4 flex items-center justify-between text-xs">
         <Link
           href={safeNext}
-          className="inline-flex items-center gap-1.5 text-muted hover:text-ink transition-colors"
+          className="inline-flex min-h-[44px] items-center gap-1.5 pr-3 text-muted hover:text-ink transition-colors"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
           <span>Return to {safeNext === "/" ? "Index" : "Reader"}</span>
         </Link>
-        <ThemeToggle />
       </div>
     </div>
   );

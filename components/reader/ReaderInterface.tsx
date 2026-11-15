@@ -23,6 +23,8 @@ import {
   setCookie,
   loadSidebarVisibility,
   saveSidebarVisibility,
+  loadGuestChapterScroll,
+  saveGuestChapterScroll,
   DEFAULT_SETTINGS,
 } from "@/lib/storage";
 import { createClient } from "@/lib/supabase/client";
@@ -42,7 +44,7 @@ import {
 import {
   syncReadingProgress,
   fetchReadingProgress,
-  fetchCloudBookmarks,
+  fetchCloudBookmarksResult,
   addCloudBookmark,
   removeCloudBookmark,
   ERROR_SAVE_FAILED,
@@ -93,6 +95,7 @@ interface ReaderInterfaceProps {
   initialScroll?: number;
   initialVersion?: number;
   initialUserId?: string;
+  initialTocOpen?: boolean;
 }
 
 interface ToastNotice {
@@ -118,22 +121,24 @@ export function ReaderInterface({
   initialScroll,
   initialVersion,
   initialUserId,
+  initialTocOpen = false,
 }: ReaderInterfaceProps) {
   const totalChaptersCount = totalChapters ?? manifest?.totalChapters ?? 2334;
   const initialId = initialChapter?.id ?? initialChapterId ?? 1;
 
   // Language & Edition State (English translation vs Chinese raw)
-  const [edition] = useState<NovelEdition>(initialEdition);
+  const [edition, setEdition] = useState<NovelEdition>(initialEdition);
   const manifestsRef = useRef<Record<NovelEdition, ChapterMetadata[] | null>>({
     en: manifest && manifest.edition !== "zh" ? manifest.chapters : null,
     zh: manifest && manifest.edition === "zh" ? manifest.chapters : null,
   });
 
-  // Ensure the chosen edition is persisted to localStorage and cookie
+  // Ensure the chosen edition is persisted to localStorage, cookie, and <html lang>
   useEffect(() => {
     try {
       localStorage.setItem("reverend_reader_edition", edition);
       setCookie("reverend_reader_edition", edition);
+      document.documentElement.lang = edition === "zh" ? "zh-Hans" : "en";
     } catch {}
   }, [edition]);
 
@@ -154,7 +159,7 @@ export function ReaderInterface({
   );
 
   // Modals State
-  const [isTocOpen, setIsTocOpen] = useState(false);
+  const [isTocOpen, setIsTocOpen] = useState(initialTocOpen);
   const [tocInitialTab, setTocInitialTab] = useState<"chapters" | "bookmarks">("chapters");
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
@@ -177,6 +182,8 @@ export function ReaderInterface({
   // Desktop fluid momentum scrolling hook
   useFluidScroll(settings.scrollFluidity ?? 0);
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
+  const [bookmarkError, setBookmarkError] = useState<string | null>(null);
+  const guestImportOfferedForRef = useRef<string | null>(null);
   const [customBgUrl, setCustomBgUrl] = useState<string | null>(null);
   const prevCustomBgRef = useRef<string | null>(null);
 
@@ -190,6 +197,7 @@ export function ReaderInterface({
   const progressPipelineRef = useRef<Promise<void>>(Promise.resolve());
   const lastAcceptedSequenceRef = useRef(new Map<string, number>());
   const scrollDebounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const guestScrollDebounceRef = useRef<NodeJS.Timeout | null>(null);
   const lastSavedScrollRef = useRef<number>(-1);
   const targetRestorationScrollRef = useRef<number | undefined>(initialScroll);
 
@@ -199,13 +207,93 @@ export function ReaderInterface({
 
     setToastNotice({ ...notice, id });
 
-    // Only auto-dismiss non-error notices
+    // Only auto-dismiss non-error notices without interactive action arrays
     if (notice.type !== "error" && !notice.actions?.length) {
       toastTimeoutRef.current = setTimeout(() => {
         setToastNotice(null);
-      }, 4000);
+      }, 4500);
     }
   }, []);
+
+  const loadUserBookmarks = useCallback(
+    async (activeUserId: string) => {
+      try {
+        const supabase = createClient();
+        const res = await fetchCloudBookmarksResult(supabase, activeUserId);
+        if (userRef.current?.id !== activeUserId) return;
+
+        if (!res.success) {
+          setBookmarkError("Couldn't load your cloud bookmarks right now.");
+          return;
+        }
+
+        setBookmarkError(null);
+        setBookmarks(res.bookmarks);
+
+        // Offer a one-click import if the signed-in reader also saved local guest bookmarks
+        if (guestImportOfferedForRef.current !== activeUserId) {
+          guestImportOfferedForRef.current = activeUserId;
+          const guestBookmarks = loadBookmarks();
+          const cloudIds = new Set(res.bookmarks.map((b) => b.chapterId));
+          const missing = guestBookmarks.filter((b) => !cloudIds.has(b.chapterId));
+
+          if (missing.length > 0) {
+            showToast({
+              type: "info",
+              message: `Found ${missing.length} bookmark${missing.length === 1 ? "" : "s"} saved on this device.`,
+              actions: [
+                {
+                  label: "Import to account",
+                  onClick: () => {
+                    setToastNotice(null);
+                    void (async () => {
+                      const sb = createClient();
+                      const imported: Bookmark[] = [];
+                      for (const item of missing) {
+                        const addRes = await addCloudBookmark(sb, activeUserId, item);
+                        if (addRes.success) {
+                          imported.push(item);
+                        }
+                      }
+                      if (userRef.current?.id === activeUserId && imported.length > 0) {
+                        setBookmarks((prev) => {
+                          const existing = new Set(prev.map((b) => b.chapterId));
+                          return [
+                            ...imported.filter((b) => !existing.has(b.chapterId)),
+                            ...prev,
+                          ];
+                        });
+                        const importedIds = new Set(imported.map((b) => b.chapterId));
+                        saveBookmarks(guestBookmarks.filter((b) => !importedIds.has(b.chapterId)));
+                        showToast({
+                          type: "success",
+                          message: `Imported ${imported.length} bookmark${imported.length === 1 ? "" : "s"} to your account.`,
+                        });
+                      } else if (imported.length === 0) {
+                        showToast({
+                          type: "error",
+                          message: "Couldn't import local bookmarks right now.",
+                        });
+                      }
+                    })();
+                  },
+                },
+                {
+                  label: "Not now",
+                  onClick: () => setToastNotice(null),
+                },
+              ],
+            });
+          }
+        }
+      } catch {
+        if (userRef.current?.id === activeUserId) {
+          setBookmarkError("Couldn't load your cloud bookmarks right now.");
+        }
+      }
+    },
+    [showToast]
+  );
 
   // Check auth and load account-scoped cloud data.
   useEffect(() => {
@@ -226,6 +314,7 @@ export function ReaderInterface({
       if (!activeUser) {
         currentVersionRef.current = null;
         versionOwnerRef.current = null;
+        setBookmarkError(null);
         setBookmarks(loadBookmarks());
         return;
       }
@@ -234,13 +323,10 @@ export function ReaderInterface({
         currentVersionRef.current = null;
         versionOwnerRef.current = null;
       }
+      setBookmarkError(null);
       setBookmarks([]);
 
-      fetchCloudBookmarks(supabase, activeUser.id).then((cloud) => {
-        if (!disposed && userRef.current?.id === activeUser.id) {
-          setBookmarks(cloud);
-        }
-      });
+      void loadUserBookmarks(activeUser.id);
 
       fetchReadingProgress(supabase, activeUser.id).then((snapshot) => {
         if (!disposed && userRef.current?.id === activeUser.id && snapshot.success) {
@@ -267,27 +353,25 @@ export function ReaderInterface({
       disposed = true;
       subscription.unsubscribe();
     };
-  }, []);
+  }, [loadUserBookmarks]);
 
-  // Load saved preferences and bookmarks on mount from cookies/localStorage
+  // Load saved preferences, sidebar visibility, and guest chapter scroll ratio on mount
   useEffect(() => {
     try {
       const stored = loadThemeSettings();
       setSettings(stored);
       setSidebarVisible(loadSidebarVisibility());
 
-      // If no initialChapterId was passed via URL and no cloud progress set it
-      const lastRead = localStorage.getItem("reverend_last_read");
-      if (lastRead && initialId === 1 && !initialChapter) {
-        const id = parseInt(lastRead, 10);
-        if (!isNaN(id) && id >= 1 && id <= totalChaptersCount) {
-          setCurrentChapterId(id);
+      if (!initialUserId && initialScroll === undefined) {
+        const guestScroll = loadGuestChapterScroll(initialId);
+        if (typeof guestScroll === "number" && guestScroll > 0.02) {
+          targetRestorationScrollRef.current = guestScroll;
         }
       }
     } catch {
       // Ignore local storage / cookie read errors
     }
-  }, [initialId, totalChaptersCount, initialChapter]);
+  }, [initialId, initialUserId, initialScroll]);
 
   // Asynchronously fetch chapters manifest in the background (prevents 488KB SSR HTML payload)
   useEffect(() => {
@@ -334,6 +418,12 @@ export function ReaderInterface({
       }
       if (settingsSaveTimerRef.current) {
         clearTimeout(settingsSaveTimerRef.current);
+      }
+      if (toastTimeoutRef.current) {
+        clearTimeout(toastTimeoutRef.current);
+      }
+      if (guestScrollDebounceRef.current) {
+        clearTimeout(guestScrollDebounceRef.current);
       }
       if (pendingSettingsRef.current) {
         saveThemeSettings(pendingSettingsRef.current);
@@ -413,6 +503,7 @@ export function ReaderInterface({
                 nextVersion
               );
               if (rebased) window.dispatchEvent(new Event("online"));
+              setToastNotice(null);
             },
           },
           {
@@ -694,29 +785,58 @@ export function ReaderInterface({
     return () => document.removeEventListener("visibilitychange", handleVisibility);
   }, [flushProgressNow]);
 
-  // Scroll listener: debounced progress sync
+  // Reset scroll tracking refs whenever active chapter changes
+  useEffect(() => {
+    lastSavedScrollRef.current = -1;
+    if (scrollDebounceTimerRef.current) {
+      clearTimeout(scrollDebounceTimerRef.current);
+      scrollDebounceTimerRef.current = null;
+    }
+    if (guestScrollDebounceRef.current) {
+      clearTimeout(guestScrollDebounceRef.current);
+      guestScrollDebounceRef.current = null;
+    }
+  }, [currentChapterId]);
+
+  // Scroll listener: debounced progress sync (signed-in cloud + guest localStorage)
   useEffect(() => {
     const handleScroll = () => {
-      if (!userRef.current || !currentChapter) return;
+      if (!currentChapter) return;
+
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      const normalized =
+        maxScroll > 0 ? Math.min(1, Math.max(0, window.scrollY / maxScroll)) : 0;
+
+      if (!userRef.current) {
+        if (guestScrollDebounceRef.current) {
+          clearTimeout(guestScrollDebounceRef.current);
+        }
+        guestScrollDebounceRef.current = setTimeout(() => {
+          saveGuestChapterScroll(currentChapter.id, normalized);
+        }, 600);
+        return;
+      }
 
       if (scrollDebounceTimerRef.current) {
         clearTimeout(scrollDebounceTimerRef.current);
       }
 
       scrollDebounceTimerRef.current = setTimeout(() => {
-        const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-        const normalized =
-          maxScroll > 0 ? Math.min(1, Math.max(0, window.scrollY / maxScroll)) : 0;
+        const latestMaxScroll = document.documentElement.scrollHeight - window.innerHeight;
+        const latestNormalized =
+          latestMaxScroll > 0
+            ? Math.min(1, Math.max(0, window.scrollY / latestMaxScroll))
+            : 0;
 
         // Only save if scroll changed by at least 1%
-        if (Math.abs(normalized - lastSavedScrollRef.current) >= 0.01) {
+        if (Math.abs(latestNormalized - lastSavedScrollRef.current) >= 0.01) {
           const payload: ProgressPayload = {
             chapter_id: String(currentChapter.id),
             chapter_number: currentChapter.number,
             chapter_title: currentChapter.title,
-            scroll_position: normalized,
-              expected_version:
-                versionOwnerRef.current === userRef.current?.id ? currentVersionRef.current : null,
+            scroll_position: latestNormalized,
+            expected_version:
+              versionOwnerRef.current === userRef.current?.id ? currentVersionRef.current : null,
           };
           dispatchProgressSave(payload);
         }
@@ -728,6 +848,9 @@ export function ReaderInterface({
       window.removeEventListener("scroll", handleScroll);
       if (scrollDebounceTimerRef.current) {
         clearTimeout(scrollDebounceTimerRef.current);
+      }
+      if (guestScrollDebounceRef.current) {
+        clearTimeout(guestScrollDebounceRef.current);
       }
     };
   }, [currentChapter, dispatchProgressSave]);
@@ -844,7 +967,7 @@ export function ReaderInterface({
     [bookmarks, user, showToast]
   );
 
-  // Restore scroll position after content renders
+  // Restore scroll position after content renders and fonts finish laying out
   useEffect(() => {
     if (loading || !content) return;
 
@@ -852,18 +975,31 @@ export function ReaderInterface({
       const scrollRatio = targetRestorationScrollRef.current;
       targetRestorationScrollRef.current = undefined;
 
-      // Small tick to ensure layout measurement is accurate
-      const timer = setTimeout(() => {
-        const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-        if (maxScroll > 0) {
-          window.scrollTo({
-            top: scrollRatio * maxScroll,
-            behavior: "instant",
-          });
-        }
-      }, 100);
+      let cancelled = false;
+      const applyScroll = () => {
+        if (cancelled) return;
+        requestAnimationFrame(() => {
+          if (cancelled) return;
+          const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+          if (maxScroll > 0) {
+            window.scrollTo({
+              top: scrollRatio * maxScroll,
+              behavior: "instant",
+            });
+          }
+        });
+      };
 
-      return () => clearTimeout(timer);
+      const fontsReady =
+        typeof document !== "undefined" && "fonts" in document ? document.fonts.ready : Promise.resolve();
+      void Promise.race([
+        fontsReady,
+        new Promise((resolve) => setTimeout(resolve, 300)),
+      ]).then(applyScroll);
+
+      return () => {
+        cancelled = true;
+      };
     }
   }, [loading, content]);
 
@@ -895,11 +1031,12 @@ export function ReaderInterface({
         url.searchParams.set("c", String(id));
         url.searchParams.set("edition", edition);
         url.searchParams.delete("scroll");
+        url.searchParams.delete("toc");
         window.history.replaceState({}, "", url.toString());
 
-        // If not restoring scroll, scroll to top
+        // If not restoring scroll, jump cleanly to chapter top
         if (targetRestorationScrollRef.current === undefined) {
-          window.scrollTo({ top: 0, behavior: "smooth" });
+          window.scrollTo({ top: 0, behavior: "instant" });
         }
 
         // Preload next and previous chapters in background
@@ -910,7 +1047,7 @@ export function ReaderInterface({
           preloadChapter({ id: id - 1 }, edition);
         }
       } catch (err: unknown) {
-        const message = err instanceof Error ? err.message : "Failed to load chapter content.";
+        const message = err instanceof Error ? err.message : "Couldn't load this chapter right now.";
         setError(message);
         setLoading(false);
       }
@@ -955,10 +1092,45 @@ export function ReaderInterface({
     loadChapter(currentChapterId);
   }, [loadChapter, currentChapterId]);
 
-  const handleSelectChapterFromModal = (id: number) => {
-    flushProgressNow();
-    setCurrentChapterId(id);
-  };
+  const handleSelectChapterFromModal = useCallback(
+    (id: number) => {
+      flushProgressNow();
+      setCurrentChapterId(id);
+    },
+    [flushProgressNow]
+  );
+
+  const handleChangeEdition = useCallback(
+    (nextEdition: NovelEdition) => {
+      if (nextEdition === edition) return;
+      flushProgressNow();
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      if (maxScroll > 0) {
+        const currentRatio = Math.min(1, Math.max(0, window.scrollY / maxScroll));
+        if (currentRatio > 0.02) {
+          targetRestorationScrollRef.current = currentRatio;
+        }
+      }
+      setEdition(nextEdition);
+    },
+    [edition, flushProgressNow]
+  );
+
+  const handleOpenToc = useCallback(() => {
+    setTocInitialTab("chapters");
+    setIsTocOpen(true);
+  }, []);
+
+  const handleOpenBookmarks = useCallback(() => {
+    setTocInitialTab("bookmarks");
+    setIsTocOpen(true);
+  }, []);
+
+  const handleCloseToc = useCallback(() => setIsTocOpen(false), []);
+  const handleOpenSettings = useCallback(() => setIsSettingsOpen(true), []);
+  const handleCloseSettings = useCallback(() => setIsSettingsOpen(false), []);
+  const handleOpenComments = useCallback(() => setIsCommentsOpen(true), []);
+  const handleCloseComments = useCallback(() => setIsCommentsOpen(false), []);
 
   // Toggle sidebar visibility and persist to localStorage
   const handleToggleSidebarVisible = useCallback((nextVisible: boolean) => {
@@ -1179,8 +1351,8 @@ export function ReaderInterface({
         />
       )}
 
-      {/* Main Container */}
-      <div className="relative z-10 flex min-h-screen flex-col">
+      {/* Main Container (no outer z-10 stacking context so fixed drawers/popovers layer predictably) */}
+      <div className="flex min-h-screen flex-col">
         {/* Navigation Bar */}
         <ChapterNavigation
           currentChapter={currentChapter}
@@ -1189,20 +1361,19 @@ export function ReaderInterface({
           hasNext={hasNext}
           onPrev={handlePrev}
           onNext={handleNext}
-          onOpenToc={() => {
-            setTocInitialTab("chapters");
-            setIsTocOpen(true);
-          }}
-          onOpenSettings={() => setIsSettingsOpen(true)}
+          onOpenToc={handleOpenToc}
+          onOpenSettings={handleOpenSettings}
           isBookmarked={isCurrentBookmarked}
           onToggleBookmark={handleToggleBookmark}
+          edition={edition}
+          onChangeEdition={handleChangeEdition}
           settings={settings}
         />
 
-        {/* Reading Canvas (reserves right padding only when sidebar is visible so text is never covered) */}
+        {/* Reading Canvas (reserves right padding only on desktop when sidebar is visible) */}
         <main
           className={`flex-1 transition-[padding] duration-200 ${
-            sidebarVisible ? "pl-3 pr-11 sm:pl-6 sm:pr-16" : "px-3 sm:px-6"
+            sidebarVisible ? "px-3.5 sm:pl-6 sm:pr-16" : "px-3.5 sm:px-6"
           }`}
         >
           <ChapterContent
@@ -1215,13 +1386,15 @@ export function ReaderInterface({
             hasNext={hasNext}
             onPrev={handlePrev}
             onNext={handleNext}
+            onOpenToc={handleOpenToc}
             settings={settings}
             hasCustomBg={Boolean(customBgUrl)}
+            edition={edition}
           />
         </main>
       </div>
 
-      {/* Slim Right-Side Chapter Interaction Sidebar */}
+      {/* Unified Mobile Bottom Thumb Bar & Desktop Right-Side Interaction Rail */}
       <InteractionSidebar
         visible={sidebarVisible}
         onToggleVisible={handleToggleSidebarVisible}
@@ -1229,22 +1402,26 @@ export function ReaderInterface({
         isBookmarked={isCurrentBookmarked}
         isCommentsOpen={isCommentsOpen}
         onToggleLike={handleToggleChapterLike}
-        onOpenComments={() => setIsCommentsOpen(true)}
+        onOpenComments={handleOpenComments}
         onToggleBookmark={handleToggleBookmark}
         onSelectReaction={handleSelectChapterReaction}
-        onOpenBookmarksModal={() => {
-          setTocInitialTab("bookmarks");
-          setIsTocOpen(true);
-        }}
+        onOpenBookmarksModal={handleOpenBookmarks}
         user={user}
         currentChapterId={currentChapterId}
+        currentChapterNumber={currentChapter.number}
+        hasPrev={hasPrev}
+        hasNext={hasNext}
+        onPrev={handlePrev}
+        onNext={handleNext}
+        onOpenToc={handleOpenToc}
+        onOpenSettings={handleOpenSettings}
         settings={settings}
       />
 
       {/* Chapter Comments Drawer (Lazy Loaded, fetches only when opened) */}
       <CommentsDrawer
         isOpen={isCommentsOpen}
-        onClose={() => setIsCommentsOpen(false)}
+        onClose={handleCloseComments}
         chapter={currentChapter}
         totalCommentCount={socialState.commentCount}
         onCommentCountDelta={handleCommentCountDelta}
@@ -1256,7 +1433,7 @@ export function ReaderInterface({
       {/* Table of Contents & Bookmarks Modal (Lazy Loaded) */}
       <ChapterSelectorModal
         isOpen={isTocOpen}
-        onClose={() => setIsTocOpen(false)}
+        onClose={handleCloseToc}
         chapters={chapters}
         currentChapterId={currentChapterId}
         onSelectChapter={handleSelectChapterFromModal}
@@ -1264,12 +1441,14 @@ export function ReaderInterface({
         onRemoveBookmark={handleRemoveBookmark}
         initialTab={tocInitialTab}
         isLoading={isManifestLoading}
+        bookmarkError={bookmarkError}
+        onRetryBookmarks={() => user && void loadUserBookmarks(user.id)}
       />
 
       {/* Settings Modal (Lazy Loaded) */}
       <SettingsModal
         isOpen={isSettingsOpen}
-        onClose={() => setIsSettingsOpen(false)}
+        onClose={handleCloseSettings}
         settings={settings}
         onChangeSettings={handleUpdateSettings}
         customBgUrl={customBgUrl}
@@ -1278,9 +1457,12 @@ export function ReaderInterface({
 
       {/* Floating Toast Notification */}
       {toastNotice && (
-        <div className="fixed bottom-5 right-5 z-50 max-w-sm">
+        <div
+          role={toastNotice.type === "error" ? "alert" : "status"}
+          className="fixed bottom-20 left-3.5 right-3.5 sm:left-auto sm:bottom-5 sm:right-5 sm:max-w-sm z-[70] [margin-bottom:env(safe-area-inset-bottom,0px)] sm:mb-0"
+        >
           <div
-            className={`flex items-start gap-3 border p-3.5 shadow-pop bg-surface text-xs ${
+            className={`flex items-start gap-3 rounded-2xl border p-3.5 shadow-pop bg-surface text-xs ${
               toastNotice.type === "error"
                 ? "border-danger/60 text-danger"
                 : toastNotice.type === "success"
@@ -1289,45 +1471,45 @@ export function ReaderInterface({
             }`}
           >
             {toastNotice.type === "error" ? (
-              <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-danger" />
+              <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-danger" aria-hidden="true" />
             ) : toastNotice.type === "success" ? (
-              <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-success" />
+              <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-success" aria-hidden="true" />
             ) : (
-              <LogIn className="mt-0.5 h-4 w-4 flex-shrink-0 text-accent" />
+              <LogIn className="mt-0.5 h-4 w-4 flex-shrink-0 text-accent" aria-hidden="true" />
             )}
 
-            <div className="flex-1">
+            <div className="flex-1 min-w-0">
               <p className="leading-relaxed">{toastNotice.message}</p>
               {toastNotice.action && (
-                <div className="mt-2">
+                <div className="mt-1.5">
                   {toastNotice.action.href ? (
                     <Link
                       href={toastNotice.action.href}
-                      className="inline-flex items-center gap-1 text-xs font-semibold text-accent hover:underline"
+                      className="inline-flex min-h-[36px] items-center gap-1 text-xs font-semibold text-accent hover:underline"
                     >
                       <span>{toastNotice.action.label}</span>
-                      <span>&#8594;</span>
+                      <span aria-hidden="true">&#8594;</span>
                     </Link>
                   ) : toastNotice.action.onClick ? (
                     <button
                       type="button"
                       onClick={toastNotice.action.onClick}
-                      className="inline-flex items-center gap-1 text-xs font-semibold text-accent hover:underline"
+                      className="inline-flex min-h-[36px] items-center gap-1 text-xs font-semibold text-accent hover:underline"
                     >
-                      <RefreshCw className="h-3 w-3" />
+                      <RefreshCw className="h-3 w-3" aria-hidden="true" />
                       <span>{toastNotice.action.label}</span>
                     </button>
                   ) : null}
                 </div>
               )}
               {toastNotice.actions?.length ? (
-                <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1">
+                <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-1">
                   {toastNotice.actions.map((action) => (
                     <button
                       key={action.label}
                       type="button"
                       onClick={action.onClick}
-                      className="text-xs font-semibold text-accent hover:underline"
+                      className="min-h-[36px] text-xs font-semibold text-accent hover:underline"
                     >
                       {action.label}
                     </button>
@@ -1339,10 +1521,10 @@ export function ReaderInterface({
             <button
               type="button"
               onClick={() => setToastNotice(null)}
-              className="text-muted hover:text-ink p-0.5"
+              className="inline-flex h-9 w-9 sm:h-7 sm:w-7 flex-shrink-0 items-center justify-center rounded-lg text-muted hover:bg-sunken hover:text-ink"
               aria-label="Dismiss notification"
             >
-              <X className="h-3.5 w-3.5" />
+              <X className="h-3.5 w-3.5" aria-hidden="true" />
             </button>
           </div>
         </div>

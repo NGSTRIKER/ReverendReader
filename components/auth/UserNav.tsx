@@ -58,16 +58,21 @@ export function AccountMenuContent({
 }: AccountMenuContentProps) {
   const router = useRouter();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [signOutError, setSignOutError] = useState<string | null>(null);
 
   const handleSignOut = async () => {
     setIsLoggingOut(true);
+    setSignOutError(null);
     try {
       const supabase = createClient();
-      await supabase.auth.signOut();
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        throw error;
+      }
       onClose();
       router.refresh();
-    } catch (err) {
-      console.error("Error signing out:", err);
+    } catch {
+      setSignOutError("Couldn't sign out right now. Please try again.");
     } finally {
       setIsLoggingOut(false);
     }
@@ -85,9 +90,9 @@ export function AccountMenuContent({
         <Link
           href={loginUrl}
           onClick={onClose}
-          className="btn-primary w-full py-2 text-xs font-medium"
+          className="btn-primary w-full min-h-[44px] py-2 text-xs font-medium"
         >
-          <LogIn className="h-3.5 w-3.5" />
+          <LogIn className="h-3.5 w-3.5" aria-hidden="true" />
           <span>Sign in with Discord</span>
         </Link>
       </div>
@@ -100,7 +105,7 @@ export function AccountMenuContent({
     <div>
       {/* User Info Header */}
       <div className="flex items-center gap-2.5 border-b border-line px-3 py-2.5">
-        <div className="relative h-8 w-8 flex-shrink-0 overflow-hidden rounded-[3px] border border-line bg-sunken">
+        <div className="relative h-8 w-8 flex-shrink-0 overflow-hidden rounded-full border border-line bg-sunken">
           {avatarUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -112,7 +117,7 @@ export function AccountMenuContent({
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center text-xs text-accent">
-              <UserIcon className="h-4 w-4" />
+              <UserIcon className="h-4 w-4" aria-hidden="true" />
             </div>
           )}
         </div>
@@ -125,77 +130,90 @@ export function AccountMenuContent({
         </div>
       </div>
 
+      {signOutError && (
+        <div
+          role="alert"
+          className="mx-2 mt-2 rounded-lg border border-danger/40 bg-danger/10 px-2.5 py-2 text-[11px] text-danger"
+        >
+          {signOutError}
+        </div>
+      )}
+
       {/* Menu Items */}
-      <div className="py-1">
+      <div className="py-1" role="menu" aria-label="Account actions">
         <Link
           href="/account#profile"
+          role="menuitem"
           onClick={onClose}
-          className="flex items-center gap-2.5 rounded-[3px] px-3 py-2 text-left text-xs text-ink hover:bg-sunken transition-colors"
+          className="flex min-h-[44px] sm:min-h-[40px] items-center gap-2.5 rounded-xl px-3 py-2 text-left text-xs text-ink hover:bg-sunken transition-colors"
         >
-          <UserCheck className="h-3.5 w-3.5 text-accent" />
+          <UserCheck className="h-3.5 w-3.5 text-accent" aria-hidden="true" />
           <span>Profile</span>
         </Link>
 
         <Link
           href="/account"
+          role="menuitem"
           onClick={onClose}
-          className="flex items-center gap-2.5 rounded-[3px] px-3 py-2 text-left text-xs text-ink hover:bg-sunken transition-colors"
+          className="flex min-h-[44px] sm:min-h-[40px] items-center gap-2.5 rounded-xl px-3 py-2 text-left text-xs text-ink hover:bg-sunken transition-colors"
         >
-          <LayoutDashboard className="h-3.5 w-3.5 text-accent" />
+          <LayoutDashboard className="h-3.5 w-3.5 text-accent" aria-hidden="true" />
           <span>Account overview</span>
         </Link>
 
         {onOpenBookmarks ? (
           <button
             type="button"
+            role="menuitem"
             onClick={() => {
               onClose();
               onOpenBookmarks();
             }}
-            className="flex w-full items-center gap-2.5 rounded-[3px] px-3 py-2 text-left text-xs text-ink hover:bg-sunken transition-colors"
+            className="flex w-full min-h-[44px] sm:min-h-[40px] items-center gap-2.5 rounded-xl px-3 py-2 text-left text-xs text-ink hover:bg-sunken transition-colors"
           >
-            <Bookmark className="h-3.5 w-3.5 text-accent" />
+            <Bookmark className="h-3.5 w-3.5 text-accent" aria-hidden="true" />
             <span>Bookmarks</span>
           </button>
         ) : (
           <Link
             href="/account#bookmarks"
+            role="menuitem"
             onClick={onClose}
-            className="flex items-center gap-2.5 rounded-[3px] px-3 py-2 text-left text-xs text-ink hover:bg-sunken transition-colors"
+            className="flex min-h-[44px] sm:min-h-[40px] items-center gap-2.5 rounded-xl px-3 py-2 text-left text-xs text-ink hover:bg-sunken transition-colors"
           >
-            <Bookmark className="h-3.5 w-3.5 text-accent" />
+            <Bookmark className="h-3.5 w-3.5 text-accent" aria-hidden="true" />
             <span>Bookmarks</span>
           </Link>
         )}
 
         <Link
           href="/account#progress"
+          role="menuitem"
           onClick={onClose}
-          className="flex items-center gap-2.5 rounded-[3px] px-3 py-2 text-left text-xs text-ink hover:bg-sunken transition-colors"
+          className="flex min-h-[44px] sm:min-h-[40px] items-center gap-2.5 rounded-xl px-3 py-2 text-left text-xs text-ink hover:bg-sunken transition-colors"
         >
-          <Compass className="h-3.5 w-3.5 text-accent" />
+          <Compass className="h-3.5 w-3.5 text-accent" aria-hidden="true" />
           <span>Reading progress</span>
         </Link>
-      </div>
 
-      <div className="border-t border-line my-0.5" />
+        <div className="border-t border-line my-1" role="separator" />
 
-      {/* Logout */}
-      <div className="py-1">
+        {/* Logout */}
         <button
           type="button"
+          role="menuitem"
           onClick={handleSignOut}
           disabled={isLoggingOut}
-          className="flex w-full items-center gap-2.5 rounded-[3px] px-3 py-2 text-left text-xs text-danger hover:bg-danger/10 transition-colors disabled:opacity-50"
+          className="flex w-full min-h-[44px] sm:min-h-[40px] items-center gap-2.5 rounded-xl px-3 py-2 text-left text-xs text-danger hover:bg-danger/10 transition-colors disabled:opacity-50"
         >
           {isLoggingOut ? (
             <>
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
               <span>Signing out...</span>
             </>
           ) : (
             <>
-              <LogOut className="h-3.5 w-3.5" />
+              <LogOut className="h-3.5 w-3.5" aria-hidden="true" />
               <span>Sign out</span>
             </>
           )}
@@ -207,15 +225,17 @@ export function AccountMenuContent({
 
 interface UserNavProps {
   compact?: boolean;
+  compactMobile?: boolean;
 }
 
-export function UserNav({ compact = false }: UserNavProps) {
+export function UserNav({ compact = false, compactMobile = false }: UserNavProps) {
   const pathname = usePathname();
 
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     let supabase: ReturnType<typeof createClient>;
@@ -258,6 +278,7 @@ export function UserNav({ compact = false }: UserNavProps) {
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
         setIsDropdownOpen(false);
+        triggerRef.current?.focus();
       }
     }
 
@@ -273,7 +294,16 @@ export function UserNav({ compact = false }: UserNavProps) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-8 w-8 rounded-[3px] bg-sunken">
+      <div
+        className={`flex items-center justify-center rounded-full bg-sunken ${
+          compact
+            ? "h-9 w-9"
+            : compactMobile
+              ? "h-11 w-11 sm:h-9 sm:w-20"
+              : "h-11 w-11 sm:h-9 sm:w-20"
+        }`}
+        aria-hidden="true"
+      >
         <span className="sr-only">Loading user...</span>
       </div>
     );
@@ -288,14 +318,18 @@ export function UserNav({ compact = false }: UserNavProps) {
         href={loginUrl}
         className={
           compact
-            ? "icon-btn rounded-xl h-9 w-9 text-ink"
-            : "btn-quiet px-3 py-1.5 text-xs"
+            ? "icon-btn rounded-full h-11 w-11 sm:h-9 sm:w-9 text-ink"
+            : compactMobile
+              ? "inline-flex items-center justify-center rounded-full h-11 w-11 sm:h-9 sm:w-auto sm:px-3.5 sm:py-1.5 border border-line sm:border-line-strong text-xs font-medium text-ink transition-colors hover:bg-sunken whitespace-nowrap gap-1.5"
+              : "btn-quiet rounded-full min-h-[44px] sm:min-h-[36px] px-3.5 py-1.5 text-xs"
         }
         title="Sign in"
         aria-label="Sign in"
       >
-        <LogIn className="h-4 w-4 text-accent" />
-        <span className={compact ? "sr-only" : ""}>Sign in</span>
+        <LogIn className="h-4 w-4 text-accent" aria-hidden="true" />
+        <span className={compact ? "sr-only" : compactMobile ? "sr-only sm:not-sr-only" : ""}>
+          Sign in
+        </span>
       </Link>
     );
   }
@@ -305,33 +339,39 @@ export function UserNav({ compact = false }: UserNavProps) {
   return (
     <div className="relative inline-block text-left" ref={dropdownRef}>
       <button
+        ref={triggerRef}
         type="button"
         onClick={() => setIsDropdownOpen((prev) => !prev)}
-        className="group flex items-center gap-2 rounded-[3px] p-0.5"
+        className="group flex h-11 w-11 sm:h-9 sm:w-9 items-center justify-center rounded-full p-0.5 hover:bg-sunken transition-colors"
         aria-expanded={isDropdownOpen}
-        aria-haspopup="true"
+        aria-haspopup="menu"
+        aria-label={`Account menu for ${displayName}`}
         title={`Account: ${displayName}`}
       >
-        <div className="relative h-7 w-7 overflow-hidden rounded-[3px] border border-line-strong bg-sunken">
+        <div className="relative h-8 w-8 overflow-hidden rounded-full border border-line-strong bg-sunken">
           {avatarUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={avatarUrl}
-              alt={displayName}
-              width={28}
-              height={28}
+              alt=""
+              width={32}
+              height={32}
               className="h-full w-full object-cover"
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center text-xs text-accent">
-              <UserIcon className="h-3.5 w-3.5" />
+              <UserIcon className="h-3.5 w-3.5" aria-hidden="true" />
             </div>
           )}
         </div>
       </button>
 
       {isDropdownOpen && (
-        <div className="absolute right-0 z-50 mt-2 w-56 origin-top-right border border-line bg-surface p-1.5 shadow-pop">
+        <div
+          role="dialog"
+          aria-label="Account menu"
+          className="absolute right-0 z-[60] mt-2 w-60 origin-top-right rounded-2xl border border-line bg-surface p-1.5 shadow-pop"
+        >
           <AccountMenuContent
             user={user}
             loginUrl={loginUrl}

@@ -49,6 +49,7 @@ import {
   type CommentReportReason,
 } from "@/lib/supabase/social";
 import { extractUserIdentity } from "@/components/auth/UserNav";
+import { useDialogAccessibility } from "@/components/ui/useDialogAccessibility";
 
 interface CommentsDrawerProps {
   isOpen: boolean;
@@ -112,8 +113,9 @@ export function CommentsDrawer({
   // Revealed spoiler comment ids
   const [revealedSpoilers, setRevealedSpoilers] = useState<Set<string>>(new Set());
 
-  // Open More menu comment id
+  // Open More menu comment id & two-step delete confirm id
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
   // Inline Edit state
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
@@ -129,6 +131,17 @@ export function CommentsDrawer({
 
   const listContainerRef = useRef<HTMLDivElement>(null);
   const loadedKeyRef = useRef<string | null>(null);
+  const drawerPanelRef = useRef<HTMLDivElement>(null);
+  const reportModalRef = useRef<HTMLFormElement>(null);
+
+  useDialogAccessibility(isOpen, onClose, drawerPanelRef, {
+    disabled: Boolean(reportingComment),
+  });
+  useDialogAccessibility(
+    Boolean(reportingComment),
+    () => setReportingComment(null),
+    reportModalRef
+  );
 
   const drawerBg = "bg-surface";
   const drawerBorder = "border-line";
@@ -260,23 +273,29 @@ export function CommentsDrawer({
     submittingEdit,
   ]);
 
-  // Escape key closes report modal, active menu, or drawer
+  // Click outside or Escape closes open comment action menu
   useEffect(() => {
-    if (!isOpen) return;
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        if (reportingComment) {
-          setReportingComment(null);
-        } else if (openMenuId) {
-          setOpenMenuId(null);
-        } else {
-          onClose();
-        }
+    if (!isOpen || !openMenuId) return;
+    const handleMouseDown = (e: MouseEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (!target?.closest("[data-comment-menu-root]")) {
+        setOpenMenuId(null);
+        setConfirmDeleteId(null);
       }
     };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, reportingComment, openMenuId, onClose]);
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setOpenMenuId(null);
+        setConfirmDeleteId(null);
+      }
+    };
+    document.addEventListener("mousedown", handleMouseDown);
+    window.addEventListener("keydown", handleKeyDown, true);
+    return () => {
+      document.removeEventListener("mousedown", handleMouseDown);
+      window.removeEventListener("keydown", handleKeyDown, true);
+    };
+  }, [isOpen, openMenuId]);
 
   const handleLoadMoreComments = useCallback(async () => {
     if (!hasMore || !cursor || loadingMore || loadingInitial) return;
@@ -852,54 +871,88 @@ export function CommentsDrawer({
             )}
 
             {!item.is_deleted && (
-              <div className="relative">
+              <div className="relative" data-comment-menu-root>
                 <button
                   type="button"
-                  onClick={() => setOpenMenuId(isMenuOpen ? null : item.id)}
+                  onClick={() => {
+                    setConfirmDeleteId(null);
+                    setOpenMenuId(isMenuOpen ? null : item.id);
+                  }}
                   aria-label="Comment actions"
                   aria-expanded={isMenuOpen}
                   data-testid="comment-more-btn"
-                  className={`rounded-lg p-1 ${textSecondary} hover:bg-sunken hover:text-ink focus:outline-none`}
+                  className={`inline-flex h-10 w-10 sm:h-8 sm:w-8 items-center justify-center rounded-lg ${textSecondary} hover:bg-sunken hover:text-ink`}
                 >
-                  <MoreHorizontal className="h-3.5 w-3.5" />
+                  <MoreHorizontal className="h-4 w-4 sm:h-3.5 sm:w-3.5" aria-hidden="true" />
                 </button>
 
                 {isMenuOpen && (
                   <div
                     role="menu"
-                    className="absolute right-0 top-full z-30 mt-1 w-36 rounded-xl border border-line-strong bg-surface p-1 shadow-xl"
+                    className="absolute right-0 top-full z-30 mt-1 w-40 rounded-xl border border-line-strong bg-surface p-1 shadow-xl"
                   >
                     {item.is_own && (
                       <>
                         <button
                           type="button"
+                          role="menuitem"
                           onClick={() => {
                             setOpenMenuId(null);
+                            setConfirmDeleteId(null);
                             setEditingCommentId(item.id);
                             setEditText(item.content);
                             setEditSpoiler(item.is_spoiler);
                           }}
-                          className="flex w-full items-center space-x-2 rounded-lg px-2.5 py-1.5 text-left text-xs text-ink hover:bg-sunken"
+                          className="flex w-full min-h-[40px] sm:min-h-[34px] items-center space-x-2 rounded-lg px-2.5 py-1.5 text-left text-xs text-ink hover:bg-sunken"
                         >
-                          <Pencil className="h-3 w-3 text-accent" />
+                          <Pencil className="h-3.5 w-3.5 text-accent" aria-hidden="true" />
                           <span>Edit</span>
                         </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setOpenMenuId(null);
-                            void handleDeleteComment(item);
-                          }}
-                          className="flex w-full items-center space-x-2 rounded-lg px-2.5 py-1.5 text-left text-xs text-danger hover:bg-danger/10"
-                        >
-                          <Trash2 className="h-3 w-3" />
-                          <span>Delete</span>
-                        </button>
+                        {confirmDeleteId === item.id ? (
+                          <div className="space-y-1 p-1 border-t border-line mt-1">
+                            <p className="px-1.5 text-[11px] font-medium text-danger">
+                              Delete comment?
+                            </p>
+                            <div className="flex gap-1">
+                              <button
+                                type="button"
+                                role="menuitem"
+                                onClick={() => {
+                                  setOpenMenuId(null);
+                                  setConfirmDeleteId(null);
+                                  void handleDeleteComment(item);
+                                }}
+                                className="flex-1 min-h-[36px] rounded-lg bg-danger/15 px-2 py-1 text-[11px] font-semibold text-danger hover:bg-danger/25"
+                              >
+                                Delete
+                              </button>
+                              <button
+                                type="button"
+                                role="menuitem"
+                                onClick={() => setConfirmDeleteId(null)}
+                                className="flex-1 min-h-[36px] rounded-lg border border-line px-2 py-1 text-[11px] text-muted hover:text-ink"
+                              >
+                                Keep
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <button
+                            type="button"
+                            role="menuitem"
+                            onClick={() => setConfirmDeleteId(item.id)}
+                            className="flex w-full min-h-[40px] sm:min-h-[34px] items-center space-x-2 rounded-lg px-2.5 py-1.5 text-left text-xs text-danger hover:bg-danger/10"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
+                            <span>Delete</span>
+                          </button>
+                        )}
                       </>
                     )}
                     {!item.is_own && (
                       <button
                         type="button"
+                        role="menuitem"
                         onClick={() => {
                           setOpenMenuId(null);
                           if (!user) {
@@ -914,9 +967,9 @@ export function CommentsDrawer({
                           setReportReason("spam");
                           setReportDetails("");
                         }}
-                        className="flex w-full items-center space-x-2 rounded-lg px-2.5 py-1.5 text-left text-xs text-accent hover:bg-sunken"
+                        className="flex w-full min-h-[40px] sm:min-h-[34px] items-center space-x-2 rounded-lg px-2.5 py-1.5 text-left text-xs text-accent hover:bg-sunken"
                       >
-                        <Flag className="h-3 w-3" />
+                        <Flag className="h-3.5 w-3.5" aria-hidden="true" />
                         <span>Report</span>
                       </button>
                     )}
@@ -938,9 +991,11 @@ export function CommentsDrawer({
               <textarea
                 value={editText}
                 onChange={(e) => setEditText(e.target.value)}
+                placeholder="Update your comment..."
+                aria-label="Edit comment"
                 maxLength={COMMENT_MAX_LENGTH}
                 rows={3}
-                className={`w-full rounded-lg border ${drawerBorder} ${inputBg} p-2 text-xs ${textPrimary} focus:border-accent focus:outline-none`}
+                className={`w-full rounded-lg border ${drawerBorder} ${inputBg} p-2 text-base sm:text-xs ${textPrimary} focus:border-accent`}
               />
               <div className="flex items-center justify-between gap-2">
                 <label className="inline-flex cursor-pointer items-center space-x-1.5 text-[11px] text-accent">
@@ -992,7 +1047,7 @@ export function CommentsDrawer({
             <div>
               <p
                 data-testid="comment-content-text"
-                className={`whitespace-pre-wrap break-words text-xs leading-relaxed ${textPrimary}`}
+                className={`whitespace-pre-wrap break-words text-[13px] sm:text-sm leading-relaxed ${textPrimary}`}
               >
                 {item.content}
               </p>
@@ -1012,23 +1067,24 @@ export function CommentsDrawer({
 
         {/* Footer actions: Like, Reply (top-level only), Show/Hide replies */}
         {!item.is_deleted && (
-          <div className="mt-2.5 flex items-center space-x-4">
+          <div className="mt-2 flex items-center space-x-2">
             <button
               type="button"
               onClick={() => void handleToggleCommentLike(item)}
               aria-label={item.viewer_liked ? "Unlike comment" : "Like comment"}
               aria-pressed={item.viewer_liked}
               data-testid="comment-like-btn"
-              className={`inline-flex items-center space-x-1 font-mono text-[11px] transition-colors ${
+              className={`inline-flex min-h-[36px] sm:min-h-[32px] items-center space-x-1.5 rounded-lg px-2 font-mono text-xs transition-colors ${
                 item.viewer_liked
-                  ? "text-danger font-semibold"
-                  : `${textSecondary} hover:text-accent`
+                  ? "text-accent font-semibold bg-accent/10"
+                  : `${textSecondary} hover:text-accent hover:bg-sunken`
               }`}
             >
               <Heart
                 className={`h-3.5 w-3.5 ${
                   item.viewer_liked ? "fill-current text-accent" : ""
                 }`}
+                aria-hidden="true"
               />
               <span>{item.like_count > 0 ? item.like_count : "Like"}</span>
             </button>
@@ -1047,9 +1103,9 @@ export function CommentsDrawer({
                   }
                 }}
                 data-testid="comment-reply-btn"
-                className={`inline-flex items-center space-x-1 text-[11px] ${textSecondary} hover:text-accent transition-colors`}
+                className={`inline-flex min-h-[36px] sm:min-h-[32px] items-center space-x-1.5 rounded-lg px-2 text-xs ${textSecondary} hover:text-accent hover:bg-sunken transition-colors`}
               >
-                <MessageSquareReply className="h-3.5 w-3.5" />
+                <MessageSquareReply className="h-3.5 w-3.5" aria-hidden="true" />
                 <span>Reply</span>
               </button>
             )}
@@ -1059,7 +1115,7 @@ export function CommentsDrawer({
                 type="button"
                 onClick={() => void handleToggleReplies(item.id)}
                 data-testid="toggle-replies-btn"
-                className="inline-flex items-center space-x-1 text-[11px] font-medium text-accent hover:underline"
+                className="inline-flex min-h-[36px] sm:min-h-[32px] items-center space-x-1 rounded-lg px-2 text-xs font-medium text-accent hover:underline"
               >
                 {replyThreads[item.id]?.expanded ? (
                   <>
@@ -1112,15 +1168,16 @@ export function CommentsDrawer({
           <form
             onSubmit={(e) => void handleSubmitReply(e, item.id)}
             data-testid="reply-composer-form"
-            className={`mt-3 rounded-xl border ${drawerBorder} ${inputBg} p-2.5`}
+            className={`mt-3 rounded-xl border ${drawerBorder} ${inputBg} p-2.5 focus-within:ring-2 focus-within:ring-accent focus-within:border-accent`}
           >
             <textarea
               value={replyText}
               onChange={(e) => setReplyText(e.target.value)}
               placeholder={`Reply to ${authorLabel}...`}
+              aria-label={`Reply to ${authorLabel}`}
               maxLength={COMMENT_MAX_LENGTH}
               rows={2}
-              className={`w-full resize-none bg-transparent text-xs ${textPrimary} placeholder-faint focus:outline-none`}
+              className={`w-full resize-none bg-transparent text-base sm:text-xs ${textPrimary} placeholder-faint focus-visible:outline-none`}
             />
             {replyError && (
               <p className="mt-1 text-[11px] text-danger">{replyError}</p>
@@ -1214,7 +1271,9 @@ export function CommentsDrawer({
 
       {/* Drawer Panel: Full height overlay on mobile, right-side drawer on desktop */}
       <div
-        className={`relative z-10 flex h-full w-full sm:w-[420px] md:w-[450px] flex-col border-l ${drawerBorder} ${drawerBg} ${textPrimary} shadow-2xl pointer-events-auto animate-in slide-in-from-right duration-200`}
+        ref={drawerPanelRef}
+        tabIndex={-1}
+        className={`relative z-10 flex h-full w-full sm:w-[420px] md:w-[450px] flex-col border-l ${drawerBorder} ${drawerBg} ${textPrimary} shadow-2xl pointer-events-auto drawer-enter focus:outline-none`}
         style={{
           paddingBottom: "env(safe-area-inset-bottom, 0px)",
         }}
@@ -1248,15 +1307,15 @@ export function CommentsDrawer({
             onClick={onClose}
             aria-label="Close comments drawer"
             data-testid="close-comments-drawer-btn"
-            className={`rounded-lg p-1.5 ${textSecondary} hover:bg-sunken hover:text-ink focus:outline-none`}
+            className="circle-icon-btn flex-shrink-0"
           >
-            <X className="h-4 w-4" />
+            <X className="h-4 w-4" aria-hidden="true" />
           </button>
         </header>
 
         {/* Sorting Bar: Top, Newest, Oldest */}
         <div
-          className={`flex items-center justify-between border-b ${drawerBorder} px-4 py-2 text-xs`}
+          className={`flex items-center justify-between border-b ${drawerBorder} px-4 py-1.5 text-xs`}
         >
           <span className={`text-[11px] ${textSecondary}`}>Sort by</span>
           <div className="flex items-center space-x-1" role="tablist" aria-label="Sort comments">
@@ -1270,7 +1329,7 @@ export function CommentsDrawer({
                   aria-selected={active}
                   data-testid={`sort-comments-${option}`}
                   onClick={() => setSort(option)}
-                  className={`rounded-lg px-2.5 py-1 text-[11px] capitalize transition-colors ${
+                  className={`min-h-[40px] sm:min-h-[34px] rounded-lg px-3 py-1 text-xs capitalize transition-colors ${
                     active
                       ? "bg-accent/15 text-accent font-semibold"
                       : `${textSecondary} hover:bg-sunken hover:text-ink`
@@ -1367,7 +1426,7 @@ export function CommentsDrawer({
               onSubmit={(e) => void handleSubmitComment(e)}
               data-testid="comment-composer-form"
             >
-              <div className={`rounded-xl border ${drawerBorder} ${inputBg} p-2.5 focus-within:border-accent`}>
+              <div className={`rounded-xl border ${drawerBorder} ${inputBg} p-2.5 focus-within:ring-2 focus-within:ring-accent focus-within:border-accent`}>
                 <textarea
                   value={composerText}
                   onChange={(e) => {
@@ -1375,10 +1434,11 @@ export function CommentsDrawer({
                     if (composerError) setComposerError(null);
                   }}
                   placeholder={`Share your thoughts on Chapter ${chapter.number}...`}
+                  aria-label={`Write a comment on Chapter ${chapter.number}`}
                   maxLength={COMMENT_MAX_LENGTH}
                   rows={2}
                   data-testid="comment-composer-input"
-                  className={`w-full resize-none bg-transparent text-xs ${textPrimary} placeholder-faint focus:outline-none`}
+                  className={`w-full resize-none bg-transparent text-base sm:text-xs ${textPrimary} placeholder-faint focus-visible:outline-none`}
                 />
 
                 {composerError && (
@@ -1415,12 +1475,12 @@ export function CommentsDrawer({
                     type="submit"
                     disabled={submittingComment || !composerText.trim()}
                     data-testid="comment-submit-btn"
-                    className="inline-flex items-center space-x-1.5 rounded-lg bg-accent px-3 py-1.5 text-xs font-semibold text-on-accent hover:bg-accent-hover transition-colors disabled:opacity-40"
+                    className="inline-flex min-h-[40px] sm:min-h-[34px] items-center space-x-1.5 rounded-lg bg-accent px-3.5 py-1.5 text-xs font-semibold text-on-accent hover:bg-accent-hover transition-colors disabled:opacity-40"
                   >
                     {submittingComment ? (
-                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
                     ) : (
-                      <Send className="h-3.5 w-3.5" />
+                      <Send className="h-3.5 w-3.5" aria-hidden="true" />
                     )}
                     <span>Post</span>
                   </button>
@@ -1430,16 +1490,16 @@ export function CommentsDrawer({
           ) : (
             <div
               data-testid="comment-auth-prompt"
-              className={`flex items-center justify-between rounded-xl border ${drawerBorder} ${cardBg} px-3.5 py-2.5`}
+              className={`flex items-center justify-between gap-2 rounded-xl border ${drawerBorder} ${cardBg} px-3.5 py-2.5`}
             >
               <span className={`text-xs ${textSecondary}`}>
                 Sign in with Discord to join the chapter discussion.
               </span>
               <Link
                 href={loginUrl}
-                className="inline-flex items-center space-x-1.5 rounded-lg bg-accent px-3 py-1.5 text-xs font-semibold text-white hover:bg-accent-hover transition-colors"
+                className="inline-flex min-h-[40px] sm:min-h-[34px] items-center space-x-1.5 rounded-lg bg-accent px-3.5 py-1.5 text-xs font-semibold text-on-accent hover:bg-accent-hover transition-colors flex-shrink-0"
               >
-                <LogIn className="h-3.5 w-3.5" />
+                <LogIn className="h-3.5 w-3.5" aria-hidden="true" />
                 <span>Login</span>
               </Link>
             </div>
@@ -1456,21 +1516,23 @@ export function CommentsDrawer({
             className="absolute inset-0 z-40 flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm"
           >
             <form
+              ref={reportModalRef}
+              tabIndex={-1}
               onSubmit={(e) => void handleSubmitReport(e)}
-              className={`w-full max-w-sm rounded-2xl border ${drawerBorder} ${drawerBg} p-5 shadow-2xl`}
+              className={`w-full max-w-sm rounded-2xl border ${drawerBorder} ${drawerBg} p-5 shadow-2xl focus:outline-none`}
             >
               <div className="flex items-center justify-between border-b border-line pb-3">
                 <div className="flex items-center space-x-2">
-                  <Flag className="h-4 w-4 text-accent" />
+                  <Flag className="h-4 w-4 text-accent" aria-hidden="true" />
                   <h3 className="font-serif text-sm font-semibold">Report Comment</h3>
                 </div>
                 <button
                   type="button"
                   onClick={() => setReportingComment(null)}
-                  className={`${textSecondary} hover:text-ink`}
+                  className="circle-icon-btn"
                   aria-label="Close report dialog"
                 >
-                  <X className="h-4 w-4" />
+                  <X className="h-4 w-4" aria-hidden="true" />
                 </button>
               </div>
 
@@ -1509,9 +1571,10 @@ export function CommentsDrawer({
                     value={reportDetails}
                     onChange={(e) => setReportDetails(e.target.value)}
                     placeholder="Optional details (up to 500 characters)..."
+                    aria-label="Additional report details"
                     maxLength={REPORT_DETAILS_MAX_LENGTH}
                     rows={2}
-                    className={`w-full rounded-lg border ${drawerBorder} ${inputBg} p-2 text-xs ${textPrimary} placeholder-faint focus:border-accent focus:outline-none`}
+                    className={`w-full rounded-lg border ${drawerBorder} ${inputBg} p-2 text-base sm:text-xs ${textPrimary} placeholder-faint focus:border-accent`}
                   />
                 </div>
               </div>
@@ -1520,7 +1583,7 @@ export function CommentsDrawer({
                 <button
                   type="button"
                   onClick={() => setReportingComment(null)}
-                  className={`rounded-lg px-3 py-1.5 text-xs ${textSecondary} hover:text-ink`}
+                  className={`min-h-[40px] sm:min-h-[34px] rounded-lg px-3 py-1.5 text-xs ${textSecondary} hover:text-ink`}
                 >
                   Cancel
                 </button>
@@ -1528,9 +1591,9 @@ export function CommentsDrawer({
                   type="submit"
                   disabled={submittingReport}
                   data-testid="submit-report-btn"
-                  className="inline-flex items-center space-x-1.5 rounded-lg bg-danger px-3.5 py-1.5 text-xs font-semibold text-on-accent hover:opacity-90 disabled:opacity-50"
+                  className="inline-flex min-h-[40px] sm:min-h-[34px] items-center space-x-1.5 rounded-lg bg-danger px-3.5 py-1.5 text-xs font-semibold text-on-accent hover:opacity-90 disabled:opacity-50"
                 >
-                  {submittingReport && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+                  {submittingReport && <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />}
                   <span>Submit Report</span>
                 </button>
               </div>

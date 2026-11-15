@@ -174,9 +174,13 @@ export default async function ReadPage({ searchParams }: ReadPageProps) {
   const initialContent = getServerChapterContent(chapterMeta, initialEdition);
 
   // Read and sanitize saved typography settings from server-side cookies
-  const { settings: initialSettings } = resolveSettingsFromCookies(
+  const { settings: rawSettings, hasLoaded } = resolveSettingsFromCookies(
     (name) => cookieStore.get(name)?.value
   );
+  const initialSettings = hasLoaded
+    ? rawSettings
+    : { ...rawSettings, font: "serif" as const };
+  const initialTocOpen = resolvedParams.toc === "1" || resolvedParams.toc === "true";
 
   return (
     <ReaderInterface
@@ -188,6 +192,7 @@ export default async function ReadPage({ searchParams }: ReadPageProps) {
       initialScroll={initialScroll}
       initialVersion={initialVersion}
       initialUserId={initialUserId}
+      initialTocOpen={initialTocOpen}
     />
   );
 }

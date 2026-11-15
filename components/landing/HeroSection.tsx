@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Download, Layers } from "lucide-react";
-import { SpinningOrbsSphere } from "@/components/landing/SpinningOrbsSphere";
+import { ArrowRight, Download } from "lucide-react";
 import { setCookie } from "@/lib/storage";
 
 interface HeroSectionProps {
@@ -11,89 +10,11 @@ interface HeroSectionProps {
   initialEdition?: "en" | "zh";
 }
 
-interface VolumeOption {
-  id: string;
-  number: string;
-  numberZh: string;
-  title: string;
-  titleZh: string;
-  range: string;
-  startChapter: number;
-  chapterCount: number;
-}
-
-const VOLUMES: VolumeOption[] = [
-  {
-    id: "vol-1",
-    number: "I",
-    numberZh: "卷一",
-    title: "Nature Does Not Change",
-    titleZh: "魔性不改",
-    range: "Chapters 1–199",
-    startChapter: 1,
-    chapterCount: 199,
-  },
-  {
-    id: "vol-2",
-    number: "II",
-    numberZh: "卷二",
-    title: "The Demon Leaves the Mountain",
-    titleZh: "魔头出山",
-    range: "Chapters 200–405",
-    startChapter: 200,
-    chapterCount: 206,
-  },
-  {
-    id: "vol-3",
-    number: "III",
-    numberZh: "卷三",
-    title: "The Demon's Rampage",
-    titleZh: "魔乱天下",
-    range: "Chapters 406–649",
-    startChapter: 406,
-    chapterCount: 244,
-  },
-  {
-    id: "vol-4",
-    number: "IV",
-    numberZh: "卷四",
-    title: "The Demon Sovereign Rises",
-    titleZh: "魔皇称雄",
-    range: "Chapters 650–1,021",
-    startChapter: 650,
-    chapterCount: 372,
-  },
-  {
-    id: "vol-5",
-    number: "V",
-    numberZh: "卷五",
-    title: "A Demon King's Might",
-    titleZh: "魔尊纵横",
-    range: "Chapters 1,022–1,966",
-    startChapter: 1022,
-    chapterCount: 945,
-  },
-  {
-    id: "vol-6",
-    number: "VI",
-    numberZh: "卷六",
-    title: "Eternal Life",
-    titleZh: "宿命天成",
-    range: "Chapters 1,967–2,334",
-    startChapter: 1967,
-    chapterCount: 368,
-  },
-];
-
 export function HeroSection({
   continueChapter = null,
   initialEdition = "en",
 }: HeroSectionProps) {
   const [languageEdition, setLanguageEdition] = useState<"en" | "zh">(initialEdition);
-  const [selectedEdition, setSelectedEdition] = useState<"complete" | string>("complete");
-  const [isArtHovered, setIsArtHovered] = useState(false);
-  const [isCardHovered, setIsCardHovered] = useState(false);
-  const [pointerTilt, setPointerTilt] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     try {
@@ -109,266 +30,193 @@ export function HeroSection({
     try {
       localStorage.setItem("reverend_reader_edition", ed);
       setCookie("reverend_reader_edition", ed);
+      document.documentElement.lang = ed === "zh" ? "zh-Hans" : "en";
     } catch {}
   };
 
   const isZh = languageEdition === "zh";
 
-  const activeVolume =
-    selectedEdition === "complete"
-      ? null
-      : VOLUMES.find((v) => v.id === selectedEdition) || null;
-
-  let primaryHref = `/read?c=1&edition=${languageEdition}`;
-  let primaryLabel = isZh ? "章节目录" : "Chapters";
-
-  if (activeVolume) {
-    primaryHref = `/read?c=${activeVolume.startChapter}&edition=${languageEdition}`;
-    primaryLabel = isZh
-      ? `阅读${activeVolume.numberZh} (${activeVolume.titleZh})`
-      : `Read Book ${activeVolume.number}`;
-  } else if (continueChapter && continueChapter >= 1) {
-    primaryHref = `/read?c=${continueChapter}&edition=${languageEdition}`;
-    primaryLabel = isZh
+  const hasResume = Boolean(continueChapter && continueChapter >= 1);
+  const primaryHref = hasResume
+    ? `/read?c=${continueChapter}&edition=${languageEdition}`
+    : `/read?edition=${languageEdition}`;
+  const primaryLabel = hasResume
+    ? isZh
       ? `继续阅读第 ${continueChapter} 节`
-      : `Continue Chapter ${continueChapter}`;
-  } else {
-    primaryHref = `/read?c=1&edition=${languageEdition}`;
-    primaryLabel = isZh ? "开始阅读第一节 (中文原版)" : "Begin Chapter 1";
-  }
-
-  const handlePointerMove = (e: React.MouseEvent<HTMLElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-    const ny = ((e.clientY - rect.top) / rect.height) * 2 - 1;
-    setPointerTilt({ x: nx, y: ny });
-  };
-
-  const handlePointerLeave = () => {
-    setIsArtHovered(false);
-    setIsCardHovered(false);
-    setPointerTilt({ x: 0, y: 0 });
-  };
-
-  const sphereActive = isArtHovered || isCardHovered;
+      : `Continue Chapter ${continueChapter}`
+    : isZh
+      ? "开始阅读"
+      : "Start Reading";
 
   return (
-    <section
-      className="relative overflow-hidden py-7 sm:py-16 lg:py-24 font-times"
-      onMouseMove={handlePointerMove}
-      onMouseLeave={handlePointerLeave}
-    >
+    <section className="relative py-5 sm:py-12 lg:py-16 font-sans">
       <div className="mx-auto max-w-[1250px] px-3.5 sm:px-8 lg:px-12">
-        {/* 2-Column Grid — Phone-Optimized & Desktop Balanced */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.18fr] items-center gap-8 sm:gap-12 lg:gap-16">
-          {/* Left Column: Book Cover with Interactive Spinning Orbs Sphere Behind It */}
-          <div
-            className="relative flex flex-col items-center text-center"
-            onMouseEnter={() => setIsArtHovered(true)}
-            onMouseLeave={() => setIsArtHovered(false)}
-            onTouchStart={() => setIsArtHovered(true)}
-            onTouchEnd={() => setIsArtHovered(false)}
-          >
-            <div className="relative w-full max-w-[290px] sm:max-w-[420px] aspect-square flex items-center justify-center">
-              {/* Interactive Spinning Orbs Sphere (Replaces Glow & Static Orbit) */}
-              <SpinningOrbsSphere
-                isHovered={sphereActive}
-                tiltX={pointerTilt.x}
-                tiltY={pointerTilt.y}
-                className="absolute inset-0 w-full h-full z-0"
+        <div className="grid grid-cols-1 lg:grid-cols-[270px_1fr] items-center gap-4 sm:gap-10 lg:gap-14">
+          {/* Left Column: Upright Book Cover & Editorial Seal Meta */}
+          <div className="flex flex-row lg:flex-col items-center lg:items-center gap-4 sm:gap-6 text-left lg:text-center px-1 sm:px-0">
+            <picture className="relative block flex-shrink-0">
+              <source type="image/webp" srcSet="/images/book-cover.webp" />
+              <img
+                id="cover"
+                src="/images/book-cover.jpg"
+                alt="Reverend Insanity book cover featuring Fang Yuan"
+                width={800}
+                height={1170}
+                loading="eager"
+                fetchPriority="high"
+                className="book-cover-frame w-[76px] sm:w-[132px] lg:w-[250px] max-h-[370px] object-cover shadow-sheet"
               />
+            </picture>
 
-              {/* 3D Tilted Official Book Cover — Zero Glow */}
-              <picture className="relative z-10 block">
-                <source type="image/webp" srcSet="/images/book-cover.webp" />
-                <img
-                  id="cover"
-                  src="/images/book-cover.jpg"
-                  alt="Reverend Insanity official book cover featuring Fang Yuan"
-                  width={800}
-                  height={1170}
-                  loading="eager"
-                  fetchPriority="high"
-                  className="twatf-book-cover w-[168px] sm:w-[255px] md:w-[290px] max-h-[420px] object-cover mx-auto"
-                />
-              </picture>
+            <div className="flex flex-col justify-center lg:items-center gap-1.5 min-w-0">
+              <div className="inline-flex items-center gap-2 lg:hidden">
+                <span className="seal-badge" aria-hidden="true">
+                  蛊
+                </span>
+                <span className="text-[11px] font-medium tracking-[0.16em] uppercase text-muted">
+                  {isZh ? "五域九天 · 免费阅读" : "FIVE REGIONS · NINE HEAVENS"}
+                </span>
+              </div>
+              <span className="hidden lg:inline-block mt-1 text-[10px] tracking-[0.24em] uppercase text-muted">
+                FIVE REGIONS · NINE HEAVENS
+              </span>
+              <span className="text-xs text-muted tabular-nums">
+                {isZh
+                  ? "共 2,334 节 · 无广告 · 纯净排版"
+                  : "2,334 chapters · Free & ad-free"}
+              </span>
             </div>
-
-            {/* Art Caption */}
-            <span className="art-caption mt-3 sm:mt-6 inline-block rounded border border-line bg-surface px-3 sm:px-4 py-1 sm:py-1.5 text-[10px] sm:text-xs tracking-[0.18em] sm:tracking-[0.22em] uppercase text-muted">
-              A WORLD GOVERNED BY GU &amp; HEAVENLY DAO
-            </span>
           </div>
 
-          {/* Right Column: Main Intro Card (Also triggers Spinning Sphere on Hover) */}
-          <div
-            className="relative"
-            onMouseEnter={() => setIsCardHovered(true)}
-            onMouseLeave={() => setIsCardHovered(false)}
-            onTouchStart={() => setIsCardHovered(true)}
-            onTouchEnd={() => setIsCardHovered(false)}
-          >
-            <div className="intro relative z-10 rounded-xl sm:rounded-2xl border border-line bg-surface/95 p-5 sm:p-9 lg:p-10">
-              {/* Eyebrow */}
-              <p className="eyebrow text-[11px] sm:text-xs font-semibold tracking-[0.18em] sm:tracking-[0.22em] uppercase text-muted mb-2.5 sm:mb-3">
-                GU ZHEN REN · 蛊真人 · FANTASY EPIC
-              </p>
-
-              {/* Main Title in Times New Roman */}
-              <h1 className="font-times text-4xl sm:text-6xl lg:text-[4.4rem] font-bold tracking-tight text-ink leading-[1.04] mb-3.5 sm:mb-4">
-                Reverend<br />
-                <em className="italic text-accent font-normal">Insanity.</em>
-              </h1>
-
-              {/* Summary */}
-              <p className="summary text-muted text-sm sm:text-base leading-relaxed mb-4 sm:mb-5">
-                The tower of destiny collapses before the demonic path. Reborn five hundred years
-                into his youth with the supreme Spring Autumn Cicada, Fang Yuan walks an uncompromising
-                road through the five regions and nine heavens—indifferent to worldly morality,
-                relentlessly pursuing eternal life.
-              </p>
-
-              {/* Language / Edition Switcher */}
-              <div className="flex items-center gap-1.5 p-1 rounded-lg border border-line bg-paper w-fit mb-5">
-                <button
-                  type="button"
-                  onClick={() => handleLanguageEditionChange("en")}
-                  className={`px-3 py-1 rounded text-xs font-semibold transition-colors ${
-                    !isZh
-                      ? "bg-surface text-ink border border-line shadow-sm"
-                      : "text-muted hover:text-ink border border-transparent"
-                  }`}
-                >
-                  English Translation
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleLanguageEditionChange("zh")}
-                  className={`px-3 py-1 rounded text-xs font-semibold transition-colors flex items-center gap-1.5 ${
-                    isZh
-                      ? "bg-surface text-ink border border-line shadow-sm"
-                      : "text-muted hover:text-ink border border-transparent"
-                  }`}
-                >
-                  <span>中文原版 (蛊真人)</span>
-                  <span className="text-[10px] text-accent font-bold">RAW</span>
-                </button>
+          {/* Right Column: Warm Manuscript Reading Entry */}
+          <div className="relative">
+            <div className="intro relative z-10 rounded-xl sm:rounded-2xl border border-line bg-surface p-4 sm:p-8 lg:p-10 shadow-sm">
+              <div className="flex items-center gap-2.5 mb-2.5 sm:mb-3">
+                <span className="seal-badge" aria-hidden="true">
+                  蛊
+                </span>
+                <p className="eyebrow text-[11px] font-medium tracking-[0.18em] uppercase text-accent">
+                  {isZh ? "蛊真人 · 原版典藏" : "GU ZHENREN · 蛊真人 · COMPLETE EDITION"}
+                </p>
               </div>
 
-              {/* Choose Your Volume / Edition Selector — Symmetrical on Phone */}
-              <fieldset className="editions mb-5 sm:mb-6 border-0 p-0">
-                <legend className="text-[11px] tracking-[0.16em] uppercase text-muted mb-2.5 font-semibold flex items-center gap-1.5">
-                  <Layers className="h-3.5 w-3.5 text-ink" />
-                  {isZh ? "选择卷次或完整篇章" : "CHOOSE YOUR EDITION OR VOLUME"}
-                </legend>
+              <h1 className="font-serif text-[2rem] sm:text-5xl lg:text-[4rem] font-normal tracking-[-0.02em] text-ink leading-[1.06] mb-3 sm:mb-4">
+                Reverend <em className="italic text-accent">Insanity</em>
+              </h1>
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                  {/* Complete Canon Button — Full Width Row on Phone */}
+              <p className="summary text-muted text-[13.5px] sm:text-[15px] leading-[1.68] sm:leading-[1.8] mb-4 sm:mb-6">
+                {isZh
+                  ? "五百年风云变幻归于尘土，方源借春秋蝉重生回十五岁少年之时，于残酷修真界中逆天而行，唯求永生。"
+                  : "Five hundred years of schemes collapse at Demonic Mountain. Reborn into his fifteen-year-old body with the Spring Autumn Cicada, Fang Yuan walks an uncompromising path toward eternal life."}
+              </p>
+
+              {/* Side-by-side 2-Button Edition Selector */}
+              <div className="editions mb-4 sm:mb-6">
+                <p
+                  id="edition-selector-label"
+                  className="text-[11px] tracking-[0.16em] uppercase text-muted mb-2 font-medium"
+                >
+                  {isZh ? "选择阅读版本" : "Choose your edition"}
+                </p>
+
+                <div
+                  role="radiogroup"
+                  aria-labelledby="edition-selector-label"
+                  className="grid grid-cols-2 gap-2 sm:gap-3"
+                >
                   <button
                     type="button"
-                    onClick={() => setSelectedEdition("complete")}
-                    className={`col-span-2 sm:col-span-1 text-left rounded-lg p-2.5 sm:p-3 transition-colors border ${
-                      selectedEdition === "complete"
-                        ? "border-accent bg-sunken text-ink"
+                    role="radio"
+                    aria-checked={!isZh}
+                    onClick={() => handleLanguageEditionChange("en")}
+                    className={`min-h-[48px] text-left rounded-lg px-3 py-2.5 sm:p-3.5 transition-colors border ${
+                      !isZh
+                        ? "border-accent bg-accent/10 text-ink"
                         : "border-line bg-paper hover:border-line-strong"
                     }`}
                   >
-                    <span className="block text-xs sm:text-sm font-bold text-ink">
-                      {isZh ? "完整原版全本" : "Complete Canon"}
+                    <span className="block text-xs sm:text-sm font-medium text-ink">
+                      English Edition
                     </span>
-                    <span className="block text-[11px] text-muted mt-0.5">
-                      {isZh ? "共 2,334 节" : "2,334 chapters"}
+                    <span className="block text-[11px] text-muted mt-0.5 tabular-nums">
+                      2,334 Ch. · Translated
                     </span>
                   </button>
 
-                  {/* Volumes 1 to 6 */}
-                  {VOLUMES.map((vol) => {
-                    const isSelected = selectedEdition === vol.id;
-                    return (
-                      <button
-                        key={vol.id}
-                        type="button"
-                        onClick={() => setSelectedEdition(vol.id)}
-                        className={`text-left rounded-lg p-2.5 sm:p-3 transition-colors border ${
-                          isSelected
-                            ? "border-accent bg-sunken text-ink"
-                            : "border-line bg-paper hover:border-line-strong"
-                        }`}
-                      >
-                        <span className="block text-xs sm:text-sm font-bold text-ink truncate">
-                          {isZh ? `${vol.numberZh} · ${vol.titleZh}` : `Book ${vol.number}`}
-                        </span>
-                        <span className="block text-[11px] text-muted mt-0.5">
-                          {isZh ? `${vol.chapterCount} 节` : `${vol.chapterCount} chapters`}
-                        </span>
-                      </button>
-                    );
-                  })}
+                  <button
+                    type="button"
+                    role="radio"
+                    aria-checked={isZh}
+                    onClick={() => handleLanguageEditionChange("zh")}
+                    className={`min-h-[48px] text-left rounded-lg px-3 py-2.5 sm:p-3.5 transition-colors border ${
+                      isZh
+                        ? "border-accent bg-accent/10 text-ink"
+                        : "border-line bg-paper hover:border-line-strong"
+                    }`}
+                  >
+                    <span className="block text-xs sm:text-sm font-medium text-ink">
+                      中文原版 (蛊真人)
+                    </span>
+                    <span className="block text-[11px] text-muted mt-0.5 tabular-nums">
+                      2,334 节 · Original Raw
+                    </span>
+                  </button>
                 </div>
-              </fieldset>
+              </div>
 
-              {/* Primary Action Row — Full-Width CTA on Phone */}
-              <div className="actions flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-3 sm:gap-6 pt-1">
+              {/* Primary Actions Row */}
+              <div className="actions flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-2.5 sm:gap-5">
                 <Link
                   id="start"
                   href={primaryHref}
-                  className="primary group inline-flex w-full sm:w-auto sm:min-w-[200px] items-center justify-between gap-4 rounded-lg bg-accent px-5 sm:px-6 py-3.5 text-sm sm:text-base font-bold text-on-accent transition-colors hover:bg-accent-hover"
+                  className="primary group inline-flex w-full sm:w-auto sm:min-w-[210px] min-h-[48px] items-center justify-between gap-4 rounded-lg bg-accent px-5 py-3 text-sm font-semibold text-on-accent transition-colors hover:bg-accent-hover shadow-sm"
                 >
                   <span>{primaryLabel}</span>
-                  <span className="text-base transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5">
-                    ↗
-                  </span>
+                  <ArrowRight
+                    className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
+                    aria-hidden="true"
+                  />
                 </Link>
 
-                <div className="flex items-center justify-between sm:justify-start gap-4 px-1 sm:px-0">
-                  {/* Download EPUB Link */}
+                <div className="flex items-center justify-between sm:justify-start gap-4">
                   <a
                     id="download"
-                    href={isZh ? "/downloads/Gu_Zhen_Ren_Raw.epub" : "/downloads/Reverend_Insanity.epub"}
+                    href={
+                      isZh
+                        ? "/downloads/Gu_Zhen_Ren_Raw.epub"
+                        : "/downloads/Reverend_Insanity.epub"
+                    }
                     download={isZh ? "Gu_Zhen_Ren_Raw.epub" : "Reverend_Insanity.epub"}
-                    className="inline-flex items-center gap-1.5 text-xs uppercase tracking-wider text-muted hover:text-ink border-b border-line hover:border-ink py-1.5 transition-colors whitespace-nowrap"
+                    className="inline-flex min-h-[44px] items-center gap-1.5 px-1 text-xs text-muted hover:text-accent transition-colors whitespace-nowrap"
                     title={
                       isZh
                         ? "Download complete 2,334 chapters Chinese raw EPUB (19 MB)"
                         : "Download complete 2,334 chapters EPUB (25 MB)"
                     }
                   >
-                    <Download className="h-3.5 w-3.5" />
-                    <span>{isZh ? "下载中文 EPUB ↓" : "Download EPUB ↓"}</span>
+                    <Download className="h-3.5 w-3.5" aria-hidden="true" />
+                    <span className="underline underline-offset-4 decoration-line-strong">
+                      {isZh ? "下载中文 EPUB (19 MB)" : "Download EPUB (25 MB)"}
+                    </span>
                   </a>
 
-                  {/* Read from Ch 1 if continuing */}
                   {continueChapter && continueChapter > 1 && (
                     <Link
                       href={`/read?c=1&edition=${languageEdition}`}
-                      className="text-xs uppercase tracking-wider text-muted hover:text-ink border-b border-line hover:border-ink py-1.5 transition-colors whitespace-nowrap"
+                      className="inline-flex min-h-[44px] items-center px-1 text-xs text-muted hover:text-accent underline underline-offset-4 decoration-line-strong transition-colors whitespace-nowrap"
                     >
-                      {isZh ? "从第一节重读" : "Read Chapter 1"}
+                      {isZh ? "从第一节开始" : "Chapter 1"}
                     </Link>
                   )}
                 </div>
               </div>
 
-              {/* Resume Note */}
-              <p id="resume-note" className="text-xs text-muted mt-4 sm:mt-5">
-                Your place is saved automatically on this device.
+              {/* Trust & Auto-Save Assurance Line */}
+              <p id="resume-note" className="text-xs text-muted mt-3 sm:mt-4">
+                {isZh
+                  ? "阅读进度自动保存于当前设备 · 无需账号即可阅读全部章节"
+                  : "Progress saved automatically on this device · No account required"}
               </p>
-
-              {/* Quick Volume Links — Clean 3-Col Grid on Phone */}
-              <nav
-                className="browse-editions mt-3 grid grid-cols-3 sm:flex sm:flex-wrap gap-2 sm:gap-x-4 sm:gap-y-2 text-xs"
-                aria-label="Resume reading by volume"
-              >
-                {VOLUMES.map((vol) => (
-                  <Link
-                    key={vol.id}
-                    href={`/read?c=${vol.startChapter}&edition=${languageEdition}`}
-                    className="text-muted hover:text-ink border-b border-dashed border-line hover:border-ink pb-0.5 transition-colors truncate"
-                  >
-                    {isZh ? `${vol.numberZh} (${vol.startChapter}节)` : `Book ${vol.number} (Ch ${vol.startChapter})`}
-                  </Link>
-                ))}
-              </nav>
             </div>
           </div>
         </div>

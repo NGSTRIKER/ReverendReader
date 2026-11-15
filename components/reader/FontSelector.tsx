@@ -25,27 +25,28 @@ interface FontSelectorProps {
   onChangeSettings: (settings: Partial<ReaderSettings>) => void;
 }
 
-const COLOR_PRESETS: { hex: string; name: string; tag?: string }[] = [
-  { hex: "#e4e8f0", name: "Matte Terminal", tag: "Default" },
-  { hex: "#ffffff", name: "Crisp White" },
-  { hex: "#e6d5b8", name: "Vintage Parchment" },
-  { hex: "#f4ecd8", name: "Imperial Silk" },
-  { hex: "#cdd6f4", name: "Catppuccin Text" },
-  { hex: "#b4befe", name: "Lavender Spirit" },
-  { hex: "#74c7ec", name: "Sapphire Core" },
-  { hex: "#a6e3a1", name: "Jade Essence" },
-  { hex: "#f9e2af", name: "Rank 9 Gold" },
-  { hex: "#fab387", name: "Sunset Peach" },
-  { hex: "#f5c2e7", name: "Velvet Rose" },
-  { hex: "#f87171", name: "Demon Seal Red" },
+const COLOR_PRESETS: { hex: string; name: string; tag?: string; lightSwatch?: boolean }[] = [
+  { hex: "#e4e8f0", name: "Auto Ink", tag: "Adaptive" },
+  { hex: "#181714", name: "Deep Ink", lightSwatch: false },
+  { hex: "#4a3525", name: "Warm Sepia", lightSwatch: false },
+  { hex: "#ffffff", name: "Crisp White", lightSwatch: true },
+  { hex: "#e6d5b8", name: "Aged Cream", lightSwatch: true },
+  { hex: "#f4ecd8", name: "Warm Silk", lightSwatch: true },
+  { hex: "#cdd6f4", name: "Moonlight Mist", lightSwatch: true },
+  { hex: "#74c7ec", name: "Sky Cerulean", lightSwatch: true },
+  { hex: "#a6e3a1", name: "Jade Mist", lightSwatch: true },
+  { hex: "#f9e2af", name: "Amber Ochre", lightSwatch: true },
+  { hex: "#fab387", name: "Peach Sand", lightSwatch: true },
+  { hex: "#f5c2e7", name: "Lotus Tint", lightSwatch: true },
 ];
 
 const FONT_OPTIONS: { id: ReaderFont; label: string; preview: string; className: string; tag: string }[] = [
-  { id: "mono", label: "JetBrains Mono", preview: "Terminal Engine", className: "font-mono", tag: "Terminal" },
-  { id: "serif", label: "EB Garamond", preview: "Imperial Classic", className: "font-serif", tag: "Classic" },
-  { id: "literary", label: "Palatino Book", preview: "Parchment Antiqua", className: "font-literary", tag: "Literary" },
-  { id: "bellota", label: "Bellota", preview: "Flowing Calligraphic", className: "font-bellota", tag: "Artisan" },
-  { id: "sans", label: "Modern Clean", preview: "Screen Sans", className: "font-sans", tag: "System" },
+  { id: "serif", label: "Bookerly", preview: "Kindle Literary", className: "font-serif", tag: "Book" },
+  { id: "literary", label: "Literata", preview: "Editorial Serif", className: "font-literary", tag: "Literary" },
+  { id: "sans", label: "DM Sans", preview: "Clean Interface", className: "font-sans", tag: "Sans" },
+  { id: "bellota", label: "Bellota", preview: "Flowing Artisan", className: "font-bellota", tag: "Artisan" },
+  { id: "mono", label: "JetBrains Mono", preview: "Fixed Width", className: "font-mono", tag: "Mono" },
+  { id: "dyslexic", label: "OpenDyslexic", preview: "Dyslexia Friendly", className: "font-dyslexic", tag: "Access" },
 ];
 
 const WIDTH_OPTIONS = [
@@ -91,7 +92,7 @@ export function FontSelector({ settings, onChangeSettings }: FontSelectorProps) 
 
   const handleReset = () => {
     onChangeSettings({
-      font: DEFAULT_SETTINGS.font,
+      font: "serif",
       fontSize: DEFAULT_SETTINGS.fontSize,
       lineHeight: DEFAULT_SETTINGS.lineHeight,
       letterSpacing: DEFAULT_SETTINGS.letterSpacing,
@@ -101,39 +102,50 @@ export function FontSelector({ settings, onChangeSettings }: FontSelectorProps) 
     });
   };
 
+  // #e4e8f0 is the Auto Ink sentinel; any other hex overrides the surface's --ink token
+  const isAutoInkColor = currentFontColor.toLowerCase() === "#e4e8f0";
+
   return (
-    <div className="space-y-6 font-mono text-sm">
-      {/* OS Palette Mode */}
+    <div className="space-y-6 font-sans text-sm">
+      {/* Appearance Mode */}
       <div>
         <div className="flex items-center justify-between mb-2">
-          <label className="text-[11px] font-semibold uppercase tracking-wider text-muted flex items-center gap-1.5">
-            <span className="text-accent">&gt;_</span>
-            <span>Display Environment / 模式</span>
-          </label>
-          <span className="text-[11px] text-faint">Light (Red) · Dark (Matte Black)</span>
+          <p
+            id="appearance-mode-label"
+            className="text-xs font-semibold uppercase tracking-wider text-muted"
+          >
+            Appearance
+          </p>
+          <span className="text-xs text-muted">Theme Mode</span>
         </div>
-        <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
+        <div
+          role="radiogroup"
+          aria-labelledby="appearance-mode-label"
+          className="grid grid-cols-3 gap-1.5 sm:gap-2"
+        >
           {[
-            { id: "light" as const, label: "Day Book", sub: "White & Red", swatch: "bg-[#ffffff] border-[#c5162a]" },
-            { id: "dark" as const, label: "Matte Terminal", sub: "Black & Grey", swatch: "bg-[#0e0f12] border-[#4d8aff]" },
-            { id: "system" as const, label: "System Sync", sub: "OS Match", swatch: "bg-sunken border-line-strong" },
+            { id: "light" as const, label: "Day Paper", sub: "Warm Paper", swatch: "bg-[#faf8f3] border-[#af1d27]" },
+            { id: "dark" as const, label: "Night Charcoal", sub: "Dark Paper", swatch: "bg-[#0d0f0e] border-[#d0be94]" },
+            { id: "system" as const, label: "System", sub: "Auto Match", swatch: "bg-sunken border-line-strong" },
           ].map((item) => {
             const active = themeChoice === item.id;
             return (
               <button
                 key={item.id}
                 type="button"
+                role="radio"
+                aria-checked={active}
                 onClick={() => handleSelectTheme(item.id)}
-                className={`flex items-center gap-1.5 sm:gap-2 rounded-xl border p-2 sm:p-2.5 text-left transition-all ${
+                className={`flex min-h-[48px] items-center gap-1.5 sm:gap-2 rounded-xl border p-2.5 text-left transition-all ${
                   active
                     ? "border-accent bg-accent/10 text-ink shadow-sm"
                     : "border-line bg-sunken text-muted hover:border-line-strong hover:text-ink"
                 }`}
               >
-                <span className={`h-3.5 w-3.5 sm:h-4 sm:w-4 rounded-full border-2 flex-shrink-0 ${item.swatch}`} />
+                <span className={`h-4 w-4 rounded-full border-2 flex-shrink-0 ${item.swatch}`} aria-hidden="true" />
                 <div className="min-w-0">
-                  <div className="text-[11px] sm:text-xs font-semibold text-ink truncate">{item.label}</div>
-                  <div className="text-[9px] sm:text-[10px] text-muted truncate">{item.sub}</div>
+                  <div className="text-xs font-semibold text-ink truncate">{item.label}</div>
+                  <div className="text-[10px] text-muted truncate">{item.sub}</div>
                 </div>
               </button>
             );
@@ -143,16 +155,20 @@ export function FontSelector({ settings, onChangeSettings }: FontSelectorProps) 
 
       {/* Typeface Selection */}
       <div>
-        <label className="text-[11px] font-semibold uppercase tracking-wider text-muted mb-2 flex items-center justify-between">
-          <span className="flex items-center gap-1.5">
-            <Type className="h-3.5 w-3.5 text-accent" />
-            <span>Typeface / 字体</span>
-          </span>
-          <span className="chinese-seal text-[10px]">字</span>
-        </label>
-        <div className="grid grid-cols-2 gap-2">
+        <p
+          id="typeface-group-label"
+          className="text-xs font-semibold uppercase tracking-wider text-muted mb-2 flex items-center gap-1.5"
+        >
+          <Type className="h-3.5 w-3.5 text-accent" aria-hidden="true" />
+          <span>Typeface</span>
+        </p>
+        <div
+          role="radiogroup"
+          aria-labelledby="typeface-group-label"
+          className="grid grid-cols-2 gap-2"
+        >
           {FONT_OPTIONS.map((f, index) => {
-            const active = (settings.font || DEFAULT_SETTINGS.font) === f.id;
+            const active = (settings.font || "serif") === f.id;
             const spanLastOdd =
               FONT_OPTIONS.length % 2 === 1 && index === FONT_OPTIONS.length - 1
                 ? "col-span-2"
@@ -161,20 +177,22 @@ export function FontSelector({ settings, onChangeSettings }: FontSelectorProps) 
               <button
                 key={f.id}
                 type="button"
+                role="radio"
+                aria-checked={active}
                 onClick={() => onChangeSettings({ font: f.id })}
-                className={`flex flex-col items-start rounded-xl border p-3 text-left transition-all ${spanLastOdd} ${
+                className={`flex min-h-[56px] flex-col items-start justify-center rounded-xl border p-3 text-left transition-all ${spanLastOdd} ${
                   active
                     ? "border-accent bg-accent/10 text-ink shadow-sm ring-1 ring-accent/30"
                     : "border-line bg-sunken text-muted hover:border-line-strong hover:text-ink"
                 }`}
               >
-                <div className="flex w-full items-center justify-between">
-                  <span className={`text-xs font-semibold text-ink ${f.className}`}>{f.label}</span>
-                  <span className="text-[9px] uppercase tracking-wider text-faint border border-line rounded px-1">
+                <div className="flex w-full items-center justify-between gap-2">
+                  <span className={`text-sm font-semibold text-ink ${f.className}`}>{f.label}</span>
+                  <span className="text-[10px] uppercase tracking-wider text-muted border border-line rounded px-1.5 py-0.5">
                     {f.tag}
                   </span>
                 </div>
-                <span className="text-[11px] text-muted mt-0.5 truncate">{f.preview}</span>
+                <span className="text-xs text-muted mt-0.5 truncate">{f.preview}</span>
               </button>
             );
           })}
@@ -186,10 +204,13 @@ export function FontSelector({ settings, onChangeSettings }: FontSelectorProps) 
         {/* Font Size */}
         <div>
           <div className="flex justify-between items-center mb-1.5">
-            <label className="text-[11px] font-semibold uppercase tracking-wider text-muted">
-              Size / 字号
+            <label
+              htmlFor="font-size-range"
+              className="text-xs font-semibold uppercase tracking-wider text-muted"
+            >
+              Font Size
             </label>
-            <span className="text-xs font-medium text-accent tabular-nums bg-accent/10 px-2 py-0.5 rounded-md border border-accent/20">
+            <span className="font-mono text-xs font-medium text-accent tnum bg-accent/10 px-2 py-0.5 rounded-md border border-accent/20">
               {settings.fontSize}px
             </span>
           </div>
@@ -198,28 +219,30 @@ export function FontSelector({ settings, onChangeSettings }: FontSelectorProps) 
               type="button"
               onClick={() => onChangeSettings({ fontSize: Math.max(14, settings.fontSize - 1) })}
               disabled={settings.fontSize <= 14}
-              className="btn-quiet h-8 w-8 p-0 rounded-lg flex items-center justify-center"
+              className="btn-quiet h-11 w-11 sm:h-9 sm:w-9 p-0 rounded-xl flex items-center justify-center flex-shrink-0"
               aria-label="Decrease font size"
             >
-              <Minus className="h-3.5 w-3.5" />
+              <Minus className="h-3.5 w-3.5" aria-hidden="true" />
             </button>
             <input
+              id="font-size-range"
               type="range"
               min="14"
               max="32"
               step="1"
               value={settings.fontSize}
               onChange={(e) => onChangeSettings({ fontSize: parseInt(e.target.value, 10) })}
-              className="flex-1 cursor-pointer h-1.5 bg-line-strong rounded-lg appearance-none accent-accent"
+              aria-label="Font size in pixels"
+              className="flex-1 cursor-pointer h-2 bg-line-strong rounded-lg appearance-none accent-accent"
             />
             <button
               type="button"
               onClick={() => onChangeSettings({ fontSize: Math.min(32, settings.fontSize + 1) })}
               disabled={settings.fontSize >= 32}
-              className="btn-quiet h-8 w-8 p-0 rounded-lg flex items-center justify-center"
+              className="btn-quiet h-11 w-11 sm:h-9 sm:w-9 p-0 rounded-xl flex items-center justify-center flex-shrink-0"
               aria-label="Increase font size"
             >
-              <Plus className="h-3.5 w-3.5" />
+              <Plus className="h-3.5 w-3.5" aria-hidden="true" />
             </button>
           </div>
         </div>
@@ -227,10 +250,13 @@ export function FontSelector({ settings, onChangeSettings }: FontSelectorProps) 
         {/* Line Height */}
         <div>
           <div className="flex justify-between items-center mb-1.5">
-            <label className="text-[11px] font-semibold uppercase tracking-wider text-muted">
-              Line Spacing / 行高
+            <label
+              htmlFor="line-height-range"
+              className="text-xs font-semibold uppercase tracking-wider text-muted"
+            >
+              Line Height
             </label>
-            <span className="text-xs font-medium text-accent tabular-nums bg-accent/10 px-2 py-0.5 rounded-md border border-accent/20">
+            <span className="font-mono text-xs font-medium text-accent tnum bg-accent/10 px-2 py-0.5 rounded-md border border-accent/20">
               {settings.lineHeight.toFixed(2)}
             </span>
           </div>
@@ -243,19 +269,21 @@ export function FontSelector({ settings, onChangeSettings }: FontSelectorProps) 
                 })
               }
               disabled={settings.lineHeight <= 1.3}
-              className="btn-quiet h-8 w-8 p-0 rounded-lg flex items-center justify-center"
+              className="btn-quiet h-11 w-11 sm:h-9 sm:w-9 p-0 rounded-xl flex items-center justify-center flex-shrink-0"
               aria-label="Decrease line height"
             >
-              <Minus className="h-3.5 w-3.5" />
+              <Minus className="h-3.5 w-3.5" aria-hidden="true" />
             </button>
             <input
+              id="line-height-range"
               type="range"
               min="1.3"
               max="2.6"
               step="0.05"
               value={settings.lineHeight}
               onChange={(e) => onChangeSettings({ lineHeight: parseFloat(e.target.value) })}
-              className="flex-1 cursor-pointer h-1.5 bg-line-strong rounded-lg appearance-none accent-accent"
+              aria-label="Line height multiplier"
+              className="flex-1 cursor-pointer h-2 bg-line-strong rounded-lg appearance-none accent-accent"
             />
             <button
               type="button"
@@ -265,10 +293,10 @@ export function FontSelector({ settings, onChangeSettings }: FontSelectorProps) 
                 })
               }
               disabled={settings.lineHeight >= 2.6}
-              className="btn-quiet h-8 w-8 p-0 rounded-lg flex items-center justify-center"
+              className="btn-quiet h-11 w-11 sm:h-9 sm:w-9 p-0 rounded-xl flex items-center justify-center flex-shrink-0"
               aria-label="Increase line height"
             >
-              <Plus className="h-3.5 w-3.5" />
+              <Plus className="h-3.5 w-3.5" aria-hidden="true" />
             </button>
           </div>
         </div>
@@ -279,52 +307,68 @@ export function FontSelector({ settings, onChangeSettings }: FontSelectorProps) 
         {/* Letter Spacing */}
         <div>
           <div className="flex justify-between items-center mb-1.5">
-            <label className="text-[11px] font-semibold uppercase tracking-wider text-muted">
-              Letter Spacing / 字间距
+            <label
+              htmlFor="letter-spacing-range"
+              className="text-xs font-semibold uppercase tracking-wider text-muted"
+            >
+              Letter Spacing
             </label>
-            <span className="text-xs font-medium text-accent tabular-nums bg-accent/10 px-2 py-0.5 rounded-md border border-accent/20">
+            <span className="font-mono text-xs font-medium text-accent tnum bg-accent/10 px-2 py-0.5 rounded-md border border-accent/20">
               {typeof settings.letterSpacing === "number" ? settings.letterSpacing.toFixed(1) : "0.2"}px
             </span>
           </div>
           <input
+            id="letter-spacing-range"
             type="range"
             min="-0.5"
             max="2.5"
             step="0.1"
             value={typeof settings.letterSpacing === "number" ? settings.letterSpacing : 0.2}
             onChange={(e) => onChangeSettings({ letterSpacing: parseFloat(e.target.value) })}
-            className="w-full cursor-pointer h-1.5 bg-line-strong rounded-lg appearance-none accent-accent"
+            aria-label="Letter spacing in pixels"
+            className="w-full cursor-pointer h-2 bg-line-strong rounded-lg appearance-none accent-accent"
           />
         </div>
 
         {/* Text Alignment */}
         <div>
-          <label className="text-[11px] font-semibold uppercase tracking-wider text-muted mb-1.5 block">
-            Alignment / 对齐
-          </label>
-          <div className="grid grid-cols-2 gap-2">
+          <p
+            id="alignment-group-label"
+            className="text-xs font-semibold uppercase tracking-wider text-muted mb-1.5"
+          >
+            Alignment
+          </p>
+          <div
+            role="radiogroup"
+            aria-labelledby="alignment-group-label"
+            className="grid grid-cols-2 gap-2"
+          >
             <button
               type="button"
+              role="radio"
+              aria-checked={settings.textAlign !== "justify"}
               onClick={() => onChangeSettings({ textAlign: "left" })}
-              className={`flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-xl border text-xs transition-colors ${
+              className={`flex min-h-[44px] sm:min-h-[38px] items-center justify-center gap-1.5 py-2 px-3 rounded-xl border text-xs transition-colors ${
                 settings.textAlign !== "justify"
                   ? "border-accent bg-accent/10 text-accent font-semibold"
                   : "border-line bg-sunken text-muted hover:text-ink"
               }`}
             >
-              <AlignLeft className="h-3.5 w-3.5" />
+              <AlignLeft className="h-3.5 w-3.5" aria-hidden="true" />
               <span>Left</span>
             </button>
             <button
               type="button"
+              role="radio"
+              aria-checked={settings.textAlign === "justify"}
               onClick={() => onChangeSettings({ textAlign: "justify" })}
-              className={`flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-xl border text-xs transition-colors ${
+              className={`flex min-h-[44px] sm:min-h-[38px] items-center justify-center gap-1.5 py-2 px-3 rounded-xl border text-xs transition-colors ${
                 settings.textAlign === "justify"
                   ? "border-accent bg-accent/10 text-accent font-semibold"
                   : "border-line bg-sunken text-muted hover:text-ink"
               }`}
             >
-              <AlignJustify className="h-3.5 w-3.5" />
+              <AlignJustify className="h-3.5 w-3.5" aria-hidden="true" />
               <span>Justify</span>
             </button>
           </div>
@@ -334,18 +378,22 @@ export function FontSelector({ settings, onChangeSettings }: FontSelectorProps) 
       {/* Font Color Customization & Presets */}
       <div>
         <div className="flex items-center justify-between mb-2">
-          <label className="text-[11px] font-semibold uppercase tracking-wider text-muted flex items-center gap-1.5">
-            <Palette className="h-3.5 w-3.5 text-accent" />
-            <span>Font Color Customization / 字体颜色</span>
+          <label
+            htmlFor="font-color-hex-input"
+            className="text-xs font-semibold uppercase tracking-wider text-muted flex items-center gap-1.5"
+          >
+            <Palette className="h-3.5 w-3.5 text-accent" aria-hidden="true" />
+            <span>Text Color</span>
           </label>
-          <span className="text-[10px] text-faint">Custom Hex or Preset</span>
+          <span className="text-xs text-muted">Auto Ink or Custom Hex</span>
         </div>
 
         {/* Hex Input Bar */}
         <div className="flex items-center gap-2 mb-3">
-          <div className="flex-1 flex items-center rounded-xl border border-line bg-sunken px-3 py-1.5 focus-within:border-accent">
-            <span className="text-xs text-muted mr-1.5">#</span>
+          <div className="flex-1 flex min-h-[44px] sm:min-h-[38px] items-center rounded-xl border border-line bg-sunken px-3 py-1.5 focus-within:ring-2 focus-within:ring-accent focus-within:border-accent">
+            <span className="font-mono text-xs text-muted mr-1.5" aria-hidden="true">#</span>
             <input
+              id="font-color-hex-input"
               type="text"
               value={hexInput.startsWith("#") ? hexInput.slice(1) : hexInput}
               onChange={(e) => {
@@ -355,43 +403,62 @@ export function FontSelector({ settings, onChangeSettings }: FontSelectorProps) 
                 } as React.ChangeEvent<HTMLInputElement>);
               }}
               placeholder="e4e8f0"
-              className="w-full bg-transparent text-xs uppercase text-ink focus:outline-none"
+              aria-label="Custom font color hex code"
+              className="w-full bg-transparent font-mono text-base sm:text-xs uppercase text-ink focus-visible:outline-none"
               maxLength={6}
             />
           </div>
           <div
-            className="h-8 w-8 rounded-xl border border-line flex-shrink-0 shadow-inner"
-            style={{ backgroundColor: currentFontColor }}
-            title={`Active: ${currentFontColor}`}
+            className="h-11 w-11 sm:h-9 sm:w-9 rounded-xl border border-line flex-shrink-0 shadow-inner"
+            style={
+              isAutoInkColor
+                ? { background: "linear-gradient(135deg, #181714 50%, #f1efe9 50%)" }
+                : { backgroundColor: currentFontColor }
+            }
+            title={isAutoInkColor ? "Active: Auto Ink (Follows Surface)" : `Active: ${currentFontColor}`}
           />
         </div>
 
         {/* Preset Color Swatches */}
-        <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
+        <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
           {COLOR_PRESETS.map((preset) => {
             const isSelected = currentFontColor.toLowerCase() === preset.hex.toLowerCase();
+            const isAutoSwatch = preset.hex === "#e4e8f0";
             return (
               <button
                 key={preset.hex}
                 type="button"
                 onClick={() => onChangeSettings({ fontColor: preset.hex })}
-                title={`${preset.name} (${preset.hex})`}
-                className={`group flex flex-col items-center justify-center rounded-xl border py-2 px-1 text-center transition-all ${
+                title={isAutoSwatch ? "Auto Ink (Adapts to Paper / Surface)" : `${preset.name} (${preset.hex})`}
+                aria-pressed={isSelected}
+                className={`group flex min-h-[52px] flex-col items-center justify-center rounded-xl border py-2 px-1.5 text-center transition-all ${
                   isSelected
                     ? "border-accent bg-accent/15 shadow-sm ring-1 ring-accent/30"
                     : "border-line bg-sunken hover:border-line-strong hover:bg-surface"
                 }`}
               >
                 <span
-                  className="h-3.5 w-3.5 rounded-full border border-black/20 shadow-sm mb-1 flex items-center justify-center flex-shrink-0"
-                  style={{ backgroundColor: preset.hex }}
+                  className="h-4 w-4 rounded-full border border-black/20 shadow-sm mb-1 flex items-center justify-center flex-shrink-0"
+                  style={
+                    isAutoSwatch
+                      ? { background: "linear-gradient(135deg, #181714 50%, #f1efe9 50%)" }
+                      : { backgroundColor: preset.hex }
+                  }
                 >
-                  {isSelected && <Check className="h-2 w-2 text-black font-bold" />}
+                  {isSelected && (
+                    <Check
+                      className={`h-2.5 w-2.5 font-bold ${
+                        isAutoSwatch
+                          ? "text-accent drop-shadow"
+                          : preset.lightSwatch
+                            ? "text-black"
+                            : "text-white"
+                      }`}
+                      aria-hidden="true"
+                    />
+                  )}
                 </span>
-                <span
-                  className="text-[10px] font-medium truncate max-w-full px-0.5"
-                  style={{ color: preset.hex }}
-                >
+                <span className="text-[11px] font-medium text-ink truncate max-w-full px-0.5">
                   {preset.name}
                 </span>
               </button>
@@ -399,68 +466,77 @@ export function FontSelector({ settings, onChangeSettings }: FontSelectorProps) 
           })}
         </div>
 
-        {/* Live Typography Preview */}
-        <div className="mt-3.5 rounded-xl border border-line bg-sunken/80 p-3.5 text-center">
-          <div className="flex items-center justify-between text-[10px] uppercase tracking-wider text-muted mb-2">
-            <span>&gt;_ Live Preview</span>
-            <span className="chinese-seal text-[9px]">方源 · 诗</span>
+        {/* Live Typography & Surface Preview */}
+        <div
+          data-reader-surface={settings.surfaceTheme || "matte-terminal"}
+          className="mt-3.5 rounded-xl border border-line bg-paper p-3.5 transition-colors"
+        >
+          <div className="text-[10px] font-medium uppercase tracking-wider text-muted mb-1.5">
+            Preview
           </div>
           <p
             className={`transition-colors duration-150 ${getReaderFontClass(settings.font)} ${
-              settings.textAlign === "justify" ? "text-justify" : "text-center"
-            }`}
+              settings.textAlign === "justify" ? "text-justify" : "text-left"
+            } text-ink`}
             style={{
-              color: currentFontColor,
+              color: isAutoInkColor ? undefined : currentFontColor,
               fontSize: `${Math.min(18, Math.max(14, settings.fontSize - 2))}px`,
               lineHeight: settings.lineHeight,
               letterSpacing:
                 typeof settings.letterSpacing === "number" ? `${settings.letterSpacing}px` : "0.2px",
             }}
           >
-            “人是万物之灵，蛊是天地之精。”
-            <br />
             “Humans are clever in tens of thousands of ways, Gu are the true refined essences of Heaven and Earth.”
           </p>
         </div>
       </div>
 
-      {/* Reading Width Options */}
-      <div>
-        <label className="text-[11px] font-semibold uppercase tracking-wider text-muted mb-2 flex items-center justify-between">
-          <span className="flex items-center gap-1.5">
-            <Maximize2 className="h-3.5 w-3.5 text-accent" />
-            <span>Reading Canvas Width / 页面宽度</span>
+      {/* Reading Width Options (Desktop Columns) */}
+      <div className="hidden sm:block">
+        <div className="text-xs font-semibold uppercase tracking-wider text-muted mb-2 flex items-center justify-between">
+          <span id="page-width-label" className="flex items-center gap-1.5">
+            <Maximize2 className="h-3.5 w-3.5 text-accent" aria-hidden="true" />
+            <span>Page Width</span>
           </span>
-          <span className="text-[10px] text-faint">Responsive Columns</span>
-        </label>
-        <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5 sm:gap-2">
-          {WIDTH_OPTIONS.map((item) => (
-            <button
-              key={item.label}
-              type="button"
-              onClick={() => onChangeSettings({ maxWidth: item.value })}
-              className={`flex flex-col items-center justify-center rounded-xl border py-1.5 sm:py-2 px-1 text-xs transition-all ${
-                settings.maxWidth === item.value
-                  ? "border-accent bg-accent/15 text-ink font-semibold shadow-sm ring-1 ring-accent/30"
-                  : "border-line bg-sunken text-muted hover:text-ink hover:border-line-strong"
-              }`}
-            >
-              <span className="font-medium truncate text-ink text-[11px] sm:text-xs">{item.label}</span>
-              <span className="text-[9px] sm:text-[10px] text-muted mt-0.5">{item.desc}</span>
-            </button>
-          ))}
+          <span className="text-xs text-muted">Desktop Columns</span>
+        </div>
+        <div
+          role="radiogroup"
+          aria-labelledby="page-width-label"
+          className="grid grid-cols-3 sm:grid-cols-6 gap-1.5 sm:gap-2"
+        >
+          {WIDTH_OPTIONS.map((item) => {
+            const active = settings.maxWidth === item.value;
+            return (
+              <button
+                key={item.label}
+                type="button"
+                role="radio"
+                aria-checked={active}
+                onClick={() => onChangeSettings({ maxWidth: item.value })}
+                className={`flex flex-col items-center justify-center rounded-xl border py-2 px-1 text-xs transition-all ${
+                  active
+                    ? "border-accent bg-accent/15 text-ink font-semibold shadow-sm ring-1 ring-accent/30"
+                    : "border-line bg-sunken text-muted hover:text-ink hover:border-line-strong"
+                }`}
+              >
+                <span className="font-medium truncate text-ink text-xs">{item.label}</span>
+                <span className="font-mono text-[10px] text-muted mt-0.5">{item.desc}</span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
       {/* Reset Defaults */}
       <div className="pt-2 border-t border-line flex justify-between items-center">
-        <span className="text-[11px] text-muted">Restore default typesetting</span>
+        <span className="text-xs text-muted">Restore default typesetting</span>
         <button
           type="button"
           onClick={handleReset}
-          className="btn-quiet text-xs py-1.5 px-3 rounded-lg flex items-center gap-1.5"
+          className="btn-quiet min-h-[44px] sm:min-h-[38px] text-xs py-2 px-3 rounded-xl flex items-center gap-1.5"
         >
-          <RotateCcw className="h-3 w-3" />
+          <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
           <span>Reset Defaults</span>
         </button>
       </div>

@@ -43,7 +43,7 @@ export async function fetchChapterContent(
 
   const apiRes = await fetch(`/api/chapter?id=${chapter.id}&edition=${edition}`);
   if (!apiRes.ok) {
-    throw new Error(`Failed to load chapter (${apiRes.status}: ${apiRes.statusText})`);
+    throw new Error("Couldn't load this chapter right now. Please try again.");
   }
 
   const rawText = await apiRes.text();

@@ -38,8 +38,8 @@ const bellota = Bellota({
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" },
+    { media: "(prefers-color-scheme: light)", color: "#faf8f3" },
+    { media: "(prefers-color-scheme: dark)", color: "#0d0f0e" },
   ],
   width: "device-width",
   initialScale: 1,
@@ -103,11 +103,14 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const theme = parseThemeCookie((await cookies()).get(THEME_COOKIE)?.value);
+  const cookieStore = await cookies();
+  const theme = parseThemeCookie(cookieStore.get(THEME_COOKIE)?.value);
+  const rawEdition = cookieStore.get("reverend_reader_edition")?.value;
+  const htmlLang = rawEdition === "zh" ? "zh-Hans" : "en";
 
   return (
     <html
-      lang="en"
+      lang={htmlLang}
       data-theme={theme}
       className={`${ebGaramond.variable} ${jetbrainsMono.variable} ${dmSans.variable} ${bellota.variable}`}
     >
