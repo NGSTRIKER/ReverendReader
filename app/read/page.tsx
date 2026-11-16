@@ -7,13 +7,23 @@ import { ReaderInterface, InitialChapterInfo } from "@/components/reader/ReaderI
 import { resolveSettingsFromCookies } from "@/lib/storage";
 import { cleanChapterContent } from "@/lib/chapterFetcher";
 import { createClient } from "@/lib/supabase/server";
+import { SEO_KEYWORDS } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: "Read Reverend Insanity Online",
+  title: "Read Reverend Insanity (RI) Online Free",
   description:
-    "Read all 2,334 chapters of Reverend Insanity by Gu Zhenren with adjustable type, light and dark themes, bookmarks, and synced progress.",
+    "Read all 2,334 chapters of Reverend Insanity (RI) by Gu Zhenren online free with adjustable typography, light and dark themes, bookmarks, and synced progress.",
+  keywords: SEO_KEYWORDS,
   alternates: {
     canonical: "/read",
+  },
+  openGraph: {
+    title: "Read Reverend Insanity (RI) Online Free — Chapter Reader",
+    description:
+      "Ad-free chapter reader for all 2,334 chapters of Reverend Insanity (Gu Zhenren / 蛊真人) in English and Chinese raw.",
+    url: "/read",
+    type: "book",
+    images: ["/opengraph-image"],
   },
 };
 

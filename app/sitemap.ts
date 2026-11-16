@@ -1,18 +1,18 @@
 import { MetadataRoute } from "next";
+import { SITE_URL } from "@/lib/seo";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://reverend-reader.vercel.app";
   const now = new Date();
 
   return [
     {
-      url: `${baseUrl}/`,
+      url: `${SITE_URL}/`,
       lastModified: now,
       changeFrequency: "weekly",
       priority: 1.0,
     },
     {
-      url: `${baseUrl}/read`,
+      url: `${SITE_URL}/read`,
       lastModified: now,
       changeFrequency: "daily",
       priority: 0.9,

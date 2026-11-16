@@ -18,6 +18,12 @@ export function Footer() {
 
           <nav aria-label="Footer" className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 sm:gap-x-4">
             <Link
+              href="/read"
+              className="inline-flex min-h-[44px] items-center px-2.5 text-xs hover:text-ink transition-colors"
+            >
+              Read Online
+            </Link>
+            <Link
               href="/#synopsis"
               className="inline-flex min-h-[44px] items-center px-2.5 text-xs hover:text-ink transition-colors"
             >
@@ -28,6 +34,12 @@ export function Footer() {
               className="inline-flex min-h-[44px] items-center px-2.5 text-xs hover:text-ink transition-colors"
             >
               Volumes
+            </Link>
+            <Link
+              href="/#faq"
+              className="inline-flex min-h-[44px] items-center px-2.5 text-xs hover:text-ink transition-colors"
+            >
+              FAQ
             </Link>
             <a
               href="/downloads/Reverend_Insanity.epub"

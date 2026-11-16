@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { NOVEL_DISCOVERY_TAGS } from "@/lib/seo";
 
 const VOLUMES = [
   {
@@ -68,17 +69,29 @@ export function SynopsisSection() {
               <p>Former days are but an old dream; an identical name is made anew.&rdquo;</p>
             </blockquote>
 
-            <dl className="space-y-2.5 pt-1 text-xs border-t border-line/70">
+            <dl className="space-y-2.5 pt-2 text-xs border-t border-line/70">
               <div className="flex flex-col sm:flex-row sm:gap-2">
-                <dt className="text-muted font-medium min-w-[84px]">Author</dt>
+                <dt className="text-muted font-medium min-w-[92px]">Author</dt>
                 <dd className="text-ink">Gu Zhenren (蛊真人)</dd>
               </div>
               <div className="flex flex-col sm:flex-row sm:gap-2">
-                <dt className="text-muted font-medium min-w-[84px]">Extent</dt>
-                <dd className="text-ink tabular-nums">2,334 chapters (4.86M words)</dd>
+                <dt className="text-muted font-medium min-w-[92px]">Also known as</dt>
+                <dd className="text-ink">Reverend Insanity, RI, Master of Gu, Daoist Gu</dd>
               </div>
               <div className="flex flex-col sm:flex-row sm:gap-2">
-                <dt className="text-muted font-medium min-w-[84px]">Other works</dt>
+                <dt className="text-muted font-medium min-w-[92px]">Extent</dt>
+                <dd className="text-ink tabular-nums">2,334 chapters (4.86M words) · Complete</dd>
+              </div>
+              <div className="flex flex-col sm:flex-row sm:gap-2">
+                <dt className="text-muted font-medium min-w-[92px]">Genres</dt>
+                <dd className="text-ink">Xianxia, Dark Fantasy, Cultivation, Xuanhuan, Regression</dd>
+              </div>
+              <div className="flex flex-col sm:flex-row sm:gap-2">
+                <dt className="text-muted font-medium min-w-[92px]">Access</dt>
+                <dd className="text-ink">Read online free · Ad-free · English &amp; Chinese EPUB</dd>
+              </div>
+              <div className="flex flex-col sm:flex-row sm:gap-2">
+                <dt className="text-muted font-medium min-w-[92px]">Other works</dt>
                 <dd className="text-muted">
                   <em>Infinite Bloodcore</em>, <em>Mysteries of Immortal Puppet Master</em>
                 </dd>
@@ -155,6 +168,28 @@ export function SynopsisSection() {
               </Link>
             ))}
           </div>
+        </div>
+
+        {/* Genres & Discovery Tags */}
+        <div id="tags" className="pt-10 sm:pt-12 mt-10 sm:mt-12 border-t border-line">
+          <h2 className="font-serif text-lg sm:text-xl font-normal tracking-tight text-ink mb-3.5">
+            Genres, Themes &amp; Novel Tags
+          </h2>
+          <ul
+            aria-label="Reverend Insanity genres, themes, and search tags"
+            className="flex flex-wrap gap-2"
+          >
+            {NOVEL_DISCOVERY_TAGS.map((tag) => (
+              <li key={tag.label}>
+                <Link
+                  href={tag.href}
+                  className="inline-flex min-h-[44px] sm:min-h-[34px] items-center rounded-md border border-line bg-paper px-3 py-1.5 text-xs text-muted transition-colors hover:border-line-strong hover:bg-sunken hover:text-ink"
+                >
+                  {tag.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </section>

@@ -9,6 +9,10 @@ export const metadata: Metadata = {
   title: "Reader Account",
   description:
     "View and manage your Reverend Insanity reading progress, saved bookmarks, and reader profile.",
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default async function AccountPage() {

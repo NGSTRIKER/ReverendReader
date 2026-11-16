@@ -4,11 +4,42 @@ import { createClient } from "@/lib/supabase/server";
 import { Navigation } from "@/components/landing/Navigation";
 import { HeroSection } from "@/components/landing/HeroSection";
 import { SynopsisSection } from "@/components/landing/SynopsisSection";
+import { ReaderHighlightsAndFaq } from "@/components/landing/ReaderHighlightsAndFaq";
 import { Footer } from "@/components/landing/Footer";
+import { SEO_KEYWORDS, SITE_NAME, SITE_URL, buildHomeJsonLd } from "@/lib/seo";
 
 export const metadata: Metadata = {
+  title: {
+    absolute: "Read Reverend Insanity (RI) Online Free — All 2,334 Chapters",
+  },
+  description:
+    "Read Reverend Insanity (RI / Gu Zhenren / 蛊真人) online free. Best ad-free web novel reader for all 2,334 chapters in English & Chinese raw, with bookmarks and EPUB download.",
+  keywords: SEO_KEYWORDS,
   alternates: {
     canonical: "/",
+  },
+  openGraph: {
+    title: "Read Reverend Insanity (RI) Online Free — All 2,334 Chapters",
+    description:
+      "Free, ad-free online reader for Gu Zhenren's Reverend Insanity (蛊真人). All 2,334 chapters in English and Chinese raw, customizable typography, and offline EPUB downloads.",
+    url: "/",
+    siteName: SITE_NAME,
+    type: "website",
+    images: [
+      {
+        url: "/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: "Reverend Insanity (RI) by Gu Zhenren — Read all 2,334 chapters online free",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Read Reverend Insanity (RI) Online Free — All 2,334 Chapters",
+    description:
+      "Best ad-free reader for Reverend Insanity (RI / Gu Zhenren): all 2,334 chapters online free in English & Chinese raw, plus EPUB downloads.",
+    images: ["/opengraph-image"],
   },
 };
 
@@ -49,37 +80,7 @@ export default async function HomePage() {
     }
   }
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://reverend-reader.vercel.app";
-
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "WebSite",
-        "@id": `${siteUrl}/#website`,
-        url: siteUrl,
-        name: "Reverend Reader",
-        description: "Online reader for Reverend Insanity by Gu Zhenren.",
-        inLanguage: "en-US",
-      },
-      {
-        "@type": "Book",
-        "@id": `${siteUrl}/#book`,
-        name: "Reverend Insanity",
-        alternateName: ["Gu Zhenren", "蛊真人", "Master of Gu"],
-        author: {
-          "@type": "Person",
-          name: "Gu Zhenren",
-          alternateName: "蛊真人",
-        },
-        genre: ["Dark Fantasy", "Xianxia", "Cultivation", "Philosophical Fiction"],
-        numberOfPages: 2334,
-        inLanguage: "en",
-        description:
-          "Humans are the spirit of all living beings, Gu are the essence of heaven and earth. Follow Fang Yuan's five-hundred-year return through the world of Gu cultivation.",
-      },
-    ],
-  };
+  const jsonLd = buildHomeJsonLd(SITE_URL);
 
   return (
     <div className="relative flex min-h-screen flex-col text-ink font-sans selection:bg-accent/20">
@@ -94,6 +95,7 @@ export default async function HomePage() {
       <main id="main-content" className="flex-1">
         <HeroSection continueChapter={continueChapter} initialEdition={initialEdition} />
         <SynopsisSection />
+        <ReaderHighlightsAndFaq />
       </main>
 
       <Footer />

@@ -3,9 +3,10 @@ import { Bellota, DM_Sans, EB_Garamond, JetBrains_Mono } from "next/font/google"
 import { cookies } from "next/headers";
 import { Analytics } from "@vercel/analytics/next";
 import { THEME_COOKIE, parseThemeCookie } from "@/lib/theme";
+import { SEO_KEYWORDS, SITE_NAME, SITE_URL } from "@/lib/seo";
 import "./globals.css";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://reverend-reader.vercel.app";
+const siteUrl = SITE_URL;
 
 const ebGaramond = EB_Garamond({
   subsets: ["latin"],
@@ -48,37 +49,54 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Reverend Insanity by Gu Zhenren | Read Online",
+    default: "Read Reverend Insanity (RI) Online Free | Gu Zhenren",
     template: "%s | Reverend Reader",
   },
   description:
-    "Read Reverend Insanity by Gu Zhenren (蛊真人) online. All 2,334 chapters of Fang Yuan's story in a quiet, fast reader with bookmarks and synced progress.",
-  keywords: [
-    "Reverend Insanity",
-    "Gu Zhenren",
-    "蛊真人",
-    "Fang Yuan",
-    "Cultivation Novel",
-    "Dark Fantasy",
-    "Xianxia",
-    "Web Novel Reader",
-  ],
+    "Read Reverend Insanity (RI / Gu Zhenren / 蛊真人) online free. Best ad-free web novel reader for all 2,334 chapters in English and Chinese raw, with EPUB download and synced bookmarks.",
+  keywords: SEO_KEYWORDS,
   authors: [{ name: "Gu Zhenren" }],
-  creator: "Reverend Reader",
-  applicationName: "Reverend Reader",
+  creator: SITE_NAME,
+  publisher: SITE_NAME,
+  applicationName: SITE_NAME,
+  category: "Books & Literature",
+  classification: "Web Novel, Xianxia, Dark Fantasy, Cultivation Fiction",
+  referrer: "strict-origin-when-cross-origin",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
   openGraph: {
-    title: "Reverend Insanity, read online",
+    title: "Read Reverend Insanity (RI) Online Free — All 2,334 Chapters",
     description:
-      "All 2,334 chapters of Gu Zhenren's Reverend Insanity in a quiet reader with adjustable type, bookmarks and synced progress.",
+      "Free, ad-free reader for all 2,334 chapters of Gu Zhenren's Reverend Insanity (蛊真人) in English and Chinese raw, with adjustable typography, bookmarks, and EPUB downloads.",
     url: siteUrl,
-    siteName: "Reverend Reader",
+    siteName: SITE_NAME,
     locale: "en_US",
+    alternateLocale: ["zh_CN"],
     type: "website",
+    images: [
+      {
+        url: "/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: "Reverend Insanity (RI) by Gu Zhenren — Read all 2,334 chapters online free",
+      },
+      {
+        url: "/images/book-cover.jpg",
+        width: 800,
+        height: 1170,
+        alt: "Reverend Insanity book cover featuring Fang Yuan",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Reverend Insanity, read online",
-    description: "A fast, quiet reader for Gu Zhenren's Reverend Insanity.",
+    title: "Read Reverend Insanity (RI) Online Free — All 2,334 Chapters",
+    description:
+      "Best ad-free reader for Gu Zhenren's Reverend Insanity (蛊真人): all 2,334 chapters online free in English & Chinese raw, plus EPUB downloads.",
+    images: ["/opengraph-image"],
   },
   robots: {
     index: true,

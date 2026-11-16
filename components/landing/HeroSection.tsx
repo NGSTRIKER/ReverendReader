@@ -59,7 +59,7 @@ export function HeroSection({
               <img
                 id="cover"
                 src="/images/book-cover.jpg"
-                alt="Reverend Insanity book cover featuring Fang Yuan"
+                alt="Reverend Insanity (RI) by Gu Zhenren book cover featuring Fang Yuan"
                 width={800}
                 height={1170}
                 loading="eager"
@@ -106,8 +106,8 @@ export function HeroSection({
 
               <p className="summary text-muted text-[13.5px] sm:text-[15px] leading-[1.68] sm:leading-[1.8] mb-4 sm:mb-6">
                 {isZh
-                  ? "五百年风云变幻归于尘土，方源借春秋蝉重生回十五岁少年之时，于残酷修真界中逆天而行，唯求永生。"
-                  : "Five hundred years of schemes collapse at Demonic Mountain. Reborn into his fifteen-year-old body with the Spring Autumn Cicada, Fang Yuan walks an uncompromising path toward eternal life."}
+                  ? "五百年风云变幻归于尘土，方源借春秋蝉重生回十五岁少年之时，于残酷修真界中逆天而行，唯求永生。免费在线阅读《蛊真人》（Reverend Insanity / RI）全本 2,334 节。"
+                  : "Five hundred years of schemes collapse at Demonic Mountain. Reborn into his fifteen-year-old body with the Spring Autumn Cicada, Fang Yuan walks an uncompromising path toward eternal life. Read all 2,334 chapters of Reverend Insanity (RI) online free."}
               </p>
 
               {/* Side-by-side 2-Button Edition Selector */}
@@ -214,8 +214,8 @@ export function HeroSection({
               {/* Trust & Auto-Save Assurance Line */}
               <p id="resume-note" className="text-xs text-muted mt-3 sm:mt-4">
                 {isZh
-                  ? "阅读进度自动保存于当前设备 · 无需账号即可阅读全部章节"
-                  : "Progress saved automatically on this device · No account required"}
+                  ? "免费无广告在线阅读 · 阅读进度自动保存 · 无需账号即可阅读全部章节"
+                  : "Free & ad-free online reader · Progress saved automatically · No account required"}
               </p>
             </div>
           </div>
