@@ -8,8 +8,6 @@ const destDir = path.join(root, "public", "tts", "ort");
 const FILES = [
   "ort-wasm-simd-threaded.mjs",
   "ort-wasm-simd-threaded.wasm",
-  "ort-wasm-simd-threaded.jsep.mjs",
-  "ort-wasm-simd-threaded.jsep.wasm",
 ];
 
 if (!fs.existsSync(srcDir)) {

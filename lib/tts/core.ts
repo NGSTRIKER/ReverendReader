@@ -73,16 +73,23 @@ export class ParadeeCore {
     return (this.english[lang] ??= (async () => {
       const key = lang === "en-gb" ? "gb" : "us";
       const british = key === "gb";
-      const [gold, silver, tags, own] = await Promise.all([
+      const [gold, silver, tags] = await Promise.all([
         this.loader.json(`misaki/${key}_gold.json`),
         this.loader.json(`misaki/${key}_silver.json`),
         this.loader.json("g2p/en-tags.json"),
-        this.loadG2P(),
       ]);
       const data = { gold, silver };
       // `plain` reads the digits inside words misaki doesn't know.
       const plain = new MisakiEnglish(british, data, tags);
-      return new MisakiEnglish(british, data, tags, englishFallback(own, british, plain));
+      let fallbackFn: ((text: string) => Promise<string>) | null = null;
+      const lazyFallback = async (text: string) => {
+        if (!fallbackFn) {
+          const own = await this.loadG2P();
+          fallbackFn = englishFallback(own, british, plain);
+        }
+        return fallbackFn(text);
+      };
+      return new MisakiEnglish(british, data, tags, lazyFallback);
     })());
   }
 

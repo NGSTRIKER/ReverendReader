@@ -1,4 +1,4 @@
-import * as ort from "onnxruntime-web";
+import * as ort from "onnxruntime-web/wasm";
 import { ParadeeCore, type AssetLoader } from "./core";
 import { TTS_ASSET_BASE, type WordTiming } from "./paradee";
 
@@ -19,12 +19,12 @@ ort.env.wasm.numThreads = 1;
 
 const loader: AssetLoader = {
   async bytes(path: string): Promise<Uint8Array> {
-    const res = await fetch(`${TTS_ASSET_BASE}${path}`);
+    const res = await fetch(`${TTS_ASSET_BASE}${path}`, { cache: "force-cache" });
     if (!res.ok) throw new Error(`Failed to fetch ${path} (${res.status})`);
     return new Uint8Array(await res.arrayBuffer());
   },
   async json<T = unknown>(path: string): Promise<T> {
-    const res = await fetch(`${TTS_ASSET_BASE}${path}`);
+    const res = await fetch(`${TTS_ASSET_BASE}${path}`, { cache: "force-cache" });
     if (!res.ok) throw new Error(`Failed to fetch ${path} (${res.status})`);
     return (await res.json()) as T;
   },

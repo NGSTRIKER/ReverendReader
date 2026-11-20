@@ -42,6 +42,7 @@ interface UseParadeeTtsOptions {
 
 const STORAGE_VOICE_KEY = "reverend_tts_voice";
 const STORAGE_SPEED_KEY = "reverend_tts_speed";
+const STORAGE_USED_KEY = "reverend_tts_used";
 
 function loadStoredVoice(): ParadeeVoice {
   if (typeof window === "undefined") return DEFAULT_VOICE;
@@ -159,7 +160,30 @@ export function useParadeeTts({
     setStatus("loading-model");
     await callWorker({ type: "init", voice: voiceRef.current });
     modelReadyRef.current = true;
+    try {
+      localStorage.setItem(STORAGE_USED_KEY, "1");
+    } catch {}
   }, [callWorker]);
+
+  // Background pre-warm for returning TTS users so Play starts immediately
+  useEffect(() => {
+    if (!enabled || modelReadyRef.current) return;
+    let used = false;
+    try {
+      used = localStorage.getItem(STORAGE_USED_KEY) === "1";
+    } catch {}
+    if (!used) return;
+
+    const timer = window.setTimeout(() => {
+      if (modelReadyRef.current) return;
+      void callWorker({ type: "init", voice: voiceRef.current })
+        .then(() => {
+          modelReadyRef.current = true;
+        })
+        .catch(() => undefined);
+    }, 1200);
+    return () => window.clearTimeout(timer);
+  }, [enabled, callWorker]);
 
   const getOrSynth = useCallback(
     (index: number, gen: number): Promise<CachedAudio> | null => {
