@@ -5,9 +5,10 @@
 
 "use client";
 
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { ChapterMetadata, NovelEdition, ReaderSettings } from "@/types/novel";
 import { getReaderFontClass } from "@/lib/storage";
+import type { ActiveSentenceHighlight, ActiveWordHighlight } from "@/lib/tts/useParadeeTts";
 import { ChevronLeft, ChevronRight, AlertCircle, RefreshCw } from "lucide-react";
 
 interface ChapterContentProps {
@@ -24,6 +25,8 @@ interface ChapterContentProps {
   settings: ReaderSettings;
   hasCustomBg?: boolean;
   edition?: NovelEdition;
+  activeSentence?: ActiveSentenceHighlight | null;
+  activeWord?: ActiveWordHighlight | null;
 }
 
 const SURFACE_WRAPPER_CLASSES: Record<string, string> = {
@@ -78,9 +81,21 @@ export const ChapterContent = React.memo(function ChapterContent({
   settings,
   hasCustomBg = false,
   edition = "en",
+  activeSentence = null,
+  activeWord = null,
 }: ChapterContentProps) {
   const isZh = edition === "zh";
+  const activeSentenceRef = useRef<HTMLSpanElement | null>(null);
 
+  useEffect(() => {
+    if (!activeSentence || !activeSentenceRef.current) return;
+    const el = activeSentenceRef.current;
+    const rect = el.getBoundingClientRect();
+    const margin = 120;
+    if (rect.top < margin || rect.bottom > window.innerHeight - margin) {
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }, [activeSentence?.index]);
   const paragraphs = React.useMemo(() => {
     if (!content) return [];
     return content
@@ -225,9 +240,42 @@ export const ChapterContent = React.memo(function ChapterContent({
                 : undefined,
           }}
         >
-          {paragraphs.map((para, index) => (
-            <p key={index}>{para}</p>
-          ))}
+          {paragraphs.map((para, index) => {
+            if (!activeSentence || activeSentence.paragraphIndex !== index) {
+              return <p key={index}>{para}</p>;
+            }
+            const sFrom = Math.max(0, Math.min(para.length, activeSentence.from));
+            const sTo = Math.max(sFrom, Math.min(para.length, activeSentence.to));
+            const hasWord =
+              activeWord &&
+              activeWord.paragraphIndex === index &&
+              activeWord.from >= sFrom &&
+              activeWord.to <= sTo &&
+              activeWord.from < activeWord.to;
+
+            return (
+              <p key={index}>
+                {para.slice(0, sFrom)}
+                <span
+                  ref={activeSentenceRef}
+                  className="bg-accent/10 rounded px-0.5 transition-colors duration-150"
+                >
+                  {hasWord ? (
+                    <>
+                      {para.slice(sFrom, activeWord.from)}
+                      <span className="bg-accent/25 rounded px-0.5 underline decoration-accent/60 underline-offset-4">
+                        {para.slice(activeWord.from, activeWord.to)}
+                      </span>
+                      {para.slice(activeWord.to, sTo)}
+                    </>
+                  ) : (
+                    para.slice(sFrom, sTo)
+                  )}
+                </span>
+                {para.slice(sTo)}
+              </p>
+            );
+          })}
         </div>
       )}
 

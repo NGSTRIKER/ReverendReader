@@ -9,6 +9,7 @@ import {
   List,
   SlidersHorizontal,
   Bookmark,
+  Volume2,
 } from "lucide-react";
 import { UserNav } from "@/components/auth/UserNav";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
@@ -27,6 +28,9 @@ interface ChapterNavigationProps {
   edition?: NovelEdition;
   onChangeEdition?: (edition: NovelEdition) => void;
   settings?: ReaderSettings;
+  onToggleTts?: () => void;
+  isTtsActive?: boolean;
+  ttsAvailable?: boolean;
 }
 
 export function ChapterNavigation({
@@ -42,6 +46,9 @@ export function ChapterNavigation({
   onToggleBookmark,
   edition = "en",
   onChangeEdition,
+  onToggleTts,
+  isTtsActive = false,
+  ttsAvailable = false,
 }: ChapterNavigationProps) {
   // Mobile: hide header while scrolling down, reveal on scroll up (rAF-throttled).
   const [hidden, setHidden] = useState(false);
@@ -217,6 +224,24 @@ export function ChapterNavigation({
           >
             <ChevronRight className="h-4 w-4" strokeWidth={1.75} aria-hidden="true" />
           </button>
+
+          {/* Read Aloud (Paradee TTS) */}
+          {ttsAvailable && onToggleTts && (
+            <button
+              type="button"
+              onClick={onToggleTts}
+              aria-label={isTtsActive ? "Close read aloud" : "Listen to chapter (Paradee TTS)"}
+              aria-pressed={isTtsActive}
+              title="Read aloud (Paradee 1.3)"
+              className={`icon-btn rounded-full h-9 w-9 transition-colors ${
+                isTtsActive
+                  ? "text-accent bg-accent/15 border border-accent/35"
+                  : ""
+              }`}
+            >
+              <Volume2 className="h-4 w-4" strokeWidth={1.75} aria-hidden="true" />
+            </button>
+          )}
 
           {/* Reader Customization / Preferences Button (Desktop) */}
           <button

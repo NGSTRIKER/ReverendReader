@@ -14,6 +14,7 @@ import { ChapterContent } from "./ChapterContent";
 import { InteractionSidebar } from "./InteractionSidebar";
 import { useFluidScroll } from "./useFluidScroll";
 import { fetchChapterContent, preloadChapter } from "@/lib/chapterFetcher";
+import { useParadeeTts } from "@/lib/tts/useParadeeTts";
 import {
   loadThemeSettings,
   saveThemeSettings,
@@ -74,6 +75,11 @@ const SettingsModal = dynamic(
 
 const CommentsDrawer = dynamic(
   () => import("./CommentsDrawer").then((mod) => mod.CommentsDrawer),
+  { ssr: false }
+);
+
+const TtsPlayerBar = dynamic(
+  () => import("./TtsPlayerBar").then((mod) => mod.TtsPlayerBar),
   { ssr: false }
 );
 
@@ -1088,6 +1094,27 @@ export function ReaderInterface({
     }
   }, [hasNext, flushProgressNow]);
 
+  const chapterParagraphs = React.useMemo(() => {
+    if (!content) return [];
+    return content
+      .split(/\n\s*\n/)
+      .map((p) => p.trim())
+      .filter((p) => p.length > 0);
+  }, [content]);
+
+  const ttsEnabled = edition === "en";
+  const tts = useParadeeTts({
+    chapterId: currentChapterId,
+    paragraphs: chapterParagraphs,
+    enabled: ttsEnabled,
+    onChapterEnded: hasNext ? handleNext : undefined,
+  });
+
+  const handleToggleTts = useCallback(() => {
+    if (tts.isOpen) tts.closePlayer();
+    else tts.openPlayer();
+  }, [tts]);
+
   const handleRetryChapter = useCallback(() => {
     loadChapter(currentChapterId);
   }, [loadChapter, currentChapterId]);
@@ -1368,6 +1395,9 @@ export function ReaderInterface({
           edition={edition}
           onChangeEdition={handleChangeEdition}
           settings={settings}
+          onToggleTts={handleToggleTts}
+          isTtsActive={tts.isOpen}
+          ttsAvailable={ttsEnabled}
         />
 
         {/* Reading Canvas (reserves right padding only on desktop when sidebar is visible) */}
@@ -1390,6 +1420,8 @@ export function ReaderInterface({
             settings={settings}
             hasCustomBg={Boolean(customBgUrl)}
             edition={edition}
+            activeSentence={tts.activeSentence}
+            activeWord={tts.activeWord}
           />
         </main>
       </div>
@@ -1453,6 +1485,23 @@ export function ReaderInterface({
         onChangeSettings={handleUpdateSettings}
         customBgUrl={customBgUrl}
         onSetCustomBg={handleSetCustomBg}
+      />
+
+      {/* Paradee 1.3 Read Aloud Player Bar */}
+      <TtsPlayerBar
+        isOpen={tts.isOpen}
+        status={tts.status}
+        error={tts.error}
+        voice={tts.voice}
+        speed={tts.speed}
+        currentIndex={tts.currentIndex}
+        totalSentences={tts.totalSentences}
+        onTogglePlay={tts.togglePlay}
+        onPrev={tts.prevSentence}
+        onNext={tts.nextSentence}
+        onChangeVoice={tts.setVoice}
+        onChangeSpeed={tts.setSpeed}
+        onClose={tts.closePlayer}
       />
 
       {/* Floating Toast Notification */}
