@@ -11,6 +11,7 @@ import {
   Bookmark,
   MoreVertical,
   Palette,
+  Volume2,
 } from "lucide-react";
 import { UserNav } from "@/components/auth/UserNav";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
@@ -27,6 +28,9 @@ interface ChapterNavigationProps {
   isBookmarked: boolean;
   onToggleBookmark: () => void;
   settings?: ReaderSettings;
+  onToggleTts?: () => void;
+  isTtsActive?: boolean;
+  ttsAvailable?: boolean;
 }
 
 export function ChapterNavigation({
@@ -40,6 +44,9 @@ export function ChapterNavigation({
   onOpenSettings,
   isBookmarked,
   onToggleBookmark,
+  onToggleTts,
+  isTtsActive = false,
+  ttsAvailable = false,
 }: ChapterNavigationProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
@@ -179,6 +186,24 @@ export function ChapterNavigation({
           >
             <ChevronRight className="h-4 w-4" strokeWidth={1.75} />
           </button>
+
+          {/* Read Aloud (Paradee TTS) */}
+          {ttsAvailable && onToggleTts && (
+            <button
+              type="button"
+              onClick={onToggleTts}
+              aria-label={isTtsActive ? "Close read aloud" : "Listen to chapter (Paradee TTS)"}
+              aria-pressed={isTtsActive}
+              title="Read aloud (Paradee 1.3)"
+              className={`icon-btn rounded-xl h-9 w-9 transition-colors ${
+                isTtsActive
+                  ? "text-accent bg-accent/15 border border-accent/35"
+                  : ""
+              }`}
+            >
+              <Volume2 className="h-4 w-4" strokeWidth={1.75} />
+            </button>
+          )}
 
           {/* Reader Customization / Preferences Button (ALWAYS visible & prioritized on mobile & desktop) */}
           <button

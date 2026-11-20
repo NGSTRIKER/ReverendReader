@@ -28,6 +28,11 @@ yarn-error.log*
 *.tmp
 __pycache__/
 *.pyc
+.tts-test.wav
+.tts-log.txt
+
+# ONNX Runtime Web WASM binaries (copied from node_modules at build/dev time)
+/public/tts/ort/
 
 # Operating System
 .DS_Store
